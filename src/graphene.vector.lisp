@@ -1,0 +1,2420 @@
+;;; ----------------------------------------------------------------------------
+;;; graphene.vector.lisp
+;;;
+;;; The documentation of this file is taken from the GRAPHENE Reference Manual
+;;; and modified to document the Lisp binding to the Graphene library.
+;;; See <https://ebassi.github.io/graphene/docs/>.
+;;; The API documentation of the Lisp binding is available from
+;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;;
+;;; Copyright (C) 2022 Dieter Kaiser
+;;;
+;;; This program is free software: you can redistribute it and/or modify
+;;; it under the terms of the GNU Lesser General Public License for Lisp
+;;; as published by the Free Software Foundation, either version 3 of the
+;;; License, or (at your option) any later version and with a preamble to
+;;; the GNU Lesser General Public License that clarifies the terms for use
+;;; with Lisp programs and is referred as the LLGPL.
+;;;
+;;; This program is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU Lesser General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU Lesser General Public
+;;; License along with this program and the preamble to the Gnu Lesser
+;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
+;;; and <http://opensource.franz.com/preamble.html>.
+;;; ----------------------------------------------------------------------------
+;;;
+;;; Vectors
+;;;
+;;;     Vectors in 2, 3, and 4 dimensions
+;;;
+;;; Types and Values
+;;;
+;;;     GRAPHENE_VEC2_LEN
+;;;     graphene_vec2_t
+;;;     GRAPHENE_VEC3_LEN
+;;;     graphene_vec3_t
+;;;     GRAPHENE_VEC4_LEN
+;;;     graphene_vec4_t
+;;;
+;;; Functions
+;;;
+;;;     graphene_vec2_alloc
+;;;     graphene_vec2_free
+;;;     graphene_vec2_init
+;;;     graphene_vec2_init_from_vec2
+;;;     graphene_vec2_init_from_float
+;;;     graphene_vec2_to_float
+;;;     graphene_vec2_add
+;;;     graphene_vec2_subtract
+;;;     graphene_vec2_multiply
+;;;     graphene_vec2_divide
+;;;     graphene_vec2_dot
+;;;     graphene_vec2_scale
+;;;     graphene_vec2_length
+;;;     graphene_vec2_normalize
+;;;     graphene_vec2_negate
+;;;     graphene_vec2_equal
+;;;     graphene_vec2_near
+;;;     graphene_vec2_min
+;;;     graphene_vec2_max
+;;;     graphene_vec2_interpolate
+;;;     graphene_vec2_get_x
+;;;     graphene_vec2_get_y
+;;;     graphene_vec2_zero
+;;;     graphene_vec2_one
+;;;     graphene_vec2_x_axis
+;;;     graphene_vec2_y_axis
+;;;
+;;;     graphene_vec3_alloc
+;;;     graphene_vec3_free
+;;;     graphene_vec3_init
+;;;     graphene_vec3_init_from_vec3
+;;;     graphene_vec3_init_from_float
+;;;     graphene_vec3_to_float
+;;;     graphene_vec3_add
+;;;     graphene_vec3_subtract
+;;;     graphene_vec3_multiply
+;;;     graphene_vec3_divide
+;;;     graphene_vec3_cross
+;;;     graphene_vec3_dot
+;;;     graphene_vec3_scale
+;;;     graphene_vec3_length
+;;;     graphene_vec3_normalize
+;;;     graphene_vec3_negate
+;;;     graphene_vec3_equal
+;;;     graphene_vec3_near
+;;;     graphene_vec3_min
+;;;     graphene_vec3_max
+;;;     graphene_vec3_interpolate
+;;;     graphene_vec3_get_x
+;;;     graphene_vec3_get_y
+;;;     graphene_vec3_get_z
+;;;     graphene_vec3_get_xy
+;;;     graphene_vec3_get_xy0
+;;;     graphene_vec3_get_xyz0
+;;;     graphene_vec3_get_xyz1
+;;;     graphene_vec3_get_xyzw
+;;;     graphene_vec3_zero
+;;;     graphene_vec3_one
+;;;     graphene_vec3_x_axis
+;;;     graphene_vec3_y_axis
+;;;     graphene_vec3_z_axis
+;;;
+;;;     graphene_vec4_alloc
+;;;     graphene_vec4_free
+;;;     graphene_vec4_init
+;;;     graphene_vec4_init_from_vec4
+;;;     graphene_vec4_init_from_vec3
+;;;     graphene_vec4_init_from_vec2
+;;;     graphene_vec4_init_from_float
+;;;     graphene_vec4_to_float
+;;;     graphene_vec4_add
+;;;     graphene_vec4_subtract
+;;;     graphene_vec4_multiply
+;;;     graphene_vec4_divide
+;;;     graphene_vec4_dot
+;;;     graphene_vec4_scale
+;;;     graphene_vec4_length
+;;;     graphene_vec4_normalize
+;;;     graphene_vec4_negate
+;;;     graphene_vec4_equal
+;;;     graphene_vec4_near
+;;;     graphene_vec4_min
+;;;     graphene_vec4_max
+;;;     graphene_vec4_interpolate
+;;;     graphene_vec4_get_x
+;;;     graphene_vec4_get_y
+;;;     graphene_vec4_get_z
+;;;     graphene_vec4_get_w
+;;;     graphene_vec4_get_xy
+;;;     graphene_vec4_get_xyz
+;;;     graphene_vec4_zero
+;;;     graphene_vec4_one
+;;;     graphene_vec4_x_axis
+;;;     graphene_vec4_y_axis
+;;;     graphene_vec4_z_axis
+;;;     graphene_vec4_w_axis
+;;;
+;;; Description
+;;;
+;;; Graphene has three vector types, distinguished by their length:
+;;;
+;;; graphene_vec2_t, which holds 2 components x and y
+;;; graphene_vec3_t, which holds 3 components x, y, and z
+;;; graphene_vec4_t, which holds 4 components x, y, z, and w
+;;;
+;;; Each vector type should be treated as an opaque data type.
+;;; ----------------------------------------------------------------------------
+
+(in-package :graphene)
+
+;;; ----------------------------------------------------------------------------
+
+(defmacro with-graphene-vec2 ((var &rest args) &body body)
+  (cond ((not args)
+         ;; We have no arguments, the default is initialization with zeros.
+         `(let ((,var (vec2-alloc)))
+            (vec2-init ,var 0.0 0.0)
+            (unwind-protect
+              (progn ,@body)
+              (vec2-free ,var))))
+        ((not (second args))
+         ;; We have one argument. The argument is of type vec2-t
+         (destructuring-bind (arg &optional type)
+             (if (listp (first args)) (first args) (list (first args)))
+           (cond ((or (not type)
+                      (eq type 'vec2-t))
+                  ;; One argument with no type or of type vec2-t
+                  `(let ((,var (vec2-alloc)))
+                     (vec2-init-from-vec2 ,var ,arg)
+                     (unwind-protect
+                       (progn ,@body)
+                       (vec2-free ,var))))
+                 (t
+                  (error "Type error in WITH-GRAPHENE-VEC2")))))
+        ((not (third args))
+         ;; We have a list of two arguments with (x,y) values
+         `(let ((,var (vec2-alloc)))
+            (vec2-init ,var ,@args)
+            (unwind-protect
+              (progn ,@body)
+              (vec2-free ,var))))
+        (t
+         (error "Syntax error in WITH-GRAPHENE-VEC2"))))
+
+(export 'with-graphene-vec2)
+
+(defmacro with-graphene-vec2s (vars &body body)
+  (if vars
+      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+        `(with-graphene-vec2 ,var
+           (with-graphene-vec2s ,(rest vars)
+             ,@body)))
+      `(progn ,@body)))
+
+(export 'with-graphene-vec2s)
+
+;;; ----------------------------------------------------------------------------
+
+(defmacro with-graphene-vec3 ((var &rest args) &body body)
+  (cond ((not args)
+         ;; We have no arguments, the default is initialization with zeros.
+         `(let ((,var (vec3-alloc)))
+            (vec3-init ,var 0.0 0.0 0.0)
+            (unwind-protect
+              (progn ,@body)
+              (vec3-free ,var))))
+        ((not (second args))
+         ;; We have one argument. The argument is of type vec3-t
+         (destructuring-bind (arg &optional type)
+             (if (listp (first args)) (first args) (list (first args)))
+           (cond ((or (not type)
+                      (eq type 'vec3-t))
+                  ;; One argument with no type or of type vec3-t
+                  `(let ((,var (vec3-alloc)))
+                     (vec3-init-from-vec3 ,var ,arg)
+                     (unwind-protect
+                       (progn ,@body)
+                       (vec3-free ,var))))
+                 (t
+                  (error "Type error in WITH-GRAPHENE-VEC3")))))
+        ((not (fourth args))
+         ;; We have a list of two arguments with (x,y,z) values
+         `(let ((,var (vec3-alloc)))
+            (vec3-init ,var ,@args)
+            (unwind-protect
+              (progn ,@body)
+              (vec3-free ,var))))
+        (t
+         (error "Syntax error in WITH-GRAPHENE-VEC3"))))
+
+(export 'with-graphene-vec3)
+
+(defmacro with-graphene-vec3s (vars &body body)
+  (if vars
+      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+        `(with-graphene-vec3 ,var
+           (with-graphene-vec3s ,(rest vars)
+             ,@body)))
+      `(progn ,@body)))
+
+(export 'with-graphene-vec3s)
+
+;;; ----------------------------------------------------------------------------
+
+(defmacro with-graphene-vec4 ((var &rest args) &body body)
+  (cond ((not args)
+         ;; We have no arguments, the default is initialization with zeros.
+         `(let ((,var (vec4-alloc)))
+            (vec4-init ,var 0.0 0.0 0.0 0.0)
+            (unwind-protect
+              (progn ,@body)
+              (vec4-free ,var))))
+        ((not (second args))
+         ;; We have one argument. The argument must be of type vec4-t.
+         (destructuring-bind (arg &optional type)
+             (if (listp (first args)) (first args) (list (first args)))
+           (cond ((or (not type)
+                      (eq type 'vec4-t))
+                  ;; One argument with no type or of type vec4-t
+                  `(let ((,var (vec4-alloc)))
+                     (vec4-init-from-vec4 ,var ,arg)
+                     (unwind-protect
+                       (progn ,@body)
+                       (vec4-free ,var))))
+                 (t
+                  (error "Type error in WITH-GRAPHENE-VEC4")))))
+        ((not (third args))
+         ;; We have two argument. The first argument must be of type vec4-t.
+         (destructuring-bind (arg &optional type)
+             (if (listp (first args)) (first args) (list (first args)))
+           (cond ((or (not type)
+                      (eq type 'vec3-t))
+                  ;; One argument with no type or of type vec4-t
+                  `(let ((,var (vec4-alloc)))
+                     (vec4-init-from-vec3 ,var ,arg ,@(rest args))
+                     (unwind-protect
+                       (progn ,@body)
+                       (vec4-free ,var))))
+                 (t
+                  (error "Type error in WITH-GRAPHENE-VEC4")))))
+        ((not (fourth args))
+         ;; We have three arguments. The first argument must be of type vec2-t.
+         (destructuring-bind (arg &optional type)
+             (if (listp (first args)) (first args) (list (first args)))
+           (cond ((or (not type)
+                      (eq type 'vec2-t))
+                  ;; One argument with no type or of type vec2-t
+                  `(let ((,var (vec4-alloc)))
+                     (vec4-init-from-vec2 ,var ,arg ,@(rest args))
+                     (unwind-protect
+                       (progn ,@body)
+                       (vec4-free ,var))))
+                 (t
+                  (error "Type error in WITH-GRAPHENE-VEC4")))))
+        ((not (fifth args))
+         ;; We have a list of four arguments with (x,y,z,w) values
+         `(let ((,var (vec4-alloc)))
+            (vec4-init ,var ,@args)
+            (unwind-protect
+              (progn ,@body)
+              (vec4-free ,var))))
+        (t
+         (error "Syntax error in WITH-GRAPHENE-VEC4"))))
+
+(export 'with-graphene-vec4)
+
+(defmacro with-graphene-vec4s (vars &body body)
+  (if vars
+      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+        `(with-graphene-vec4 ,var
+           (with-graphene-vec4s ,(rest vars)
+             ,@body)))
+      `(progn ,@body)))
+
+(export 'with-graphene-vec4s)
+
+;;; ----------------------------------------------------------------------------
+;;; GRAPHENE_VEC2_LEN
+;;; ----------------------------------------------------------------------------
+
+#+liber-documentation
+(setf (liber:alias-for-variable '+vec2-len+) "Constant")
+
+(defconstant +vec2-len+ 2
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @variable-value{2}
+  @begin{short}
+    Evaluates to the number of components of a @symbol{vec2-t} structure.
+  @end{short}
+  @see-symbol{vec2-t}")
+
+(export '+vec2-len+)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_t
+;;; ----------------------------------------------------------------------------
+
+(defcstruct vec2-t)
+
+#+liber-documentation
+(setf (liber:alias-for-symbol 'vec2-t)
+      "CStruct"
+      (liber:symbol-documentation 'vec2-t)
+ "@version{#2022-9-22}
+  @begin{short}
+    The @sym{vec2-t} structure is capable of holding a vector with two
+    dimensions: x and y.
+  @end{short}
+  Use the @fun{vec2-x} and @fun{vec2-y} functions to get the values of the
+  components. There are no functions to set the values directly.
+  @see-function{vec2-x}
+  @see-function{vec2-y}")
+
+(export 'vec2-t)
+
+;;; ----------------------------------------------------------------------------
+;;; GRAPHENE_VEC3_LEN
+;;; ----------------------------------------------------------------------------
+
+#+liber-documentation
+(setf (liber:alias-for-variable '+vec3-len+) "Constant")
+
+(defconstant +vec3-len+ 3
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @variable-value{3}
+  @begin{short}
+    Evaluates to the number of components of a @symbol{vec3-t} structure.
+  @end{short}
+  @see-symbol{vec3-t}")
+
+(export '+vec3-len+)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_t
+;;; ----------------------------------------------------------------------------
+
+(defcstruct vec3-t)
+
+#+liber-documentation
+(setf (liber:alias-for-symbol 'vec3-t)
+      "CStruct"
+      (liber:symbol-documentation 'vec3-t)
+ "@version{#2022-9-22}
+  @begin{short}
+    The @sym{vec3-t} structure is capable of holding a vector with three
+    dimensions: x, y, and z.
+  @end{short}
+  Use the @fun{vec3-x}, @fun{vec3-y}, and @fun{vec3-z} functions to get the
+  values of the components. There are no functions to set the values directly.
+  @see-function{vec3-x}
+  @see-function{vec3-y}
+  @see-function{vec3-z}")
+
+(export 'vec3-t)
+
+;;; ----------------------------------------------------------------------------
+;;; GRAPHENE_VEC4_LEN
+;;; ----------------------------------------------------------------------------
+
+#+liber-documentation
+(setf (liber:alias-for-variable '+vec4-len+) "Constant")
+
+(defconstant +vec4-len+ 4
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @variable-value{4}
+  @begin{short}
+    Evaluates to the number of components of a @symbol{vec4-t} structure.
+  @end{short}
+  @see-symbol{vec4-t}")
+
+(export '+vec4-len+)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_t
+;;; ----------------------------------------------------------------------------
+
+(defcstruct vec4-t)
+
+#+liber-documentation
+(setf (liber:alias-for-symbol 'vec4-t)
+      "CStruct"
+      (liber:symbol-documentation 'vec4-t)
+ "@version{#2022-9-22}
+  @begin{short}
+    The @sym{vec4-t} structure is capable of holding a vector with four
+    dimensions: x, y, z and w.
+  @end{short}
+  Use the @fun{vec4-x}, @fun{vec4-y}, @fun{vec4-z}, and @fun{vec4-w} functions
+  to get the values of the components. There are no functions to set the
+  values directly.
+  @see-function{vec4-x}
+  @see-function{vec4-y}
+  @see-function{vec4-z}
+  @see-function{vec4-w}")
+
+(export 'vec4-t)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_alloc ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_alloc" vec2-alloc)
+    (:pointer (:struct vec2-t))
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @return{The newly allocated @symbol{vec2-t} instance. Use the @fun{vec2-free}
+    function to free the resources allocated by this function.}
+  @begin{short}
+    Allocates a new @symbol{vec2-t} instance.
+  @end{short}
+  @see-symbol{vec2-t}
+  @see-function{vec2-free}")
+
+(export 'vec2-alloc)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_free ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_free" vec2-free) :void
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @short{Frees the resources allocated by @arg{v}.}
+  @see-symbol{vec2-t}
+  @see-function{vec2-alloc}"
+  (vector (:pointer (:struct vec2-t))))
+
+(export 'vec2-free)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_init ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-init (v x y)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @argument[x]{a single float with the x field of the vector}
+  @argument[y]{a single float with the y field of the vector}
+  @return{The initialized @symbol{vec2-t} instance.}
+  @short{Initializes a @symbol{vec2-t} instance using the given values.}
+  This function can be called multiple times.
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_init"
+                   (:pointer (:struct vec2-t)) v
+                   :float (coerce x 'single-float)
+                   :float (coerce y 'single-float)
+                   (:pointer (:struct vec2-t))))
+
+(export 'vec2-init)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_init_from_vec2 ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_init_from_vec2" vec2-init-from-vec2)
+    (:pointer (:struct vec2-t))
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @argument[source]{a @symbol{vec2-t} instance}
+  @return{The initialized @symbol{vec2-t} instance.}
+  @begin{short}
+    Initializes a @symbol{vec2-t} instance using another @symbol{vec2-t}
+    instance.
+  @end{short}
+  This function can be called multiple times.
+  @see-symbol{vec2-t}"
+  (v (:pointer (:struct vec2-t)))
+  (source (:pointer (:struct vec2-t))))
+
+(export 'vec2-init-from-vec2)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_init_from_float ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-init-from-float (v arg)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @argument[arg]{a list with two single float values}
+  @return{The initialized @symbol{vec2-t} instance.}
+  @short{Initializes @arg{v} with the contents of the given list.}
+  @begin[Note]{dictionary}
+    The Lisp implementation does not use the C function, but calls the
+    @fun{vec2-init} function to inialize the vector.
+    @begin{pre}
+(defun vec2-init-from-float (v arg)
+  (apply #'vec2-init v arg))
+    @end{pre}
+  @end{dictionary}
+  @see-symbol{vec2-t}
+  @see-function{vec2-init}"
+  (apply #'vec2-init v arg))
+
+(export 'vec2-init-from-float)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_to_float ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_to_float" %vec2-to-float) :void
+  (v (:pointer (:struct vec2-t)))
+  (v-ar (:pointer :float)))
+
+(defun vec2-to-float (v)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @return{A list with the single float values of the components of @arg{v}.}
+  @begin{short}
+    Stores the components of @arg{v} into a list.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (with-foreign-object (v-ar :float +vec2-len+)
+    (%vec2-to-float v v-ar)
+    (loop for i from 0 below +vec2-len+
+          collect (mem-aref v-ar :float i))))
+
+(export 'vec2-to-float)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_add ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-add (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec2-t} instance}
+  @argument[b]{a @symbol{vec2-t} instance}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance with the result.}
+  @begin{short}
+    Adds each component of the two passed vectors and places each result into
+    the components of @arg{result}.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_add"
+                   (:pointer (:struct vec2-t)) a
+                   (:pointer (:struct vec2-t)) b
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec2-add)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_subtract ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-subtract (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec2-t} instance}
+  @argument[b]{a @symbol{vec2-t} instance}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance with the result.}
+  @begin{short}
+    Subtracts from each component of the first operand @arg{a} the corresponding
+    component of the second operand @arg{b} and places each result into the
+    components of @arg{result}.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_subtract"
+                   (:pointer (:struct vec2-t)) a
+                   (:pointer (:struct vec2-t)) b
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec2-subtract)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_multiply ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-multiply (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec2-t} instance}
+  @argument[b]{a @symbol{vec2-t} instance}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance with the result.}
+  @begin{short}
+    Multiplies each component of the two passed vectors and places each result
+    into the components of @arg{result}.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_multiply"
+                   (:pointer (:struct vec2-t)) a
+                   (:pointer (:struct vec2-t)) b
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec2-multiply)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_divide ()
+;;; ----------------------------------------------------------------------------
+
+;; TODO: Signals an error
+;;   VEC2-DIVIDE in GRAPHENE-VECTOR []:
+;;   Unexpected Error: #<FLOATING-POINT-INVALID-OPERATION {100278A543}>
+;;   arithmetic error FLOATING-POINT-INVALID-OPERATION signalled.
+
+#+nil
+(defun vec2-divide (a b result)
+  (foreign-funcall "graphene_vec2_divide"
+                   (:pointer (:struct vec2-t)) a
+                   (:pointer (:struct vec2-t)) b
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+;; Workaround uses the VEC4-DIVIDE function
+
+(defun vec2-divide (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec2-t} instance}
+  @argument[b]{a @symbol{vec2-t} instance}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance with the result.}
+  @begin{short}
+    Divides each component of the first operand @arg{a} by the corresponding
+    component of the second operand @arg{b}, and places the results into the
+    vector @arg{result}.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (with-graphene-vec4s ((v1 a 1.0 1.0) (v2 b 1.0 1.0) res)
+    (vec4-divide v1 v2 res)
+    (vec4-xy res result)))
+
+(export 'vec2-divide)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_dot ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_dot" vec2-dot) :float
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec2-t} instance}
+  @argument[b]{a @symbol{vec2-t} instance}
+  @return{A single float with the dot product of the vectors.}
+  @begin{short}
+    Computes the dot product of the two given vectors.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (a (:pointer (:struct vec2-t)))
+  (b (:pointer (:struct vec2-t))))
+
+(export 'vec2-dot)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_scale ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-scale (v factor result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @argument[factor]{a single float with the scale factor}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance withe result vector.}
+  @begin{short}
+    Multiplies all components of the given vector with the given scalar factor.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_scale"
+                   (:pointer (:struct vec2-t)) v
+                   :float (coerce factor 'single-float)
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec2-scale)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_length ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_length" vec2-length) :float
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @return{A single float with the length of the vector.}
+  @begin{short}
+    Computes the length of the given vector.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (v (:pointer (:struct vec2-t))))
+
+(export 'vec2-length)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_normalize ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-normalize (v result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance with the normalized vector.}
+  @begin{short}
+    Computes the normalized vector for the given vector.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_normalize"
+                   (:pointer (:struct vec2-t)) v
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec2-normalize)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_negate ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-negate (v result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance with the negated vector.}
+  @begin{short}
+    Negates the given vector.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_negate"
+                   (:pointer (:struct vec2-t)) v
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec2-negate)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_equal ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_equal" vec2-equal) :bool
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v1]{a @symbol{vec2-t} instance}
+  @argument[v2]{a @symbol{vec2-t} instance}
+  @return{@em{True} if the two vectors are equal, and @em{false} otherwise}
+  @begin{short}
+    Checks whether the two given vectors are equal.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (v1 (:pointer (:struct vec2-t)))
+  (v2 (:pointer (:struct vec2-t))))
+
+(export 'vec2-equal)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_near ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-near (v1 v2 epsilon)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v1]{a @symbol{vec2-t} instance}
+  @argument[v2]{a @symbol{vec2-t} instance}
+  @argument[epsilon]{a single float with the treshold between the two vectors}
+  @return{@em{True} if the two vectors are near each other, and @em{false}
+    otherwise.}
+  @begin{short}
+    Compares the two given vectors and checks whether their values are within
+    the given @arg{epsilon}.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_near"
+                   (:pointer (:struct vec2-t)) v1
+                   (:pointer (:struct vec2-t)) v2
+                   :float (coerce epsilon 'single-float)
+                   :bool))
+
+(export 'vec2-near)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_min ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-min (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec2-t} instance}
+  @argument[b]{a @symbol{vec2-t} instance}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance with the result.}
+  @begin{short}
+    Compares the two given vectors and places the minimum values of each
+    component into @arg{result}.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_min"
+                   (:pointer (:struct vec2-t)) a
+                   (:pointer (:struct vec2-t)) b
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec2-min)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_max ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec2-max (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec2-t} instance}
+  @argument[b]{a @symbol{vec2-t} instance}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance with the result.}
+  @begin{short}
+    Compares the two given vectors and places the maximum values of each
+    component into @arg{result}.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_max"
+                   (:pointer (:struct vec2-t)) a
+                   (:pointer (:struct vec2-t)) b
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec2-max)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_interpolate ()
+;;; ----------------------------------------------------------------------------
+
+;; TODO: Is factor a double float? Yes, the C library defines a double float
+;; value. But the value is coerced to a single float value for the calculation.
+
+(defun vec2-interpolate (v1 v2 factor result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v1]{a @symbol{vec2-t} instance}
+  @argument[v2]{a @symbol{vec2-t} instance}
+  @argument[factor]{a single float with the interpolation factor}
+  @argument[result]{a @symbol{vec2-t} instance for the result}
+  @return{A @symbol{vec2-t} instance with the interpolated vector.}
+  @begin{short}
+    Linearly interpolates @arg{v1} and @arg{v2} using the given factor.
+  @end{short}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec2_interpolate"
+                   (:pointer (:struct vec2-t)) v1
+                   (:pointer (:struct vec2-t)) v2
+                   :double (coerce factor 'double-float)
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec2-interpolate)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_get_x ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_get_x" vec2-x) :float
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @return{A single float with the value of the x component.}
+  @short{Retrieves the x component of the vector.}
+  @see-symbol{vec2-t}"
+  (v (:pointer (:struct vec2-t))))
+
+(export 'vec2-x)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_get_y ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_get_y" vec2-y) :float
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec2-t} instance}
+  @return{A single float with the value of the y component.}
+  @short{Retrieves the y component of the vector.}
+  @see-symbol{vec2-t}"
+  (v (:pointer (:struct vec2-t))))
+
+(export 'vec2-y)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_zero ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_zero" vec2-zero)
+    (:pointer (:struct vec2-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec2-t} instance with (0.0, 0.0) components.}
+  @short{Retrieves a constant zero vector.}
+  @see-symbol{vec2-t}")
+
+(export 'vec2-zero)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_one ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_one" vec2-one)
+    (:pointer (:struct vec2-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec2-t} instance with (1.0, 1.0) components.}
+  @short{Retrieves a constant one vector.}
+  @see-symbol{vec2-t}")
+
+(export 'vec2-one)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_x_axis ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_x_axis" vec2-x-axis)
+    (:pointer (:struct vec2-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec2-t} instance with the x axis vector.}
+  @short{Retrieves a constant vector with (1.0, 0.0) components.}
+  @see-symbol{vec2-t}")
+
+(export 'vec2-x-axis)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec2_y_axis ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec2_y_axis" vec2-y-axis)
+    (:pointer (:struct vec2-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec2-t} instance with the y axis vector.}
+  @short{Retrieves a constant vector with (0.0, 1.0) components.}
+  @see-symbol{vec2-t}")
+
+(export 'vec2-y-axis)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_alloc ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_alloc" vec3-alloc)
+    (:pointer (:struct vec3-t))
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @return{The newly allocated @symbol{vec3-t} instance. Use the @fun{vec3-free}
+    function to free the resources allocated by this function.}
+  @begin{short}
+    Allocates a new @symbol{vec3-t} instance.
+  @end{short}
+  @see-symbol{vec3-t}
+  @see-function{vec3-free}")
+
+(export 'vec3-alloc)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_free ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_free" vec3-free) :void
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @short{Frees the resources allocated by @arg{v}.}
+  @see-symbol{vec3-t}
+  @see-function{vec3-alloc}"
+  (vector (:pointer (:struct vec3-t))))
+
+(export 'vec3-free)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_init ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-init (v x y z)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @argument[x]{a single float with the x field of the vector}
+  @argument[y]{a single float with the y field of the vector}
+  @argument[z]{a single float with the z field of the vector}
+  @return{The initialized @symbol{vec3-t} instance.}
+  @short{Initializes a @symbol{vec3-t} instance using the given values.}
+  This function can be called multiple times.
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_init"
+                   (:pointer (:struct vec3-t)) v
+                   :float (coerce x 'single-float)
+                   :float (coerce y 'single-float)
+                   :float (coerce z 'single-float)
+                   (:pointer (:struct vec3-t))))
+
+(export 'vec3-init)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_init_from_vec3 ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_init_from_vec3" vec3-init-from-vec3)
+    (:pointer (:struct vec3-t))
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @argument[source]{a @symbol{vec3-t} instance}
+  @return{The initialized @symbol{vec3-t} instance.}
+  @begin{short}
+    Initializes a @symbol{vec3-t} instance using another @symbol{vec3-t}
+    instance.
+  @end{short}
+  This function can be called multiple times.
+  @see-symbol{vec3-t}"
+  (v (:pointer (:struct vec3-t)))
+  (source (:pointer (:struct vec3-t))))
+
+(export 'vec3-init-from-vec3)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_init_from_float ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-init-from-float (v arg)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @argument[arg]{a list with three single float values}
+  @return{The initialized @symbol{vec3-t} instance.}
+  @short{Initializes @arg{v} with the contents of the given list.}
+  @begin[Note]{dictionary}
+    The Lisp implementation does not use the C function, but calls the
+    @fun{vec3-init} function to inialize the vector.
+    @begin{pre}
+(defun vec3-init-from-float (v arg)
+  (apply #'vec2-init v arg))
+    @end{pre}
+  @end{dictionary}
+  @see-symbol{vec3-t}
+  @see-function{vec3-init}"
+  (apply #'vec3-init v arg))
+
+(export 'vec3-init-from-float)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_to_float ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_to_float" %vec3-to-float) :void
+  (v (:pointer (:struct vec3-t)))
+  (v-ar (:pointer :float)))
+
+(defun vec3-to-float (v)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @return{A list with the single float values of the components of @arg{v}.}
+  @begin{short}
+    Stores the components of @arg{v} into a list.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (with-foreign-object (v-ar :float +vec3-len+)
+    (%vec3-to-float v v-ar)
+    (loop for i from 0 below +vec3-len+
+          collect (mem-aref v-ar :float i))))
+
+(export 'vec3-to-float)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_add ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-add (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec3-t} instance}
+  @argument[b]{a @symbol{vec3-t} instance}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance with the result.}
+  @begin{short}
+    Adds each component of the two passed vectors and places each result into
+    the components of @arg{result}.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_add"
+                   (:pointer (:struct vec3-t)) a
+                   (:pointer (:struct vec3-t)) b
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-add)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_subtract ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-subtract (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec3-t} instance}
+  @argument[b]{a @symbol{vec3-t} instance}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance with the result.}
+  @begin{short}
+    Subtracts from each component of the first operand @arg{a} the corresponding
+    component of the second operand @arg{b} and places each result into the
+    components of @arg{result}.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_subtract"
+                   (:pointer (:struct vec3-t)) a
+                   (:pointer (:struct vec3-t)) b
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-subtract)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_multiply ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-multiply (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec3-t} instance}
+  @argument[b]{a @symbol{vec3-t} instance}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance with the result.}
+  @begin{short}
+    Multiplies each component of the two passed vectors and places each result
+    into the components of @arg{result}.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_multiply"
+                   (:pointer (:struct vec3-t)) a
+                   (:pointer (:struct vec3-t)) b
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-multiply)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_divide ()
+;;; ----------------------------------------------------------------------------
+
+;; TODO: Signals an error
+;;   VEC3-DIVIDE in GRAPHENE-VECTOR []:
+;;   Unexpected Error: #<FLOATING-POINT-INVALID-OPERATION {100278A543}>
+;;   arithmetic error FLOATING-POINT-INVALID-OPERATION signalled.
+
+#+nil
+(defun vec3-divide (a b result)
+  (foreign-funcall "graphene_vec3_divide"
+                   (:pointer (:struct vec3-t)) a
+                   (:pointer (:struct vec3-t)) b
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+;; Workaround uses the VEC4-DIVIDE function
+
+(defun vec3-divide (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec3-t} instance}
+  @argument[b]{a @symbol{vec3-t} instance}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance with the result.}
+  @begin{short}
+    Divides each component of the first operand @arg{a} by the corresponding
+    component of the second operand @arg{b}, and places the results into the
+    vector @arg{result}.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (with-graphene-vec4s ((v1 a 1.0) (v2 b 1.0) res)
+    (vec4-divide v1 v2 res)
+    (vec4-xyz res result)))
+
+(export 'vec3-divide)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_cross ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-cross (a b result)
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[a]{a @symbol{vec3-t} instance}
+  @argument[b]{a @symbol{vec3-t} instance}
+  @return{A @symbol{vec3-t} instance with the result.}
+  @begin{short}
+    Computes the cross product of the two given vectors.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_cross"
+                   (:pointer (:struct vec3-t)) a
+                   (:pointer (:struct vec3-t)) b
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-cross)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_dot ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_dot" vec3-dot) :float
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec3-t} instance}
+  @argument[b]{a @symbol{vec3-t} instance}
+  @return{A single float with the dot product of the vectors.}
+  @begin{short}
+    Computes the dot product of the two given vectors.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (a (:pointer (:struct vec3-t)))
+  (b (:pointer (:struct vec3-t))))
+
+(export 'vec3-dot)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_scale ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-scale (v factor result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @argument[factor]{a single float with the scale factor}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance withe result vector.}
+  @begin{short}
+    Multiplies all components of the given vector with the given scalar factor.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_scale"
+                   (:pointer (:struct vec3-t)) v
+                   :float (coerce factor 'single-float)
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-scale)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_length ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_length" vec3-length) :float
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @return{A single float with the length of the vector.}
+  @begin{short}
+    Computes the length of the given vector.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (v (:pointer (:struct vec3-t))))
+
+(export 'vec3-length)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_normalize ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-normalize (v result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance with the normalized vector.}
+  @begin{short}
+    Computes the normalized vector for the given vector.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_normalize"
+                   (:pointer (:struct vec3-t)) v
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-normalize)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_negate ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-negate (v result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance with the negated vector.}
+  @begin{short}
+    Negates the given vector.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_negate"
+                   (:pointer (:struct vec3-t)) v
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-negate)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_equal ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_equal" vec3-equal) :bool
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v1]{a @symbol{vec3-t} instance}
+  @argument[v2]{a @symbol{vec3-t} instance}
+  @return{@em{True} if the two vectors are equal, and @em{false} otherwise}
+  @begin{short}
+    Checks whether the two given vectors are equal.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (v1 (:pointer (:struct vec3-t)))
+  (v2 (:pointer (:struct vec3-t))))
+
+(export 'vec3-equal)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_near ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-near (v1 v2 epsilon)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v1]{a @symbol{vec3-t} instance}
+  @argument[v2]{a @symbol{vec3-t} instance}
+  @argument[epsilon]{a single float with the treshold between the two vectors}
+  @return{@em{True} if the two vectors are near each other, and @em{false}
+    otherwise.}
+  @begin{short}
+    Compares the two given vectors and checks whether their values are within
+    the given @arg{epsilon}.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_near"
+                   (:pointer (:struct vec3-t)) v1
+                   (:pointer (:struct vec3-t)) v2
+                   :float (coerce epsilon 'single-float)
+                   :bool))
+
+(export 'vec3-near)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_min ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-min (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec3-t} instance}
+  @argument[b]{a @symbol{vec3-t} instance}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance with the result.}
+  @begin{short}
+    Compares the two given vectors and places the minimum values of each
+    component into @arg{result}.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_min"
+                   (:pointer (:struct vec3-t)) a
+                   (:pointer (:struct vec3-t)) b
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-min)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_max ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-max (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec3-t} instance}
+  @argument[b]{a @symbol{vec3-t} instance}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance with the result.}
+  @begin{short}
+    Compares the two given vectors and places the maximum values of each
+    component into @arg{result}.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_max"
+                   (:pointer (:struct vec3-t)) a
+                   (:pointer (:struct vec3-t)) b
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-max)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_interpolate ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-interpolate (v1 v2 factor result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v1]{a @symbol{vec3-t} instance}
+  @argument[v2]{a @symbol{vec3-t} instance}
+  @argument[factor]{a single float with the interpolation factor}
+  @argument[result]{a @symbol{vec3-t} instance for the result}
+  @return{A @symbol{vec3-t} instance with the interpolated vector.}
+  @begin{short}
+    Linearly interpolates @arg{v1} and @arg{v2} using the given factor.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_interpolate"
+                   (:pointer (:struct vec3-t)) v1
+                   (:pointer (:struct vec3-t)) v2
+                   :double (coerce factor 'double-float)
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-interpolate)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_get_x ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_get_x" vec3-x) :float
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @return{A single float with the value of the x component.}
+  @short{Retrieves the x component of the vector.}
+  @see-symbol{vec3-t}"
+  (v (:pointer (:struct vec3-t))))
+
+(export 'vec3-x)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_get_y ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_get_y" vec3-y) :float
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @return{A single float with the value of the y component.}
+  @short{Retrieves the y component of the vector.}
+  @see-symbol{vec3-t}"
+  (v (:pointer (:struct vec3-t))))
+
+(export 'vec3-y)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_get_z ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_get_z" vec3-z) :float
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @return{A single float with the value of the z component.}
+  @short{Retrieves the z component of the vector.}
+  @see-symbol{vec3-t}"
+  (v (:pointer (:struct vec3-t))))
+
+(export 'vec3-z)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_get_xy ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-xy (v result)
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @return{A @symbol{vec2-t} instance.}
+  @begin{short}
+    Returns a @symbol{vec2-t} instance that contains the first two components
+    of the given vector.
+  @end{short}
+  @see-symbol{vec3-t}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec3_get_xy"
+                   (:pointer (:struct vec3-t)) v
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec3-xy)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_get_xy0 ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-xy0 (v result)
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @return{A @symbol{vec3-t} instance.}
+  @begin{short}
+    Returns a @symbol{vec3-t} instance that contains the first two components
+    of the given vector, and the third component set to 0.0.
+  @end{short}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec3_get_xy0"
+                   (:pointer (:struct vec3-t)) v
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec3-xy0)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_get_xyz0 ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-xyz0 (v result)
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @return{A @symbol{vec4-t} instance.}
+  @begin{short}
+    Returns a @symbol{vec4-t} instance that contains the first three components
+    of the given vector, and the fourth component set to 0.0.
+  @end{short}
+  @see-symbol{vec3-t}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec3_get_xyz0"
+                   (:pointer (:struct vec3-t)) v
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec3-xyz0)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_get_xyz1 ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-xyz1 (v result)
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @return{A @symbol{vec4-t} instance.}
+  @begin{short}
+    Returns a @symbol{vec4-t} instance that contains the first three components
+    of the given vector, and the fourth component set to 1.0.
+  @end{short}
+  @see-symbol{vec3-t}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec3_get_xyz1"
+                   (:pointer (:struct vec3-t)) v
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec3-xyz1)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_get_xyzw ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec3-xyzw (v w result)
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec3-t} instance}
+  @argument[w]{a single float with the value of the fourth component}
+  @return{A @symbol{vec4-t} instance.}
+  @begin{short}
+    Returns a @symbol{vec4-t} instance that contains the first three components
+    of the given vector, and the fourth component set to @arg{w}.
+  @end{short}
+  @see-symbol{vec3-t}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec3_get_xyzw"
+                   (:pointer (:struct vec3-t)) v
+                   :float (coerce w 'single-float)
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec3-xyzw)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_zero ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_zero" vec3-zero)
+    (:pointer (:struct vec3-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec3-t} instance with three components, all sets to 0.0.}
+  @short{Retrieves a constant zero vector.}
+  @see-symbol{vec3-t}")
+
+(export 'vec3-zero)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_one ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_one" vec3-one)
+    (:pointer (:struct vec3-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec3-t} instance with three components, all sets to 1.0.}
+  @short{Retrieves a constant one vector.}
+  @see-symbol{vec3-t}")
+
+(export 'vec3-one)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_x_axis ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_x_axis" vec3-x-axis)
+    (:pointer (:struct vec3-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec3-t} instance with the x axis vector.}
+  @short{Retrieves a constant vector with (1.0, 0.0, 0.0) components.}
+  @see-symbol{vec3-t}")
+
+(export 'vec3-x-axis)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_y_axis ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_y_axis" vec3-y-axis)
+    (:pointer (:struct vec3-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec3-t} instance with the y axis vector.}
+  @short{Retrieves a constant vector with (0.0, 1.0, 0.0) components.}
+  @see-symbol{vec3-t}")
+
+(export 'vec3-y-axis)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec3_z_axis ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec3_z_axis" vec3-z-axis)
+    (:pointer (:struct vec3-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec3-t} instance with the z axis vector.}
+  @short{Retrieves a constant vector with (0.0, 0.0, 1.0) components.}
+  @see-symbol{vec3-t}")
+
+(export 'vec3-z-axis)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_alloc ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_alloc" vec4-alloc)
+    (:pointer (:struct vec4-t))
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @return{The newly allocated @symbol{vec4-t} instance. Use the @fun{vec4-free}
+    function to free the resources allocated by this function.}
+  @begin{short}
+    Allocates a new @symbol{vec4-t} instance.
+  @end{short}
+  @see-symbol{vec4-t}
+  @see-function{vec4-free}")
+
+(export 'vec4-alloc)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_free ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_free" vec4-free) :void
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec3-4} instance}
+  @short{Frees the resources allocated by @arg{v}.}
+  @see-symbol{vec4-t}
+  @see-function{vec4-alloc}"
+  (v (:pointer (:struct vec4-t))))
+
+(export 'vec4-free)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_init ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-init (v x y z w)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @argument[x]{a single float with the x field of the vector}
+  @argument[y]{a single float with the y field of the vector}
+  @argument[z]{a single float with the z field of the vector}
+  @argument[w]{a single float with the w field of the vector}
+  @return{The initialized @symbol{vec4-t} instance.}
+  @short{Initializes a @symbol{vec4-t} instance using the given values.}
+  This function can be called multiple times.
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_init"
+                   (:pointer (:struct vec4-t)) v
+                   :float (coerce x 'single-float)
+                   :float (coerce y 'single-float)
+                   :float (coerce z 'single-float)
+                   :float (coerce w 'single-float)
+                   (:pointer (:struct vec4-t))))
+
+(export 'vec4-init)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_init_from_vec4 ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_init_from_vec4" vec4-init-from-vec4)
+    (:pointer (:struct vec4-t))
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @argument[source]{a @symbol{vec4-t} instance}
+  @return{The initialized @symbol{vec4-t} instance.}
+  @begin{short}
+    Initializes a @symbol{vec4-t} instance using another @symbol{vec4-t}
+    instance.
+  @end{short}
+  This function can be called multiple times.
+  @see-symbol{vec4-t}"
+  (v (:pointer (:struct vec4-t)))
+  (source (:pointer (:struct vec4-t))))
+
+(export 'vec4-init-from-vec4)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_init_from_vec3 ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-init-from-vec3 (v src w)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @argument[source]{a @symbol{vec4-t} instance}
+  @argument[w]{a single float with the value of the fourth component of @arg{v}}
+  @return{The initialized @symbol{vec4-t} instance.}
+  @begin{short}
+    Initializes a @symbol{vec4-t} instance using another @symbol{vec3-t}
+    instance and the value of @arg{w}.
+  @end{short}
+  This function can be called multiple times.
+  @see-symbol{vec4-t}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec4_init_from_vec3"
+                   (:pointer (:struct vec4-t)) v
+                   (:pointer (:struct vec3-t)) src
+                   :float (coerce w 'single-float)
+                   (:pointer (:struct vec4-t))))
+
+(export 'vec4-init-from-vec3)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_init_from_vec2 ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-init-from-vec2 (v src z w)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @argument[source]{a @symbol{vec2-t} instance}
+  @argument[z]{a single float with the value of the third component of @arg{v}}
+  @argument[w]{a single float with the value of the fourth component of @arg{v}}
+  @return{The initialized @symbol{vec4-t} instance.}
+  @begin{short}
+    Initializes a @symbol{vec4-t} instance using another @symbol{vec2-t}
+    instance and the values of @arg{z} and @arg{w}.
+  @end{short}
+  This function can be called multiple times.
+  @see-symbol{vec4-t}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec4_init_from_vec2"
+                   (:pointer (:struct vec4-t)) v
+                   (:pointer (:struct vec2-t)) src
+                   :float (coerce z 'single-float)
+                   :float (coerce w 'single-float)
+                   (:pointer (:struct vec4-t))))
+
+(export 'vec4-init-from-vec2)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_init_from_float ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-init-from-float (v arg)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @argument[arg]{a list with four single float values}
+  @return{The initialized @symbol{vec4-t} instance.}
+  @short{Initializes @arg{v} with the contents of the given list.}
+  @begin[Note]{dictionary}
+    The Lisp implementation does not use the C function, but calls the
+    @fun{vec4-init} function to inialize the vector.
+    @begin{pre}
+(defun vec4-init-from-float (v arg)
+  (apply #'vec4-init v arg))
+    @end{pre}
+  @end{dictionary}
+  @see-symbol{vec4-t}
+  @see-function{vec4-init}"
+  (apply #'vec4-init v arg))
+
+(export 'vec4-init-from-float)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_to_float ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_to_float" %vec4-to-float) :void
+  (v (:pointer (:struct vec4-t)))
+  (v-ar (:pointer :float)))
+
+(defun vec4-to-float (v)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @return{A list with the single float values of the components of @arg{v}.}
+  @begin{short}
+    Stores the components of @arg{v} into a list.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (with-foreign-object (v-ar :float +vec4-len+)
+    (%vec4-to-float v v-ar)
+    (loop for i from 0 below +vec4-len+
+          collect (mem-aref v-ar :float i))))
+
+(export 'vec4-to-float)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_add ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-add (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec4-t} instance}
+  @argument[b]{a @symbol{vec4-t} instance}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance with the result.}
+  @begin{short}
+    Adds each component of the two passed vectors and places each result into
+    the components of @arg{result}.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_add"
+                   (:pointer (:struct vec4-t)) a
+                   (:pointer (:struct vec4-t)) b
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-add)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_subtract ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-subtract (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec4-t} instance}
+  @argument[b]{a @symbol{vec4-t} instance}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance with the result.}
+  @begin{short}
+    Subtracts from each component of the first operand @arg{a} the corresponding
+    component of the second operand @arg{b} and places each result into the
+    components of @arg{result}.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_subtract"
+                   (:pointer (:struct vec4-t)) a
+                   (:pointer (:struct vec4-t)) b
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-subtract)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_multiply ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-multiply (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec4-t} instance}
+  @argument[b]{a @symbol{vec4-t} instance}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance with the result.}
+  @begin{short}
+    Multiplies each component of the two passed vectors and places each result
+    into the components of @arg{result}.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_multiply"
+                   (:pointer (:struct vec4-t)) a
+                   (:pointer (:struct vec4-t)) b
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-multiply)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_divide ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-divide (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec4-t} instance}
+  @argument[b]{a @symbol{vec4-t} instance}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance with the result.}
+  @begin{short}
+    Divides each component of the first operand @arg{a} by the corresponding
+    component of the second operand @arg{b}, and places the results into the
+    vector @arg{result}.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_divide"
+                   (:pointer (:struct vec4-t)) a
+                   (:pointer (:struct vec4-t)) b
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-divide)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_dot ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_dot" vec4-dot) :float
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec4-t} instance}
+  @argument[b]{a @symbol{vec4-t} instance}
+  @return{A single float with the dot product of the vectors.}
+  @begin{short}
+    Computes the dot product of the two given vectors.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (a (:pointer (:struct vec4-t)))
+  (b (:pointer (:struct vec4-t))))
+
+(export 'vec4-dot)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_scale ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-scale (v factor result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @argument[factor]{a single float with the scale factor}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance withe result vector.}
+  @begin{short}
+    Multiplies all components of the given vector with the given scalar factor.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_scale"
+                   (:pointer (:struct vec4-t)) v
+                   :float (coerce factor 'single-float)
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-scale)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_length ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_length" vec4-length) :float
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @return{A single float with the length of the vector.}
+  @begin{short}
+    Computes the length of the given vector.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (v (:pointer (:struct vec4-t))))
+
+(export 'vec4-length)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_normalize ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-normalize (v result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance with the normalized vector.}
+  @begin{short}
+    Computes the normalized vector for the given vector.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_normalize"
+                   (:pointer (:struct vec4-t)) v
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-normalize)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_negate ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-negate (v result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance with the negated vector.}
+  @begin{short}
+    Negates the given vector.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_negate"
+                   (:pointer (:struct vec4-t)) v
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-negate)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_equal ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_equal" vec4-equal) :bool
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v1]{a @symbol{vec4-t} instance}
+  @argument[v2]{a @symbol{vec4-t} instance}
+  @return{@em{True} if the two vectors are equal, and @em{false} otherwise}
+  @begin{short}
+    Checks whether the two given vectors are equal.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (v1 (:pointer (:struct vec4-t)))
+  (v2 (:pointer (:struct vec4-t))))
+
+(export 'vec4-equal)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_near ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-near (v1 v2 epsilon)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v1]{a @symbol{vec4-t} instance}
+  @argument[v2]{a @symbol{vec4-t} instance}
+  @argument[epsilon]{a single float with the treshold between the two vectors}
+  @return{@em{True} if the two vectors are near each other, and @em{false}
+    otherwise.}
+  @begin{short}
+    Compares the two given vectors and checks whether their values are within
+    the given @arg{epsilon}.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec2_near"
+                   (:pointer (:struct vec4-t)) v1
+                   (:pointer (:struct vec4-t)) v2
+                   :float (coerce epsilon 'single-float)
+                   :bool))
+
+(export 'vec4-near)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_min ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-min (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec4-t} instance}
+  @argument[b]{a @symbol{vec4-t} instance}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance with the result.}
+  @begin{short}
+    Compares the two given vectors and places the minimum values of each
+    component into @arg{result}.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_min"
+                   (:pointer (:struct vec4-t)) a
+                   (:pointer (:struct vec4-t)) b
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-min)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_max ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-max (a b result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[a]{a @symbol{vec4-t} instance}
+  @argument[b]{a @symbol{vec4-t} instance}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance with the result.}
+  @begin{short}
+    Compares the two given vectors and places the maximum values of each
+    component into @arg{result}.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_max"
+                   (:pointer (:struct vec4-t)) a
+                   (:pointer (:struct vec4-t)) b
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-max)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_interpolate ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-interpolate (v1 v2 factor result)
+ #+liber-documentation
+ "@version{#2022-9-22}
+  @argument[v1]{a @symbol{vec4-t} instance}
+  @argument[v2]{a @symbol{vec4-t} instance}
+  @argument[factor]{a single float with the interpolation factor}
+  @argument[result]{a @symbol{vec4-t} instance for the result}
+  @return{A @symbol{vec4-t} instance with the interpolated vector.}
+  @begin{short}
+    Linearly interpolates @arg{v1} and @arg{v2} using the given factor.
+  @end{short}
+  @see-symbol{vec4-t}"
+  (foreign-funcall "graphene_vec4_interpolate"
+                   (:pointer (:struct vec4-t)) v1
+                   (:pointer (:struct vec4-t)) v2
+                   :double (coerce factor 'double-float)
+                   (:pointer (:struct vec4-t)) result
+                   :void)
+  result)
+
+(export 'vec4-interpolate)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_get_x ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_get_x" vec4-x) :float
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @return{A single float with the value of the x component.}
+  @short{Retrieves the x component of the vector.}
+  @see-symbol{vec4-t}"
+  (v (:pointer (:struct vec4-t))))
+
+(export 'vec4-x)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_get_y ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_get_y" vec4-y) :float
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @return{A single float with the value of the y component.}
+  @short{Retrieves the y component of the vector.}
+  @see-symbol{vec4-t}"
+  (v (:pointer (:struct vec4-t))))
+
+(export 'vec4-y)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_get_z ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_get_z" vec4-z) :float
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @return{A single float with the value of the z component.}
+  @short{Retrieves the z component of the vector.}
+  @see-symbol{vec4-t}"
+  (v (:pointer (:struct vec4-t))))
+
+(export 'vec4-z)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_get_w ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_get_w" vec4-w) :float
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @return{A single float with the value of the fourth component.}
+  @short{Retrieves the fourth component of the vector.}
+  @see-symbol{vec4-t}"
+  (v (:pointer (:struct vec4-t))))
+
+(export 'vec4-w)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_get_xy ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-xy (v result)
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @return{A @symbol{vec2-t} instance.}
+  @begin{short}
+    Returns a @symbol{vec2-t} instance that contains the first two components
+    of the given vector.
+  @end{short}
+  @see-symbol{vec4-t}
+  @see-symbol{vec2-t}"
+  (foreign-funcall "graphene_vec4_get_xy"
+                   (:pointer (:struct vec4-t)) v
+                   (:pointer (:struct vec2-t)) result
+                   :void)
+  result)
+
+(export 'vec4-xy)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_get_xyz ()
+;;; ----------------------------------------------------------------------------
+
+(defun vec4-xyz (v result)
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @argument[v]{a @symbol{vec4-t} instance}
+  @return{A @symbol{vec3-t} instance.}
+  @begin{short}
+    Returns a @symbol{vec3-t} instance that contains the first three components
+    of the given vector.
+  @end{short}
+  @see-symbol{vec4-t}
+  @see-symbol{vec3-t}"
+  (foreign-funcall "graphene_vec4_get_xyz"
+                   (:pointer (:struct vec4-t)) v
+                   (:pointer (:struct vec3-t)) result
+                   :void)
+  result)
+
+(export 'vec4-xyz)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_zero ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_zero" vec4-zero)
+    (:pointer (:struct vec4-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec4-t} instance with three components, all sets to 0.0.}
+  @short{Retrieves a constant zero vector.}
+  @see-symbol{vec4-t}")
+
+(export 'vec4-zero)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_one ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_one" vec4-one)
+    (:pointer (:struct vec4-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec4-t} instance with three components, all sets to 1.0.}
+  @short{Retrieves a constant one vector.}
+  @see-symbol{vec4-t}")
+
+(export 'vec4-one)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_x_axis ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_x_axis" vec4-x-axis)
+    (:pointer (:struct vec4-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec4-t} instance with the x axis vector.}
+  @short{Retrieves a constant vector with (1.0, 0.0, 0.0, 0.0) components.}
+  @see-symbol{vec4-t}")
+
+(export 'vec4-x-axis)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_y_axis ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_y_axis" vec4-y-axis)
+    (:pointer (:struct vec4-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec4-t} instance with the y axis vector.}
+  @short{Retrieves a constant vector with (0.0, 1.0, 0.0, 0.0) components.}
+  @see-symbol{vec4-t}")
+
+(export 'vec4-y-axis)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_z_axis ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_z_axis" vec4-z-axis)
+    (:pointer (:struct vec4-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec4-t} instance with the z axis vector.}
+  @short{Retrieves a constant vector with (0.0, 0.0, 1.0, 0.0) components.}
+  @see-symbol{vec4-t}")
+
+(export 'vec4-z-axis)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_vec4_w_axis ()
+;;; ----------------------------------------------------------------------------
+
+(defcfun ("graphene_vec4_w_axis" vec4-w-axis)
+    (:pointer (:struct vec4-t))
+ #+liber-documentation
+ "@version{#2022-9-23}
+  @return{A @symbol{vec4-t} instance with the w axis vector.}
+  @short{Retrieves a constant vector with (0.0, 0.0, 0.0, 1.0) components.}
+  @see-symbol{vec4-t}")
+
+(export 'vec4-w-axis)
+
+;;; --- End of file graphene.vector.lisp ---------------------------------------
