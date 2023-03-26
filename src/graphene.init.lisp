@@ -26,7 +26,7 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (cffi:define-foreign-library graphene
       ((:and :unix (:not :darwin))
-       (:or "libgraphene-1.0.so"))
+       (:or "libgraphene-1.0.so.0" "libgraphene-1.0.so"))
        (:darwin "libgraphene-1.0.dylib")
        (:windows "libgraphene-1.0-0.dll")
        (t (:default "libgraphene-1.0")))
