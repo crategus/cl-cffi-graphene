@@ -8,7 +8,7 @@
 #+nil
 (test array-ptr
 
-  (with-graphene-vec3s ((v1 1 0 0)
+  (graphene:with-graphene-vec3s ((v1 1 0 0)
                         (v2 0 1 0)
                         (v3 0 0 1)
                         (v4 1 1 0)
@@ -57,21 +57,21 @@
 
 #+nil
 (test frustum-planes
-  (with-graphene-vec3s ((vec1 1 0 0)
+  (graphene:with-graphene-vec3s ((vec1 1 0 0)
                         (vec2 0 1 0)
                         (vec3 0 0 1)
                         (vec4 1 1 0)
                         (vec5 0 1 1)
                         (vec6 1 1 1))
 
-    (with-graphene-planes ((plane1 vec1 1)
+    (graphene:with-graphene-planes ((plane1 vec1 1)
                            (plane2 vec2 2)
                            (plane3 vec3 3)
                            (plane4 vec4 4)
                            (plane5 vec5 5)
                            (plane6 vec6 6)
                            plane7 plane8 plane9 plane10 plane11 plane12)
-      (with-graphene-frustum (frustum plane1 plane2 plane3 plane4 plane5 plane6)
+      (graphene:with-graphene-frustum (frustum plane1 plane2 plane3 plane4 plane5 plane6)
 
         (is-false (list plane1 plane2 plane3
                         plane4 plane5 plane6))
@@ -81,7 +81,7 @@
                                   (list plane7 plane8 plane9
                                         plane10 plane11 plane12)))
 
-;      (is (pointer-eq plane1
+;      (is (cffi:pointer-eq plane1
 ;                      (first (frustum-planes frustum
 ;                                             (list plane1 plane2 plane3
 ;                                                   plane4 plane5 plane6)))))

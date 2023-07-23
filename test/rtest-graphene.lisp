@@ -1,5 +1,5 @@
 (defpackage :graphene-test
-  (:use :graphene :fiveam :cffi :common-lisp)
+  (:use :fiveam :common-lisp)  
   (:export #:run!
            #:graphene-suite
            #:graphene-box
@@ -29,4 +29,4 @@
 (def-suite graphene-suite)
 (in-suite graphene-suite)
 
-;;; 2022-10-2
+;;; --- 2023-7-22 --------------------------------------------------------------

@@ -10,11 +10,12 @@
 ;;; --- Macros -----------------------------------------------------------------
 
 (test with-graphene-plane.1
-  (with-graphene-vec3 (normal)
-    (with-graphene-plane (plane)
-      (is (pointerp plane))
-      (is (equal '(0.0 0.0 0.0) (vec3-to-float (plane-normal plane normal))))
-      (is (= 0.0 (plane-constant plane))))))
+  (graphene:with-graphene-vec3 (normal)
+    (graphene:with-graphene-plane (plane)
+      (is (cffi:pointerp plane))
+      (is (equal '(0.0 0.0 0.0) 
+                 (graphene:vec3-to-float (graphene:plane-normal plane normal))))
+      (is (= 0.0 (graphene:plane-constant plane))))))
 
 
 ;;; --- Functions --------------------------------------------------------------

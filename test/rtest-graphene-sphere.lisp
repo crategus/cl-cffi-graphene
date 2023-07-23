@@ -10,8 +10,8 @@
 ;;; --- Macros -----------------------------------------------------------------
 
 (test with-graphene-sphere
-  (with-graphene-point3d (center 0.0 0.0 0.0)
-    (with-graphene-sphere (sphere center 1.0)
+  (graphene:with-graphene-point3d (center 0.0 0.0 0.0)
+    (graphene:with-graphene-sphere (sphere center 1.0)
 
 )))
 
@@ -22,16 +22,16 @@
 
 (test sphere-alloc/free
   (let ((sphere nil))
-    (is (pointerp (setf sphere (sphere-alloc))))
-    (is-false (sphere-free sphere))))
+    (is (cffi:pointerp (setf sphere (graphene:sphere-alloc))))
+    (is-false (graphene:sphere-free sphere))))
 
 ;;;     graphene_sphere_init
 
 (test sphere-init
-  (let ((sphere (sphere-alloc)))
-    (with-graphene-point3d (center 0 0 0)
-      (is (pointer-eq sphere (sphere-init sphere center 1))))
-    (sphere-free sphere)))
+  (let ((sphere (graphene:sphere-alloc)))
+    (graphene:with-graphene-point3d (center 0 0 0)
+      (is (cffi:pointer-eq sphere (graphene:sphere-init sphere center 1))))
+    (graphene:sphere-free sphere)))
 
 ;;;     graphene_sphere_init_from_points
 ;;;     graphene_sphere_init_from_vectors
@@ -40,16 +40,16 @@
 ;;;     graphene_sphere_get_radius
 
 (test sphere-center/radius
-  (with-graphene-vec3 (vector)
-    (with-graphene-point3ds ((center 1.0 2.0 3.0) point)
-      (with-graphene-sphere (sphere center 1.0)
+  (graphene:with-graphene-vec3 (vector)
+    (graphene:with-graphene-point3ds ((center 1.0 2.0 3.0) point)
+      (graphene:with-graphene-sphere (sphere center 1.0)
 
-        (is (pointer-eq point (sphere-center sphere point)))
-        (is (= 1.0 (sphere-radius sphere)))
+        (is (cffi:pointer-eq point (graphene:sphere-center sphere point)))
+        (is (= 1.0 (graphene:sphere-radius sphere)))
 
         (is (equal '(1.0 2.0 3.0)
-                   (vec3-to-float
-                       (point3d-to-vec3 (sphere-center sphere point) vector))))
+                   (graphene:vec3-to-float
+                       (graphene:point3d-to-vec3 (graphene:sphere-center sphere point) vector))))
 
 ))))
 
