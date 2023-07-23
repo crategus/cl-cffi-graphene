@@ -24,7 +24,7 @@
 
 (defsystem :cl-cffi-graphene
   :name "cl-cffi-graphene"
-  :version "0.1.0"
+  :version "0.2.0"
   :author  "Dieter Kaiser"
   :license "MIT"
   :depends-on (:cffi)
