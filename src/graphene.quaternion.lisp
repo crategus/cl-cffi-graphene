@@ -2,29 +2,29 @@
 ;;; graphene.quaternion.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library.
-;;; See <https://ebassi.github.io/graphene/docs/>.
-;;; The API documentation of the Lisp binding is available from
-;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;; and modified to document the Lisp binding to the Graphene library. See 
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 Dieter Kaiser
+;;; Copyright (C) 2022 - 2023 Dieter Kaiser
 ;;;
-;;; This program is free software: you can redistribute it and/or modify
-;;; it under the terms of the GNU Lesser General Public License for Lisp
-;;; as published by the Free Software Foundation, either version 3 of the
-;;; License, or (at your option) any later version and with a preamble to
-;;; the GNU Lesser General Public License that clarifies the terms for use
-;;; with Lisp programs and is referred as the LLGPL.
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the "Software"),
+;;; to deal in the Software without restriction, including without limitation
+;;; the rights to use, copy, modify, merge, publish, distribute, sublicense,
+;;; and/or sell copies of the Software, and to permit persons to whom the
+;;; Software is furnished to do so, subject to the following conditions:
 ;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU Lesser General Public License for more details.
+;;; The above copyright notice and this permission notice shall be included in
+;;; all copies or substantial portions of the Software.
 ;;;
-;;; You should have received a copy of the GNU Lesser General Public
-;;; License along with this program and the preamble to the Gnu Lesser
-;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
-;;; and <http://opensource.franz.com/preamble.html>.
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+;;; DEALINGS IN THE SOFTWARE.
 ;;; ----------------------------------------------------------------------------
 ;;;
 ;;; Quaternion
@@ -186,7 +186,7 @@
 ;;; Since 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcstruct quaternion-t)
+(cffi:defcstruct quaternion-t)
 
 (export 'quaternion-t)
 
@@ -194,7 +194,7 @@
 ;;; graphene_quaternion_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_quaternion_alloc" quaternion-alloc)
+(cffi:defcfun ("graphene_quaternion_alloc" quaternion-alloc)
     (:pointer (:struct quaternion-t))
  #+liber-documentation
  "@version{#2022-9-24}
@@ -214,7 +214,7 @@
 ;;; graphene_quaternion_free ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_quaternion_free" quaternion-free) :void
+(cffi:defcfun ("graphene_quaternion_free" quaternion-free) :void
  #+liber-documentation
  "@version{#2022-9-24}
   @argument[quaternion]{a @symbol{quaternion-t} instance}
@@ -263,13 +263,13 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init (quaternion x y z w)
-  (foreign-funcall "graphene_quaternion_init"
-                   (:pointer (:struct quaternion-t)) quaternion
-                   :float (coerce x 'single-float)
-                   :float (coerce y 'single-float)
-                   :float (coerce z 'single-float)
-                   :float (coerce w 'single-float)
-                   (:pointer (:struct quaternion-t))))
+  (cffi:foreign-funcall "graphene_quaternion_init"
+                        (:pointer (:struct quaternion-t)) quaternion
+                        :float (coerce x 'single-float)
+                        :float (coerce y 'single-float)
+                        :float (coerce z 'single-float)
+                        :float (coerce w 'single-float)
+                        (:pointer (:struct quaternion-t))))
 
 (export 'quaternion-init)
 
@@ -288,7 +288,7 @@
 ;;;the initialized quaternion.
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_quaternion_init_identity" quaternion-init-identity)
+(cffi:defcfun ("graphene_quaternion_init_identity" quaternion-init-identity)
     (:pointer (:struct quaternion-t))
   (quaternion (:pointer (:struct quaternion-t))))
 
@@ -315,7 +315,7 @@
 ;;;the initialized quaternion.
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_quaternion_init_from_quaternion"
+(cffi:defcfun ("graphene_quaternion_init_from_quaternion"
            quaternion-init-from-quaternion)
     (:pointer (:struct quaternion-t))
   (quaternion (:pointer (:struct quaternion-t)))
@@ -343,7 +343,7 @@
 ;;;the initialized quaternion.
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_quaternion_init_from_vec4" quaternion-init-from-vec4)
+(cffi:defcfun ("graphene_quaternion_init_from_vec4" quaternion-init-from-vec4)
     (:pointer (:struct quaternion-t))
   (quaternion (:pointer (:struct quaternion-t)))
   (source (:pointer (:struct vec4-t))))
@@ -370,8 +370,8 @@
 ;;;the initialized quaternion.
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_quaternion_init_from_matrix" quaternion-init-from-matrix)
-    (:pointer (:struct quaternion-t))
+(cffi:defcfun ("graphene_quaternion_init_from_matrix" 
+               quaternion-init-from-matrix) (:pointer (:struct quaternion-t))
   (quaternion (:pointer (:struct quaternion-t)))
   (source (:pointer (:struct matrix-t))))
 
@@ -410,13 +410,13 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init-from-angles (quaternion xdeg ydeg zdeg wdeg)
-  (foreign-funcall "graphene_quaternion_init_from_angles"
-                   (:pointer (:struct quaternion-t)) quaternion
-                   :float (coerce xdeg 'single-float)
-                   :float (coerce ydeg 'single-float)
-                   :float (coerce zdeg 'single-float)
-                   :float (coerce wdeg 'single-float)
-                   (:pointer (:struct quaternion-t))))
+  (cffi:foreign-funcall "graphene_quaternion_init_from_angles"
+                        (:pointer (:struct quaternion-t)) quaternion
+                        :float (coerce xdeg 'single-float)
+                        :float (coerce ydeg 'single-float)
+                        :float (coerce zdeg 'single-float)
+                        :float (coerce wdeg 'single-float)
+                        (:pointer (:struct quaternion-t))))
 
 (export 'quaternion-init-from-angles)
 
@@ -453,13 +453,13 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init-from-radians (quaternion xrad yrad zrad wrad)
-  (foreign-funcall "graphene_quaternion_init_from_radians"
-                   (:pointer (:struct quaternion-t)) quaternion
-                   :float (coerce xrad 'single-float)
-                   :float (coerce yrad 'single-float)
-                   :float (coerce zrad 'single-float)
-                   :float (coerce wrad 'single-float)
-                   (:pointer (:struct quaternion-t))))
+  (cffi:foreign-funcall "graphene_quaternion_init_from_radians"
+                        (:pointer (:struct quaternion-t)) quaternion
+                        :float (coerce xrad 'single-float)
+                        :float (coerce yrad 'single-float)
+                        :float (coerce zrad 'single-float)
+                        :float (coerce wrad 'single-float)
+                        (:pointer (:struct quaternion-t))))
 
 (export 'quaternion-init-from-radians)
 
@@ -490,11 +490,11 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init-from-angle-vec3 (quaternion angle axis)
-  (foreign-funcall "graphene_quaternion_init_from_radians"
-                   (:pointer (:struct quaternion-t)) quaternion
-                   :float (coerce angle 'single-float)
-                   (:pointer (:struct vec3-t)) axis
-                   (:pointer (:struct quaternion-t))))
+  (cffi:foreign-funcall "graphene_quaternion_init_from_radians"
+                        (:pointer (:struct quaternion-t)) quaternion
+                        :float (coerce angle 'single-float)
+                        (:pointer (:struct vec3-t)) axis
+                        (:pointer (:struct quaternion-t))))
 
 (export 'quaternion-init-from-angle-vec3)
 
@@ -517,7 +517,7 @@
 ;;;     the initialized graphene_quaternion_t.
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_quaternion_init_from_euler" quaternion-init-from-euler)
+(cffi:defcfun ("graphene_quaternion_init_from_euler" quaternion-init-from-euler)
     (:pointer (:struct quaternion-t))
   (quaternion (:pointer (:struct quaternion-t)))
   (source :pointer)) ; euler-t not known at this point
@@ -542,10 +542,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-to-vec4 (quaternion result)
-  (foreign-funcall "graphene_quaternion_to_vec4"
-                   (:pointer (:struct quaternion-t)) quaternion
-                   (:pointer (:struct vec4-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_quaternion_to_vec4"
+                        (:pointer (:struct quaternion-t)) quaternion
+                        (:pointer (:struct vec4-t)) result
+                        :void)
   result)
 
 (export 'quaternion-to-vec4)
@@ -570,10 +570,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-to-matrix (quaternion result)
-  (foreign-funcall "graphene_quaternion_to_matrix"
-                   (:pointer (:struct quaternion-t)) quaternion
-                   (:pointer (:struct matrix-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_quaternion_to_matrix"
+                        (:pointer (:struct quaternion-t)) quaternion
+                        (:pointer (:struct matrix-t)) result
+                        :void)
   result)
 
 

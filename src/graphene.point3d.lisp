@@ -2,29 +2,29 @@
 ;;; graphene.point3d.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library.
-;;; See <https://ebassi.github.io/graphene/docs/>.
-;;; The API documentation of the Lisp binding is available from
-;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;; and modified to document the Lisp binding to the Graphene library. See 
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 Dieter Kaiser
+;;; Copyright (C) 2022 - 2023 Dieter Kaiser
 ;;;
-;;; This program is free software: you can redistribute it and/or modify
-;;; it under the terms of the GNU Lesser General Public License for Lisp
-;;; as published by the Free Software Foundation, either version 3 of the
-;;; License, or (at your option) any later version and with a preamble to
-;;; the GNU Lesser General Public License that clarifies the terms for use
-;;; with Lisp programs and is referred as the LLGPL.
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the "Software"),
+;;; to deal in the Software without restriction, including without limitation
+;;; the rights to use, copy, modify, merge, publish, distribute, sublicense,
+;;; and/or sell copies of the Software, and to permit persons to whom the
+;;; Software is furnished to do so, subject to the following conditions:
 ;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU Lesser General Public License for more details.
+;;; The above copyright notice and this permission notice shall be included in
+;;; all copies or substantial portions of the Software.
 ;;;
-;;; You should have received a copy of the GNU Lesser General Public
-;;; License along with this program and the preamble to the Gnu Lesser
-;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
-;;; and <http://opensource.franz.com/preamble.html>.
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+;;; DEALINGS IN THE SOFTWARE.
 ;;; ----------------------------------------------------------------------------
 ;;;
 ;;; Point3D
@@ -200,7 +200,7 @@
 ;;; graphene_point3d_t
 ;;; ----------------------------------------------------------------------------
 
-(defcstruct point3d-t
+(cffi:defcstruct point3d-t
   (x :float)
   (y :float)
   (z :float))
@@ -215,7 +215,7 @@
   point with three coordinates.
   @end{short}
   @begin{pre}
-(defcstruct point3d-t
+(cffi:defcstruct point3d-t
   (x :float)
   (y :float)
   (z :float))
@@ -234,10 +234,10 @@
 ;;; --- point3d-x --------------------------------------------------------------
 
 (defun (setf point3d-x) (value point)
-  (setf (foreign-slot-value point '(:struct point3d-t) 'x) value))
+  (setf (cffi:foreign-slot-value point '(:struct point3d-t) 'x) value))
 
 (defun point3d-x (point)
-  (foreign-slot-value point '(:struct point3d-t) 'x))
+  (cffi:foreign-slot-value point '(:struct point3d-t) 'x))
 
 #+liber-documentation
 (setf (liber:alias-for-function 'point3d-x)
@@ -269,10 +269,10 @@
 ;;; --- point3d-y --------------------------------------------------------------
 
 (defun (setf point3d-y) (value point)
-  (setf (foreign-slot-value point '(:struct point3d-t) 'y) value))
+  (setf (cffi:foreign-slot-value point '(:struct point3d-t) 'y) value))
 
 (defun point3d-y (point)
-  (foreign-slot-value point '(:struct point3d-t) 'y))
+  (cffi:foreign-slot-value point '(:struct point3d-t) 'y))
 
 #+liber-documentation
 (setf (liber:alias-for-function 'point3d-y)
@@ -295,10 +295,10 @@
 ;;; --- point3d-z --------------------------------------------------------------
 
 (defun point3d-z (point)
-  (foreign-slot-value point '(:struct point3d-t) 'z))
+  (cffi:foreign-slot-value point '(:struct point3d-t) 'z))
 
 (defun (setf point3d-z) (value point)
-  (setf (foreign-slot-value point '(:struct point3d-t) 'z) value))
+  (setf (cffi:foreign-slot-value point '(:struct point3d-t) 'z) value))
 
 #+liber-documentation
 (setf (liber:alias-for-function 'point3d-z)
@@ -322,7 +322,7 @@
 ;;; graphene_point3d_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point3d_alloc" point3d-alloc)
+(cffi:defcfun ("graphene_point3d_alloc" point3d-alloc)
     (:pointer (:struct point3d-t))
  #+liber-documentation
  "@version{#2022-10-1}
@@ -354,7 +354,7 @@
 ;;; graphene_point3d_free ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point3d_free" point3d-free) :void
+(cffi:defcfun ("graphene_point3d_free" point3d-free) :void
  #+liber-documentation
  "@version{#2022-10-1}
   @argument[point]{a @symbol{point3d-t} instance}
@@ -371,7 +371,7 @@
 ;;; graphene_point3d_zero ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point3d_zero" point3d-zero)
+(cffi:defcfun ("graphene_point3d_zero" point3d-zero)
     (:pointer (:struct point3d-t))
  #+liber-documentation
  "@version{#2022-10-1}
@@ -411,12 +411,12 @@
   @end{short}
   It is safe to call this function multiple times.
   @see-symbol{point3d-t}"
-  (foreign-funcall "graphene_point3d_init"
-                   (:pointer (:struct point3d-t)) point
-                   :float (coerce x 'single-float)
-                   :float (coerce y 'single-float)
-                   :float (coerce z 'single-float)
-                   (:pointer (:struct point3d-t))))
+  (cffi:foreign-funcall "graphene_point3d_init"
+                        (:pointer (:struct point3d-t)) point
+                        :float (coerce x 'single-float)
+                        :float (coerce y 'single-float)
+                        :float (coerce z 'single-float)
+                        (:pointer (:struct point3d-t))))
 
 (export 'point3d-init)
 
@@ -424,7 +424,7 @@
 ;;; graphene_point3d_init_from_point ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point3d_init_from_point" point3d-init-from-point)
+(cffi:defcfun ("graphene_point3d_init_from_point" point3d-init-from-point)
     (:pointer (:struct point3d-t))
  #+liber-documentation
  "@version{#2022-10-1}
@@ -442,7 +442,7 @@
 ;;; graphene_point3d_init_from_vec3 ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point3d_init_from_vec3" point3d-init-from-vec3)
+(cffi:defcfun ("graphene_point3d_init_from_vec3" point3d-init-from-vec3)
    (:pointer (:struct point3d-t))
  #+liber-documentation
  "@version{#2022-10-1}
@@ -478,10 +478,10 @@
   @end{dictionary}
   @see-symbol{point3d-t}
   @see-symbol{vec3-t}"
-  (foreign-funcall "graphene_point3d_to_vec3"
-                   (:pointer (:struct point3d-t)) point
-                   :pointer vector ; vec3-t not known at this point
-                   :void)
+  (cffi:foreign-funcall "graphene_point3d_to_vec3"
+                        (:pointer (:struct point3d-t)) point
+                        :pointer vector ; vec3-t not known at this point
+                        :void)
   vector)
 
 (export 'point3d-to-vec3)
@@ -490,7 +490,7 @@
 ;;; graphene_point3d_equal ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point3d_equal" point3d-equal) :bool
+(cffi:defcfun ("graphene_point3d_equal" point3d-equal) :bool
  #+liber-documentation
  "@version{#2022-10-1}
   @argument[a]{a @symbol{point3d-t} instance}
@@ -529,11 +529,11 @@
   @end{short}
   @see-symbol{point-t}
   @see-function{point3d-equal}"
-  (foreign-funcall "graphene_point3d_near"
-                   (:pointer (:struct point3d-t)) a
-                   (:pointer (:struct point3d-t)) b
-                   :float (coerce epsilon 'single-float)
-                   :bool))
+  (cffi:foreign-funcall "graphene_point3d_near"
+                        (:pointer (:struct point3d-t)) a
+                        (:pointer (:struct point3d-t)) b
+                        :float (coerce epsilon 'single-float)
+                        :bool))
 
 (export 'point3d-near)
 
@@ -553,11 +553,11 @@
   @short{Computes the distance between the two given points.}
   @see-symbol{point3d-t}
   @see-symbol{vec3-t}"
-  (values (foreign-funcall "graphene_point3d_distance"
-                           (:pointer (:struct point3d-t)) a
-                           (:pointer (:struct point3d-t)) b
-                           :pointer delta ; vec3-t not known
-                           :float)
+  (values (cffi:foreign-funcall "graphene_point3d_distance"
+                                (:pointer (:struct point3d-t)) a
+                                (:pointer (:struct point3d-t)) b
+                                :pointer delta ; vec3-t not known
+                                :float)
           delta))
 
 (export 'point3d-distance)
@@ -590,12 +590,12 @@
     @end{pre}
   @end{dictionary}
   @see-symbol{point3d-t}"
-  (foreign-funcall "graphene_point3d_interpolate"
-                   (:pointer (:struct point3d-t)) a
-                   (:pointer (:struct point3d-t)) b
-                   :double (coerce factor 'double-float)
-                   (:pointer (:struct point3d-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_point3d_interpolate"
+                        (:pointer (:struct point3d-t)) a
+                        (:pointer (:struct point3d-t)) b
+                        :double (coerce factor 'double-float)
+                        (:pointer (:struct point3d-t)) result
+                        :void)
   result)
 
 (export 'point3d-interpolate)
@@ -615,11 +615,11 @@
     Scales the coordinates of the given point by the given factor.
   @end{short}
   @see-symbol{point3d-t}"
-  (foreign-funcall "graphene_point3d_scale"
-                   (:pointer (:struct point3d-t)) point
-                   :float (coerce factor 'single-float)
-                   (:pointer (:struct point3d-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_point3d_scale"
+                        (:pointer (:struct point3d-t)) point
+                        :float (coerce factor 'single-float)
+                        (:pointer (:struct point3d-t)) result
+                        :void)
   result)
 
 (export 'point3d-scale)
@@ -637,11 +637,11 @@
   @return{The @symbol{point3d-t} instance with the cross product.}
   @short{Computes the cross product of the two given points.}
   @see-symbol{point3d-t}"
-  (foreign-funcall "graphene_point3d_cross"
-                   (:pointer (:struct point3d-t)) a
-                   (:pointer (:struct point3d-t)) b
-                   (:pointer (:struct point3d-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_point3d_cross"
+                        (:pointer (:struct point3d-t)) a
+                        (:pointer (:struct point3d-t)) b
+                        (:pointer (:struct point3d-t)) result
+                        :void)
   result)
 
 (export 'point3d-cross)
@@ -650,7 +650,7 @@
 ;;; graphene_point3d_dot ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point3d_dot" point3d-dot) :float
+(cffi:defcfun ("graphene_point3d_dot" point3d-dot) :float
  #+liber-documentation
  "@version{#2022-10-1}
   @argument[a]{a @symbol{point3d-t} instance}
@@ -667,7 +667,7 @@
 ;;; graphene_point3d_length ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point3d_length" point3d-length) :float
+(cffi:defcfun ("graphene_point3d_length" point3d-length) :float
  #+liber-documentation
  "@version{#2022-10-1}
   @argument[point]{a @symbol{point3d-t} instance}
@@ -696,10 +696,10 @@
     the given point.
   @end{short}
   @see-symbol{point3d-t}"
-  (foreign-funcall "graphene_point3d_normalize"
-                   (:pointer (:struct point3d-t)) point
-                   (:pointer (:struct point3d-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_point3d_normalize"
+                        (:pointer (:struct point3d-t)) point
+                        (:pointer (:struct point3d-t)) result
+                        :void)
   result)
 
 (export 'point3d-normalize)
@@ -727,13 +727,13 @@
   The coordinates of the resulting point will be in the [-1.0, 1.0] range.
   @see-symbol{point3d-t}
   @see-symbol{rect-t}"
-  (foreign-funcall "graphene_point3d_normalize_viewport"
-                   (:pointer (:struct point3d-t)) point
-                   (:pointer (:struct rect-t)) viewport
-                   :float (coerce znear 'single-float)
-                   :float (coerce zfar 'single-float)
-                   (:pointer (:struct point3d-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_point3d_normalize_viewport"
+                        (:pointer (:struct point3d-t)) point
+                        (:pointer (:struct rect-t)) viewport
+                        :float (coerce znear 'single-float)
+                        :float (coerce zfar 'single-float)
+                        (:pointer (:struct point3d-t)) result
+                        :void)
   result)
 
 (export 'point3d-normalize-viewport)

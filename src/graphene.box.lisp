@@ -2,29 +2,29 @@
 ;;; graphene.box.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library.
-;;; See <https://ebassi.github.io/graphene/docs/>.
-;;; The API documentation of the Lisp binding is available from
-;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;; and modified to document the Lisp binding to the Graphene library. See 
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 Dieter Kaiser
+;;; Copyright (C) 2022 - 2023 Dieter Kaiser
 ;;;
-;;; This program is free software: you can redistribute it and/or modify
-;;; it under the terms of the GNU Lesser General Public License for Lisp
-;;; as published by the Free Software Foundation, either version 3 of the
-;;; License, or (at your option) any later version and with a preamble to
-;;; the GNU Lesser General Public License that clarifies the terms for use
-;;; with Lisp programs and is referred as the LLGPL.
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the "Software"),
+;;; to deal in the Software without restriction, including without limitation
+;;; the rights to use, copy, modify, merge, publish, distribute, sublicense,
+;;; and/or sell copies of the Software, and to permit persons to whom the
+;;; Software is furnished to do so, subject to the following conditions:
 ;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU Lesser General Public License for more details.
+;;; The above copyright notice and this permission notice shall be included in
+;;; all copies or substantial portions of the Software.
 ;;;
-;;; You should have received a copy of the GNU Lesser General Public
-;;; License along with this program and the preamble to the Gnu Lesser
-;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
-;;; and <http://opensource.franz.com/preamble.html>.
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+;;; DEALINGS IN THE SOFTWARE.
 ;;; ----------------------------------------------------------------------------
 ;;;
 ;;; Box
@@ -142,7 +142,7 @@
 ;;; graphene_box_t
 ;;; ----------------------------------------------------------------------------
 
-(defcstruct box-t)
+(cffi:defcstruct box-t)
 
 #+liber-documentation
 (setf (liber:alias-for-symbol 'box-t)
@@ -161,8 +161,7 @@
 ;;; graphene_box_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_alloc" box-alloc)
-    (:pointer (:struct box-t))
+(cffi:defcfun ("graphene_box_alloc" box-alloc) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-22}
   @return{The newly allocated @symbol{box-t} instance. Use the
@@ -180,7 +179,7 @@
 ;;; graphene_box_free ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_free" box-free) :void
+(cffi:defcfun ("graphene_box_free" box-free) :void
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[box]{a @symbol{box-t} instance}
@@ -197,7 +196,7 @@
 ;;; graphene_box_init ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_init" box-init) (:pointer (:struct box-t))
+(cffi:defcfun ("graphene_box_init" box-init) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[box]{a @symbol{box-t} instance to initialize}
@@ -221,7 +220,7 @@
 ;;; graphene_box_init_from_box ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_init_from_box" box-init-from-box)
+(cffi:defcfun ("graphene_box_init_from_box" box-init-from-box)
     (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-22}
@@ -262,7 +261,7 @@
 ;;; graphene_box_init_from_vec3 ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_init_from_vec3" box-init-from-vec3)
+(cffi:defcfun ("graphene_box_init_from_vec3" box-init-from-vec3)
     (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-22}
@@ -307,7 +306,7 @@
 ;;; graphene_box_equal ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_equal" box-equal) :bool
+(cffi:defcfun ("graphene_box_equal" box-equal) :bool
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[a]{a @symbol{box-t} instance to initialize}
@@ -340,11 +339,11 @@
   @end{short}
   @see-symbol{box-t}
   @see-symbol{point3d-t}"
-  (foreign-funcall "graphene_box_expand"
-                   (:pointer (:struct box-t)) box
-                   (:pointer (:struct point3d-t)) point
-                   (:pointer (:struct box-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_box_expand"
+                        (:pointer (:struct box-t)) box
+                        (:pointer (:struct point3d-t)) point
+                        (:pointer (:struct box-t)) result
+                        :void)
   result)
 
 (export 'box-expand)
@@ -366,11 +365,11 @@
   If the @arg{scalar} argument is positive, the box will grow. If the
   @arg{scalar} argument is negative, the box will shrink.
   @see-symbol{box-t}"
-  (foreign-funcall "graphene_box_expand_scalar"
-                   (:pointer (:struct box-t)) box
-                   :float (coerce scalar 'single-float)
-                   (:pointer (:struct box-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_box_expand_scalar"
+                        (:pointer (:struct box-t)) box
+                        :float (coerce scalar 'single-float)
+                        (:pointer (:struct box-t)) result
+                        :void)
   result)
 
 (export 'box-expand-scalar)
@@ -393,11 +392,11 @@
   @end{short}
   @see-symbol{box-t}
   @see-symbol{vec3-t}"
-  (foreign-funcall "graphene_box_expand_vec3"
-                   (:pointer (:struct box-t)) box
-                   (:pointer (:struct vec3-t)) vector
-                   (:pointer (:struct box-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_box_expand_vec3"
+                        (:pointer (:struct box-t)) box
+                        (:pointer (:struct vec3-t)) vector
+                        (:pointer (:struct box-t)) result
+                        :void)
   result)
 
 (export 'box-expand-vec3)
@@ -417,10 +416,10 @@
   @end{short}
   @see-symbol{box-t}
   @see-symbol{point3d-t}"
-  (foreign-funcall "graphene_box_get_min"
-                   (:pointer (:struct box-t)) box
-                   (:pointer (:struct point3d-t)) min
-                   :void)
+  (cffi:foreign-funcall "graphene_box_get_min"
+                        (:pointer (:struct box-t)) box
+                        (:pointer (:struct point3d-t)) min
+                        :void)
   min)
 
 (export 'box-min)
@@ -440,10 +439,10 @@
   @end{short}
   @see-symbol{box-t}
   @see-symbol{point3d-t}"
-  (foreign-funcall "graphene_box_get_max"
-                   (:pointer (:struct box-t)) box
-                   (:pointer (:struct point3d-t)) max
-                   :void)
+  (cffi:foreign-funcall "graphene_box_get_max"
+                        (:pointer (:struct box-t)) box
+                        (:pointer (:struct point3d-t)) max
+                        :void)
   max)
 
 (export 'box-max)
@@ -464,10 +463,10 @@
   @end{short}
   @see-symbol{box-t}
   @see-symbol{point3d-t}"
-  (foreign-funcall "graphene_box_get_center"
-                   (:pointer (:struct box-t)) box
-                   (:pointer (:struct point3d-t)) center
-                   :void)
+  (cffi:foreign-funcall "graphene_box_get_center"
+                        (:pointer (:struct box-t)) box
+                        (:pointer (:struct point3d-t)) center
+                        :void)
   center)
 
 (export 'box-center)
@@ -476,7 +475,7 @@
 ;;; graphene_box_get_depth ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_get_depth" box-depth) :float
+(cffi:defcfun ("graphene_box_get_depth" box-depth) :float
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[box]{a @symbol{box-t} instance}
@@ -493,7 +492,7 @@
 ;;; graphene_box_get_height ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_get_height" box-height) :float
+(cffi:defcfun ("graphene_box_get_height" box-height) :float
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[box]{a @symbol{box-t} instance}
@@ -510,7 +509,7 @@
 ;;; graphene_box_get_width ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_get_width" box-width) :float
+(cffi:defcfun ("graphene_box_get_width" box-width) :float
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[box]{a @symbol{box-t} instance}
@@ -539,10 +538,10 @@
   @end{short}
   @see-symbol{box-t}
   @see-symbol{vec3-t}"
-  (foreign-funcall "graphene_box_get_size"
-                   (:pointer (:struct box-t)) box
-                   (:pointer (:struct vec3-t)) size
-                   :void)
+  (cffi:foreign-funcall "graphene_box_get_size"
+                        (:pointer (:struct box-t)) box
+                        (:pointer (:struct vec3-t)) size
+                        :void)
   size)
 
 (export 'box-size)
@@ -562,10 +561,10 @@
   @end{short}
   @see-symbol{box-t}
   @see-symbol{sphere-t}"
-  (foreign-funcall "graphene_box_get_bounding_sphere"
-                   (:pointer (:struct box-t)) box
-                   (:pointer (:struct sphere-t)) sphere
-                   :void)
+  (cffi:foreign-funcall "graphene_box_get_bounding_sphere"
+                        (:pointer (:struct box-t)) box
+                        (:pointer (:struct sphere-t)) sphere
+                        :void)
   sphere)
 
 (export 'box-bounding-sphere)
@@ -634,11 +633,11 @@
     Unions the two given boxes.
   @end{short}
   @see-symbol{box-t}"
-  (foreign-funcall "graphene_box_union"
-                   (:pointer (:struct box-t)) a
-                   (:pointer (:struct box-t)) b
-                   (:pointer (:struct box-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_box_union"
+                        (:pointer (:struct box-t)) a
+                        (:pointer (:struct box-t)) b
+                        (:pointer (:struct box-t)) result
+                        :void)
   result)
 
 (export 'box-union)
@@ -662,11 +661,11 @@
   initialized with the @fun{box-empty} values.
   @see-symbol{box-t}
   @see-function{box-empty}"
-  (let ((success (foreign-funcall "graphene_box_union"
-                                  (:pointer (:struct box-t)) a
-                                  (:pointer (:struct box-t)) b
-                                  (:pointer (:struct box-t)) result
-                                  :bool)))
+  (let ((success (cffi:foreign-funcall "graphene_box_union"
+                                       (:pointer (:struct box-t)) a
+                                       (:pointer (:struct box-t)) b
+                                       (:pointer (:struct box-t)) result
+                                       :bool)))
     (values result success)))
 
 (export 'box-intersection)
@@ -675,7 +674,7 @@
 ;;; graphene_box_contains_box ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_contains_box" box-contains-box) :bool
+(cffi:defcfun ("graphene_box_contains_box" box-contains-box) :bool
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[a]{a @symbol{box-t} instance}
@@ -694,7 +693,7 @@
 ;;; graphene_box_contains_point ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_contains_point" box-contains-point) :bool
+(cffi:defcfun ("graphene_box_contains_point" box-contains-point) :bool
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[box]{a @symbol{box-t} instance}
@@ -714,7 +713,7 @@
 ;;; graphene_box_zero ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_zero" box-zero) (:pointer (:struct box-t))
+(cffi:defcfun ("graphene_box_zero" box-zero) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
   @return{A @symbol{box-t} instance.}
@@ -730,7 +729,7 @@
 ;;; graphene_box_one ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_one" box-one) (:pointer (:struct box-t))
+(cffi:defcfun ("graphene_box_one" box-one) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
   @return{A @symbol{box-t} instance.}
@@ -746,7 +745,8 @@
 ;;; graphene_box_minus_one ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_minus_one" box-minus-one) (:pointer (:struct box-t))
+(cffi:defcfun ("graphene_box_minus_one" box-minus-one) 
+    (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
   @return{A @symbol{box-t} instance.}
@@ -763,7 +763,7 @@
 ;;; graphene_box_one_minus_one ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_one_minus_one" box-one-minus-one)
+(cffi:defcfun ("graphene_box_one_minus_one" box-one-minus-one)
     (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
@@ -781,7 +781,7 @@
 ;;; graphene_box_empty ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_empty" box-empty) (:pointer (:struct box-t))
+(cffi:defcfun ("graphene_box_empty" box-empty) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
   @return{A @symbol{box-t} instance.}
@@ -797,7 +797,7 @@
 ;;; graphene_box_infinite ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_box_infinite" box-infinite) (:pointer (:struct box-t))
+(cffi:defcfun ("graphene_box_infinite" box-infinite) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
   @return{A @symbol{box-t} instance.}

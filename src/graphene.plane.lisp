@@ -2,29 +2,29 @@
 ;;; graphene.plane.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library.
-;;; See <https://ebassi.github.io/graphene/docs/>.
-;;; The API documentation of the Lisp binding is available from
-;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;; and modified to document the Lisp binding to the Graphene library. See 
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 Dieter Kaiser
+;;; Copyright (C) 2022 - 2023 Dieter Kaiser
 ;;;
-;;; This program is free software: you can redistribute it and/or modify
-;;; it under the terms of the GNU Lesser General Public License for Lisp
-;;; as published by the Free Software Foundation, either version 3 of the
-;;; License, or (at your option) any later version and with a preamble to
-;;; the GNU Lesser General Public License that clarifies the terms for use
-;;; with Lisp programs and is referred as the LLGPL.
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the "Software"),
+;;; to deal in the Software without restriction, including without limitation
+;;; the rights to use, copy, modify, merge, publish, distribute, sublicense,
+;;; and/or sell copies of the Software, and to permit persons to whom the
+;;; Software is furnished to do so, subject to the following conditions:
 ;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU Lesser General Public License for more details.
+;;; The above copyright notice and this permission notice shall be included in
+;;; all copies or substantial portions of the Software.
 ;;;
-;;; You should have received a copy of the GNU Lesser General Public
-;;; License along with this program and the preamble to the Gnu Lesser
-;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
-;;; and <http://opensource.franz.com/preamble.html>.
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+;;; DEALINGS IN THE SOFTWARE.
 ;;; ----------------------------------------------------------------------------
 ;;;
 ;;; Plane
@@ -150,7 +150,7 @@
 ;;; Since 1.2
 ;;; ----------------------------------------------------------------------------
 
-(defcstruct plane-t)
+(cffi:defcstruct plane-t)
 
 #+liber-documentation
 (setf (liber:alias-for-symbol 'plane-t)
@@ -170,8 +170,7 @@
 ;;; graphene_plane_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_plane_alloc" plane-alloc)
-    (:pointer (:struct plane-t))
+(cffi:defcfun ("graphene_plane_alloc" plane-alloc) (:pointer (:struct plane-t))
  #+liber-documentation
  "@version{#2022-9-25}
   @return{The newly allocated @symbol{plane-t} instance. Use the
@@ -189,7 +188,7 @@
 ;;; graphene_plane_free ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_plane_free" plane-free) :void
+(cffi:defcfun ("graphene_plane_free" plane-free) :void
  #+liber-documentation
  "@version{#2022-9-25}
   @argument[plane]{a @symbol{plane-t} instance}
@@ -223,11 +222,11 @@
   @end{short}
   @see-symbol{plane-t}
   @see-symbol{vec3-t}"
-  (foreign-funcall "graphene_plane_init"
-                   (:pointer (:struct plane-t)) plane
-                   (:pointer (:struct vec3-t)) normal
-                   :float (coerce constant 'single-float)
-                   (:pointer (:struct plane-t))))
+  (cffi:foreign-funcall "graphene_plane_init"
+                        (:pointer (:struct plane-t)) plane
+                        (:pointer (:struct vec3-t)) normal
+                        :float (coerce constant 'single-float)
+                        (:pointer (:struct plane-t))))
 
 (export 'plane-init)
 
@@ -235,7 +234,7 @@
 ;;; graphene_plane_init_from_vec4 ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_plane_init_from_vec4" plane-init-from-vec4)
+(cffi:defcfun ("graphene_plane_init_from_vec4" plane-init-from-vec4)
     (:pointer (:struct plane-t))
  #+liber-documentation
  "@version{#2022-9-30}
@@ -258,7 +257,7 @@
 ;;; graphene_plane_init_from_plane ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_plane_init_from_plane" plane-init-from-plane)
+(cffi:defcfun ("graphene_plane_init_from_plane" plane-init-from-plane)
     (:pointer (:struct plane-t))
  #+liber-documentation
  "@version{#2022-9-30}
@@ -279,7 +278,7 @@
 ;;; graphene_plane_init_from_point ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_plane_init_from_point" plane-init-from-point)
+(cffi:defcfun ("graphene_plane_init_from_point" plane-init-from-point)
     (:pointer (:struct plane-t))
  #+liber-documentation
  "@version{#2022-9-30}
@@ -305,7 +304,7 @@
 ;;; graphene_plane_init_from_points ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_plane_init_from_points" plane-init-from-points)
+(cffi:defcfun ("graphene_plane_init_from_points" plane-init-from-points)
     (:pointer (:struct plane-t))
  #+liber-documentation
  "@version{#2022-9-30}
@@ -343,10 +342,10 @@
     accordingly.
   @end{short}
   @see-symbol{plane-t}"
-  (foreign-funcall "graphene_plane_normalize"
-                   (:pointer (:struct plane-t)) plane
-                   (:pointer (:struct plane-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_plane_normalize"
+                        (:pointer (:struct plane-t)) plane
+                        (:pointer (:struct plane-t)) result
+                        :void)
   result)
 
 (export 'plane-normalize)
@@ -366,10 +365,10 @@
     the plane across the origin.
   @end{short}
   @see-symbol{plane-t}"
-  (foreign-funcall "graphene_plane_negate"
-                   (:pointer (:struct plane-t)) plane
-                   (:pointer (:struct plane-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_plane_negate"
+                        (:pointer (:struct plane-t)) plane
+                        (:pointer (:struct plane-t)) result
+                        :void)
   result)
 
 (export 'plane-negate)
@@ -378,7 +377,7 @@
 ;;; graphene_plane_equal ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_plane_equal" plane-equal) :bool
+(cffi:defcfun ("graphene_plane_equal" plane-equal) :bool
  #+liber-documentation
  "@version{#2022-9-30}
   @argument[a]{a @symbol{plane-t} instance}
@@ -397,7 +396,7 @@
 ;;; graphene_plane_distance ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_plane_distance" plane-distance) :float
+(cffi:defcfun ("graphene_plane_distance" plane-distance) :float
  #+liber-documentation
  "@version{#2022-9-30}
   @argument[plane]{a @symbol{plane-t} instance}
@@ -433,14 +432,14 @@
   beforehand to avoid incurring in the cost of recomputing it every time.
   @see-symbol{plane-t}
   @see-symbol{matrix-t}"
-  (foreign-funcall "graphene_plane_transform"
-                   (:pointer (:struct plane-t)) plane
-                   (:pointer (:struct matrix-t)) matrix
-                   (:pointer (:struct matrix-t)) (if normal
-                                                     normal
-                                                     (null-pointer))
-                   (:pointer (:struct plane-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_plane_transform"
+                        (:pointer (:struct plane-t)) plane
+                        (:pointer (:struct matrix-t)) matrix
+                        (:pointer (:struct matrix-t)) (if normal
+                                                          normal
+                                                          (cffi:null-pointer))
+                        (:pointer (:struct plane-t)) result
+                        :void)
   result)
 
 (export 'plane-transform)
@@ -461,10 +460,10 @@
   @end{short}
   @see-symbol{plane-t}
   @see-symbol{vec3-t}"
-  (foreign-funcall "graphene_plane_get_normal"
-                   (:pointer (:struct plane-t)) plane
-                   (:pointer (:struct vec3-t)) normal
-                   :void)
+  (cffi:foreign-funcall "graphene_plane_get_normal"
+                        (:pointer (:struct plane-t)) plane
+                        (:pointer (:struct vec3-t)) normal
+                        :void)
   normal)
 
 (export 'plane-normal)
@@ -473,7 +472,7 @@
 ;;; graphene_plane_get_constant ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_plane_get_constant" plane-constant) :float
+(cffi:defcfun ("graphene_plane_get_constant" plane-constant) :float
  #+liber-documentation
  "@version{#2022-9-30}
   @argument[plane]{a @symbol{plane-t} instance}

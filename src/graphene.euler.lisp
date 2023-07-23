@@ -2,29 +2,29 @@
 ;;; graphene.euler.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library.
-;;; See <https://ebassi.github.io/graphene/docs/>.
-;;; The API documentation of the Lisp binding is available from
-;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;; and modified to document the Lisp binding to the Graphene library. See 
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 Dieter Kaiser
+;;; Copyright (C) 2022 - 2023 Dieter Kaiser
 ;;;
-;;; This program is free software: you can redistribute it and/or modify
-;;; it under the terms of the GNU Lesser General Public License for Lisp
-;;; as published by the Free Software Foundation, either version 3 of the
-;;; License, or (at your option) any later version and with a preamble to
-;;; the GNU Lesser General Public License that clarifies the terms for use
-;;; with Lisp programs and is referred as the LLGPL.
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the "Software"),
+;;; to deal in the Software without restriction, including without limitation
+;;; the rights to use, copy, modify, merge, publish, distribute, sublicense,
+;;; and/or sell copies of the Software, and to permit persons to whom the
+;;; Software is furnished to do so, subject to the following conditions:
 ;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU Lesser General Public License for more details.
+;;; The above copyright notice and this permission notice shall be included in
+;;; all copies or substantial portions of the Software.
 ;;;
-;;; You should have received a copy of the GNU Lesser General Public
-;;; License along with this program and the preamble to the Gnu Lesser
-;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
-;;; and <http://opensource.franz.com/preamble.html>.
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+;;; DEALINGS IN THE SOFTWARE.
 ;;; ----------------------------------------------------------------------------
 ;;;
 ;;; Euler
@@ -154,7 +154,7 @@
 ;;; graphene_euler_order_t
 ;;; ----------------------------------------------------------------------------
 
-(defcenum euler-order-t
+(cffi:defcenum euler-order-t
   :default
   :XYZ  :YZX  :ZXY  :XZY  :YXZ  :ZYX
 
@@ -177,7 +177,7 @@
   The @code{:default} value is special, and is used as an alias for one of the
   other orders.
   @begin{pre}
-(defcenum euler-order-t
+(cffi:defcenum euler-order-t
   :default
 
   :XYZ  :YZX  :ZXY  :XZY  :YXZ  :ZYX
@@ -238,7 +238,7 @@
 ;;; graphene_euler_t
 ;;; ----------------------------------------------------------------------------
 
-(defcstruct euler-t)
+(cffi:defcstruct euler-t)
 
 #+liber-documentation
 (setf (liber:alias-for-symbol 'euler-t)
@@ -313,7 +313,7 @@ G × B × A = R
 ;;; graphene_euler_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_alloc" euler-alloc)
+(cffi:defcfun ("graphene_euler_alloc" euler-alloc)
     (:pointer (:struct euler-t))
  #+liber-documentation
  "@version{#2022-9-23}
@@ -329,7 +329,7 @@ G × B × A = R
 ;;; graphene_euler_free ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_free" euler-free) :void
+(cffi:defcfun ("graphene_euler_free" euler-free) :void
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[euler]{a @symbol{euler-t} instance}
@@ -361,12 +361,12 @@ G × B × A = R
   @symbol{euler-order-t} enumeration.
   @see-symbol{euler-t}
   @see-symbol{euler-order-t}"
-  (foreign-funcall "graphene_euler_init"
-                   (:pointer (:struct euler-t)) euler
-                   :float (coerce x 'single-float)
-                   :float (coerce y 'single-float)
-                   :float (coerce z 'single-float)
-                   (:pointer (:struct euler-t))))
+  (cffi:foreign-funcall "graphene_euler_init"
+                        (:pointer (:struct euler-t)) euler
+                        :float (coerce x 'single-float)
+                        :float (coerce y 'single-float)
+                        :float (coerce z 'single-float)
+                        (:pointer (:struct euler-t))))
 
 (export 'euler-init)
 
@@ -389,13 +389,13 @@ G × B × A = R
   @end{short}
   @see-symbol{euler-t}
   @see-symbol{euler-order-t}"
-  (foreign-funcall "graphene_euler_init_with_order"
-                   (:pointer (:struct euler-t)) euler
-                   :float (coerce x 'single-float)
-                   :float (coerce y 'single-float)
-                   :float (coerce z 'single-float)
-                   euler-order-t order
-                   (:pointer (:struct euler-t))))
+  (cffi:foreign-funcall "graphene_euler_init_with_order"
+                        (:pointer (:struct euler-t)) euler
+                        :float (coerce x 'single-float)
+                        :float (coerce y 'single-float)
+                        :float (coerce z 'single-float)
+                        euler-order-t order
+                        (:pointer (:struct euler-t))))
 
 (export 'euler-init-with-order)
 
@@ -403,7 +403,7 @@ G × B × A = R
 ;;; graphene_euler_init_from_matrix ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_init_from_matrix" euler-init-from-matrix)
+(cffi:defcfun ("graphene_euler_init_from_matrix" euler-init-from-matrix)
     (:pointer (:struct euler-t))
  #+liber-documentation
  "@version{#2022-9-23}
@@ -430,7 +430,7 @@ G × B × A = R
 ;;; graphene_euler_init_from_quaternion ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_init_from_quaternion" euler-init-from-quaternion)
+(cffi:defcfun ("graphene_euler_init_from_quaternion" euler-init-from-quaternion)
     (:pointer (:struct euler-t))
  #+liber-documentation
  "@version{#2022-9-23}
@@ -458,7 +458,7 @@ G × B × A = R
 ;;; graphene_euler_init_from_vec3 ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_init_from_vec3" euler-init-from-vec3)
+(cffi:defcfun ("graphene_euler_init_from_vec3" euler-init-from-vec3)
     (:pointer (:struct euler-t))
  #+liber-documentation
  "@version{#2022-9-23}
@@ -487,7 +487,7 @@ G × B × A = R
 ;;; graphene_euler_init_from_euler ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_init_from_euler" euler-init-from-euler)
+(cffi:defcfun ("graphene_euler_init_from_euler" euler-init-from-euler)
     (:pointer (:struct euler-t))
  #+liber-documentation
  "@version{#2022-9-23}
@@ -526,13 +526,13 @@ G × B × A = R
   @end{short}
   @see-symbol{euler-t}
   @see-symbol{euler-order-t}"
-  (foreign-funcall "graphene_euler_init_from_radians"
-                   (:pointer (:struct euler-t)) euler
-                   :float (coerce x 'single-float)
-                   :float (coerce y 'single-float)
-                   :float (coerce z 'single-float)
-                   euler-order-t order
-                   (:pointer (:struct euler-t))))
+  (cffi:foreign-funcall "graphene_euler_init_from_radians"
+                        (:pointer (:struct euler-t)) euler
+                        :float (coerce x 'single-float)
+                        :float (coerce y 'single-float)
+                        :float (coerce z 'single-float)
+                        euler-order-t order
+                        (:pointer (:struct euler-t))))
 
 (export 'euler-init-from-radians)
 
@@ -540,7 +540,7 @@ G × B × A = R
 ;;; graphene_euler_equal ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_equal" euler-equal) :bool
+(cffi:defcfun ("graphene_euler_equal" euler-equal) :bool
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[a]{a @symbol{euler-t} instance}
@@ -557,7 +557,7 @@ G × B × A = R
 ;;; graphene_euler_get_x ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_get_x" euler-x) :float
+(cffi:defcfun ("graphene_euler_get_x" euler-x) :float
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[euler]{a @symbol{euler-t} instance}
@@ -572,7 +572,7 @@ G × B × A = R
 ;;; graphene_euler_get_y ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_get_y" euler-y) :float
+(cffi:defcfun ("graphene_euler_get_y" euler-y) :float
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[euler]{a @symbol{euler-t} instance}
@@ -587,7 +587,7 @@ G × B × A = R
 ;;; graphene_euler_get_z ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_get_z" euler-z) :float
+(cffi:defcfun ("graphene_euler_get_z" euler-z) :float
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[euler]{a @symbol{euler-t} instance}
@@ -602,7 +602,7 @@ G × B × A = R
 ;;; graphene_euler_get_order ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_get_order" euler-order) euler-order-t
+(cffi:defcfun ("graphene_euler_get_order" euler-order) euler-order-t
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[euler]{a @symbol{euler-t} instance}
@@ -626,7 +626,7 @@ G × B × A = R
 ;;; graphene_euler_get_alpha ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_get_alpha" euler-alpha) :float
+(cffi:defcfun ("graphene_euler_get_alpha" euler-alpha) :float
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[euler]{a @symbol{euler-t} instance}
@@ -647,7 +647,7 @@ G × B × A = R
 ;;; graphene_euler_get_beta ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_get_beta" euler-beta) :float
+(cffi:defcfun ("graphene_euler_get_beta" euler-beta) :float
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[euler]{a @symbol{euler-t} instance}
@@ -668,7 +668,7 @@ G × B × A = R
 ;;; graphene_euler_get_gamma ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_euler_get_gamma" euler-gamma) :float
+(cffi:defcfun ("graphene_euler_get_gamma" euler-gamma) :float
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[euler]{a @symbol{euler-t} instance}
@@ -701,10 +701,10 @@ G × B × A = R
   @end{short}
   @see-symbol{euler-t}
   @see-symbol{vec3-t}"
-  (foreign-funcall "graphene_euler_to_vec3"
-                   (:pointer (:struct euler-t)) euler
-                   (:pointer (:struct vec3-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_euler_to_vec3"
+                        (:pointer (:struct euler-t)) euler
+                        (:pointer (:struct vec3-t)) result
+                        :void)
   result)
 
 (export 'euler-to-vec3)
@@ -738,10 +738,10 @@ G × B × A = R
   between Euler-based, quaternion-based, and angle-axis-based rotations.
   @see-symbol{euler-t}
   @see-symbol{matrix-t}"
-  (foreign-funcall "graphene_euler_to_matrix"
-                   (:pointer (:struct euler-t)) euler
-                   (:pointer (:struct matrix-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_euler_to_matrix"
+                        (:pointer (:struct euler-t)) euler
+                        (:pointer (:struct matrix-t)) result
+                        :void)
   result)
 
 (export 'euler-to-matrix)
@@ -761,10 +761,10 @@ G × B × A = R
   @end{short}
   @see-symbol{euler-t}
   @see-symbol{quaternion-t}"
-  (foreign-funcall "graphene_euler_to_quaternion"
-                   (:pointer (:struct euler-t)) euler
-                   (:pointer (:struct quaternion-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_euler_to_quaternion"
+                        (:pointer (:struct euler-t)) euler
+                        (:pointer (:struct quaternion-t)) result
+                        :void)
   result)
 
 (export 'euler-to-quaternion)
@@ -788,11 +788,11 @@ G × B × A = R
   another @symbol{euler-t} instance.
   @see-symbol{euler-t}
   @see-symbol{quaternion-t}"
-  (foreign-funcall "graphene_euler_reorder"
-                   (:pointer (:struct euler-t)) euler
-                   euler-order-t order
-                   (:pointer (:struct euler-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_euler_reorder"
+                        (:pointer (:struct euler-t)) euler
+                        euler-order-t order
+                        (:pointer (:struct euler-t)) result
+                        :void)
   result)
 
 (export 'euler-reorder)

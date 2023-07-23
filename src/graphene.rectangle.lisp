@@ -2,29 +2,29 @@
 ;;; graphene.rectangle.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library.
-;;; See <https://ebassi.github.io/graphene/docs/>.
-;;; The API documentation of the Lisp binding is available from
-;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;; and modified to document the Lisp binding to the Graphene library. See 
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 Dieter Kaiser
+;;; Copyright (C) 2022 - 2023 Dieter Kaiser
 ;;;
-;;; This program is free software: you can redistribute it and/or modify
-;;; it under the terms of the GNU Lesser General Public License for Lisp
-;;; as published by the Free Software Foundation, either version 3 of the
-;;; License, or (at your option) any later version and with a preamble to
-;;; the GNU Lesser General Public License that clarifies the terms for use
-;;; with Lisp programs and is referred as the LLGPL.
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the "Software"),
+;;; to deal in the Software without restriction, including without limitation
+;;; the rights to use, copy, modify, merge, publish, distribute, sublicense,
+;;; and/or sell copies of the Software, and to permit persons to whom the
+;;; Software is furnished to do so, subject to the following conditions:
 ;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU Lesser General Public License for more details.
+;;; The above copyright notice and this permission notice shall be included in
+;;; all copies or substantial portions of the Software.
 ;;;
-;;; You should have received a copy of the GNU Lesser General Public
-;;; License along with this program and the preamble to the Gnu Lesser
-;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
-;;; and <http://opensource.franz.com/preamble.html>.
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+;;; DEALINGS IN THE SOFTWARE.
 ;;; ----------------------------------------------------------------------------
 ;;;
 ;;; Rectangle
@@ -171,19 +171,19 @@
 ;;; Since 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcstruct rect-t
+(cffi:defcstruct rect-t
   (origin (:pointer (:struct point-t)))
   (size (:pointer (:struct size-t))))
 
 (export 'rect-t)
 
 (defun rect-origin (rect)
-  (foreign-slot-pointer rect '(:struct rect-t) 'origin))
+  (cffi:foreign-slot-pointer rect '(:struct rect-t) 'origin))
 
 (export 'rect-origin)
 
 (defun rect-size (rect)
-  (foreign-slot-pointer rect '(:struct rect-t) 'size))
+  (cffi:foreign-slot-pointer rect '(:struct rect-t) 'size))
 
 (export 'rect-size)
 
@@ -228,8 +228,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_alloc" rect-alloc)
-    (:pointer (:struct rect-t)))
+(cffi:defcfun ("graphene_rect_alloc" rect-alloc) (:pointer (:struct rect-t)))
 
 (export 'rect-alloc)
 
@@ -247,7 +246,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_free" rect-free) :void
+(cffi:defcfun ("graphene_rect_free" rect-free) :void
   (point (:pointer (:struct rect-t))))
 
 (export 'rect-free)
@@ -289,13 +288,13 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-init (r x y width height)
-  (foreign-funcall "graphene_rect_init"
-                   (:pointer (:struct rect-t)) r
-                   :float (coerce x 'single-float)
-                   :float (coerce y 'single-float)
-                   :float (coerce width 'single-float)
-                   :float (coerce height 'single-float)
-                   (:pointer (:struct rect-t))))
+  (cffi:foreign-funcall "graphene_rect_init"
+                        (:pointer (:struct rect-t)) r
+                        :float (coerce x 'single-float)
+                        :float (coerce y 'single-float)
+                        :float (coerce width 'single-float)
+                        :float (coerce height 'single-float)
+                        (:pointer (:struct rect-t))))
 
 (export 'rect-init)
 
@@ -325,7 +324,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_init_from_rect" rect-init-from-rect)
+(cffi:defcfun ("graphene_rect_init_from_rect" rect-init-from-rect)
     (:pointer (:struct rect-t))
   (r (:pointer (:struct rect-t)))
   (src (:pointer (:struct rect-t))))
@@ -354,7 +353,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_equal" rect-equal) :bool
+(cffi:defcfun ("graphene_rect_equal" rect-equal) :bool
   (a (:pointer (:struct rect-t)))
   (b (:pointer (:struct rect-t))))
 
@@ -381,7 +380,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_normalize" rect-normalize)
+(cffi:defcfun ("graphene_rect_normalize" rect-normalize)
     (:pointer (:struct rect-t))
   (r (:pointer (:struct rect-t))))
 
@@ -430,10 +429,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-center (r p)
-  (foreign-funcall "graphene_rect_get_center"
-                   (:pointer (:struct rect-t)) r
-                   (:pointer (:struct point-t)) p
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_get_center"
+                        (:pointer (:struct rect-t)) r
+                        (:pointer (:struct point-t)) p
+                        :void)
   p)
 
 (export 'rect-center)
@@ -458,10 +457,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-top-left (r p)
-  (foreign-funcall "graphene_rect_get_top_left"
-                   (:pointer (:struct rect-t)) r
-                   (:pointer (:struct point-t)) p
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_get_top_left"
+                        (:pointer (:struct rect-t)) r
+                        (:pointer (:struct point-t)) p
+                        :void)
   p)
 
 (export 'rect-top-left)
@@ -486,10 +485,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-top-right (r p)
-  (foreign-funcall "graphene_rect_get_top_right"
-                   (:pointer (:struct rect-t)) r
-                   (:pointer (:struct point-t)) p
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_get_top_right"
+                        (:pointer (:struct rect-t)) r
+                        (:pointer (:struct point-t)) p
+                        :void)
   p)
 
 (export 'rect-top-right)
@@ -514,10 +513,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-bottom-right (r p)
-  (foreign-funcall "graphene_rect_get_bottom_right"
-                   (:pointer (:struct rect-t)) r
-                   (:pointer (:struct point-t)) p
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_get_bottom_right"
+                        (:pointer (:struct rect-t)) r
+                        (:pointer (:struct point-t)) p
+                        :void)
   p)
 
 (export 'rect-bottom-right)
@@ -542,10 +541,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-bottom-left (r p)
-  (foreign-funcall "graphene_rect_get_bottom_left"
-                   (:pointer (:struct rect-t)) r
-                   (:pointer (:struct point-t)) p
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_get_bottom_left"
+                        (:pointer (:struct rect-t)) r
+                        (:pointer (:struct point-t)) p
+                        :void)
   p)
 
 (export 'rect-bottom-left)
@@ -567,7 +566,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_get_x" rect-x) :float
+(cffi:defcfun ("graphene_rect_get_x" rect-x) :float
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-x)
@@ -589,7 +588,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_get_y" rect-y) :float
+(cffi:defcfun ("graphene_rect_get_y" rect-y) :float
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-y)
@@ -611,7 +610,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_get_width" rect-width) :float
+(cffi:defcfun ("graphene_rect_get_width" rect-width) :float
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-width)
@@ -633,7 +632,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_get_height" rect-height) :float
+(cffi:defcfun ("graphene_rect_get_height" rect-height) :float
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-height)
@@ -655,7 +654,7 @@
 ;;;Since: 1.10
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_get_area" rect-area) :float
+(cffi:defcfun ("graphene_rect_get_area" rect-area) :float
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-area)
@@ -708,11 +707,11 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-union (a b result)
-  (foreign-funcall "graphene_rect_union"
-                   (:pointer (:struct rect-t)) a
-                   (:pointer (:struct rect-t)) b
-                   (:pointer (:struct rect-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_union"
+                        (:pointer (:struct rect-t)) a
+                        (:pointer (:struct rect-t)) b
+                        (:pointer (:struct rect-t)) result
+                        :void)
   result)
 
 (export 'rect-union)
@@ -751,11 +750,11 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-intersection (a b result)
-  (foreign-funcall "graphene_rect_intersection"
-                   (:pointer (:struct rect-t)) a
-                   (:pointer (:struct rect-t)) b
-                   (:pointer (:struct rect-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_intersection"
+                        (:pointer (:struct rect-t)) a
+                        (:pointer (:struct rect-t)) b
+                        (:pointer (:struct rect-t)) result
+                        :void)
   result)
 
 (export 'rect-intersection)
@@ -782,7 +781,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_contains_point" rect-contains-point) :bool
+(cffi:defcfun ("graphene_rect_contains_point" rect-contains-point) :bool
   (r (:pointer (:struct rect-t)))
   (p (:pointer (:struct point-t))))
 
@@ -810,7 +809,7 @@
 ;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_contains_rect" rect-contains-rect) :bool
+(cffi:defcfun ("graphene_rect_contains_rect" rect-contains-rect) :bool
   (a (:pointer (:struct rect-t)))
   (b (:pointer (:struct rect-t))))
 
@@ -848,11 +847,11 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-offset (r dx dy)
-  (foreign-funcall "graphene_rect_offset"
-                   (:pointer (:struct rect-t)) r
-                   :float (coerce dx 'single-float)
-                   :float (coerce dy 'single-float)
-                   (:pointer (:struct rect-t))))
+  (cffi:foreign-funcall "graphene_rect_offset"
+                        (:pointer (:struct rect-t)) r
+                        :float (coerce dx 'single-float)
+                        :float (coerce dy 'single-float)
+                        (:pointer (:struct rect-t))))
 
 (export 'rect-offset)
 
@@ -925,11 +924,11 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-inset (r dx dy)
-  (foreign-funcall "graphene_rect_inset"
-                   (:pointer (:struct rect-t)) r
-                   :float (coerce dx 'single-float)
-                   :float (coerce dy 'single-float)
-                   (:pointer (:struct rect-t))))
+  (cffi:foreign-funcall "graphene_rect_inset"
+                        (:pointer (:struct rect-t)) r
+                        :float (coerce dx 'single-float)
+                        :float (coerce dy 'single-float)
+                        (:pointer (:struct rect-t))))
 
 (export 'rect-inset)
 
@@ -1046,10 +1045,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-round-extents (r result)
-  (foreign-funcall "graphene_rect_round_extents"
-                   (:pointer (:struct rect-t)) r
-                   (:pointer (:struct rect-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_round_extents"
+                        (:pointer (:struct rect-t)) r
+                        (:pointer (:struct rect-t)) result
+                        :void)
   result)
 
 (export 'rect-round-extents)
@@ -1079,11 +1078,11 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-expand (r p result)
-  (foreign-funcall "graphene_rect_expand"
-                   (:pointer (:struct rect-t)) r
-                   (:pointer (:struct point-t)) p
-                   (:pointer (:struct rect-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_expand"
+                        (:pointer (:struct rect-t)) r
+                        (:pointer (:struct point-t)) p
+                        (:pointer (:struct rect-t)) result
+                        :void)
   result)
 
 (export 'rect-expand)
@@ -1118,12 +1117,12 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-interpolate (a b factor result)
-  (foreign-funcall "graphene_rect_interpolate"
-                   (:pointer (:struct rect-t)) a
-                   (:pointer (:struct rect-t)) b
-                   :double (coerce factor 'double-float)
-                   (:pointer (:struct rect-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_interpolate"
+                        (:pointer (:struct rect-t)) a
+                        (:pointer (:struct rect-t)) b
+                        :double (coerce factor 'double-float)
+                        (:pointer (:struct rect-t)) result
+                        :void)
   result)
 
 (export 'rect-interpolate)
@@ -1142,7 +1141,7 @@
 ;;;Since: 1.4
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_rect_zero" rect-zero)
+(cffi:defcfun ("graphene_rect_zero" rect-zero)
     (:pointer (:struct rect-t)))
 
 (export 'rect-zero)
@@ -1177,12 +1176,12 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-scale (r sh sv result)
-  (foreign-funcall "graphene_rect_scale"
-                   (:pointer (:struct rect-t)) r
-                   :float (coerce sh 'single-float)
-                   :float (coerce sv 'single-float)
-                   (:pointer (:struct rect-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_rect_scale"
+                        (:pointer (:struct rect-t)) r
+                        :float (coerce sh 'single-float)
+                        :float (coerce sv 'single-float)
+                        (:pointer (:struct rect-t)) result
+                        :void)
   result)
 
 (export 'rect-scale)

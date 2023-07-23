@@ -2,29 +2,29 @@
 ;;; graphene.point.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library.
-;;; See <https://ebassi.github.io/graphene/docs/>.
-;;; The API documentation of the Lisp binding is available from
-;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;; and modified to document the Lisp binding to the Graphene library. See 
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 Dieter Kaiser
+;;; Copyright (C) 2022 - 2023 Dieter Kaiser
 ;;;
-;;; This program is free software: you can redistribute it and/or modify
-;;; it under the terms of the GNU Lesser General Public License for Lisp
-;;; as published by the Free Software Foundation, either version 3 of the
-;;; License, or (at your option) any later version and with a preamble to
-;;; the GNU Lesser General Public License that clarifies the terms for use
-;;; with Lisp programs and is referred as the LLGPL.
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the "Software"),
+;;; to deal in the Software without restriction, including without limitation
+;;; the rights to use, copy, modify, merge, publish, distribute, sublicense,
+;;; and/or sell copies of the Software, and to permit persons to whom the
+;;; Software is furnished to do so, subject to the following conditions:
 ;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU Lesser General Public License for more details.
+;;; The above copyright notice and this permission notice shall be included in
+;;; all copies or substantial portions of the Software.
 ;;;
-;;; You should have received a copy of the GNU Lesser General Public
-;;; License along with this program and the preamble to the Gnu Lesser
-;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
-;;; and <http://opensource.franz.com/preamble.html>.
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+;;; DEALINGS IN THE SOFTWARE.
 ;;; ----------------------------------------------------------------------------
 ;;;
 ;;; Point
@@ -194,7 +194,7 @@
 ;;; graphene_point_t
 ;;; ----------------------------------------------------------------------------
 
-(defcstruct point-t
+(cffi:defcstruct point-t
   (x :float)
   (y :float))
 
@@ -202,20 +202,21 @@
 (setf (liber:alias-for-symbol 'point-t)
       "CStruct"
       (liber:symbol-documentation 'point-t)
- "@version{#2022-9-17}
+ "@version{2023-7-22}
   @begin{short}
-    The @sym{point-t} structure is a data structure capable of describing a
-    point with two coordinates x and y of type single float.
+    The @sym{graphene:point-t} structure is a data structure capable of 
+    describing a point with two coordinates x and y of type single float.
   @end{short}
   @begin{pre}
-(defcstruct point-t
+(cffi:defcstruct point-t
   (x :float)
   (y :float))
   @end{pre}
-  Access the coordinates with the @fun{point-x} and @fun{point-y} functions.
-  @see-symbol{point3d-t}
-  @see-function{point-x}
-  @see-function{point-y}")
+  Access the coordinates with the @fun{graphene:point-x} and 
+  @fun{graphene:point-y} functions.
+  @see-symbol{graphene:point3d-t}
+  @see-function{graphene:point-x}
+  @see-function{graphene:point-y}")
 
 (export 'point-t)
 
@@ -224,64 +225,64 @@
 ;;;     point-x
 
 (defun point-x (point)
-  (foreign-slot-value point '(:struct point-t) 'x))
+  (cffi:foreign-slot-value point '(:struct point-t) 'x))
 
 (defun (setf point-x) (value point)
-  (setf (foreign-slot-value point '(:struct point-t) 'x) value))
+  (setf (cffi:foreign-slot-value point '(:struct point-t) 'x) value))
 
 #+liber-documentation
 (setf (liber:alias-for-function 'point-x)
       "Accessor"
       (documentation 'point-x 'function)
- "@version{#2022-9-17}
-  @syntax[]{(point-x point) => x}
-  @syntax[]{(setf (point-x point) x)}
-  @argument[point]{a @symbol{point-t} instance}
+ "@version{2023-7-22}
+  @syntax[]{(graphene:point-x point) => x}
+  @syntax[]{(setf (graphene:point-x point) x)}
+  @argument[point]{a @symbol{graphene:point-t} instance}
   @argument[x]{a single float with the x coordinate}
   @begin{short}
-    Accessor of the @code{x} slot of the @symbol{point-t} structure.
+    Accessor of the @code{x} slot of the @symbol{graphene:point-t} structure.
   @end{short}
   @begin[Examples]{dictionary}
     @begin{pre}
-(with-graphene-point (p 0.5 1.0) (point-x p))
+(graphene:with-graphene-point (p 0.5 1.0) (graphene:point-x p))
 => 0.5
-(with-graphene-point (p) (setf (point-x p) 2.0))
+(graphene:with-graphene-point (p) (setf (graphene:point-x p) 2.0))
 => 2.0
   @end{pre}
   @end{dictionary}
-  @see-symbol{point-t}")
+  @see-symbol{graphene:point-t}")
 
 (export 'point-x)
 
 ;;; --- point-y ----------------------------------------------------------------
 
 (defun point-y (point)
-  (foreign-slot-value point '(:struct point-t) 'y))
+  (cffi:foreign-slot-value point '(:struct point-t) 'y))
 
 (defun (setf point-y) (value point)
-  (setf (foreign-slot-value point '(:struct point-t) 'y) value))
+  (setf (cffi:foreign-slot-value point '(:struct point-t) 'y) value))
 
 #+liber-documentation
 (setf (liber:alias-for-function 'point-y)
       "Accessor"
       (documentation 'point-y 'function)
- "@version{#2022-9-17}
-  @syntax[]{(point-y point) => y}
-  @syntax[]{(setf (point-y point) y)}
-  @argument[point]{a @symbol{point-t} instance}
+ "@version{2023-7-22}
+  @syntax[]{(graphene:point-y point) => y}
+  @syntax[]{(setf (graphene:point-y point) y)}
+  @argument[point]{a @symbol{graphene:point-t} instance}
   @argument[y]{a single float with the y coordinate}
   @begin{short}
-    Accessor of the @code{y} slot of the @symbol{point-t} structure.
+    Accessor of the @code{y} slot of the @symbol{graphene:point-t} structure.
   @end{short}
   @begin[Examples]{dictionary}
     @begin{pre}
-(with-graphene-point (p 0.5 1.0) (point-y p))
+(graphene:with-graphene-point (p 0.5 1.0) (graphene:point-y p))
 => 1.0
-(with-graphene-point (p) (setf (point-y p) 2.0))
+(graphene:with-graphene-point (p) (setf (graphene:point-y p) 2.0))
 => 2.0
   @end{pre}
   @end{dictionary}
-  @see-symbol{point-t}")
+  @see-symbol{graphene:point-t}")
 
 (export 'point-y)
 
@@ -289,8 +290,7 @@
 ;;; graphene_point_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point_alloc" point-alloc)
-    (:pointer (:struct point-t))
+(cffi:defcfun ("graphene_point_alloc" point-alloc) (:pointer (:struct point-t))
  #+liber-documentation
  "@version{#2022-9-17}
   @return{The newly allocated @symbol{point-t} instance.}
@@ -320,7 +320,7 @@
 ;;; graphene_point_free ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point_free" point-free) :void
+(cffi:defcfun ("graphene_point_free" point-free) :void
  #+liber-documentation
  "@version{#2022-9-17}
   @argument[point]{a @symbol{point-t} instance}
@@ -337,7 +337,7 @@
 ;;; graphene_point_zero ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point_zero" point-zero)
+(cffi:defcfun ("graphene_point_zero" point-zero)
     (:pointer (:struct point-t))
  #+liber-documentation
  "@version{#2022-9-19}
@@ -372,11 +372,11 @@
   @end{short}
   It is safe to call this function multiple times.
   @see-symbol{point-t}"
-  (foreign-funcall "graphene_point_init"
-                   (:pointer (:struct point-t)) point
-                   :float (coerce x 'single-float)
-                   :float (coerce y 'single-float)
-                   (:pointer (:struct point-t))))
+  (cffi:foreign-funcall "graphene_point_init"
+                        (:pointer (:struct point-t)) point
+                        :float (coerce x 'single-float)
+                        :float (coerce y 'single-float)
+                        (:pointer (:struct point-t))))
 
 (export 'point-init)
 
@@ -384,7 +384,7 @@
 ;;; graphene_point_init_from_point ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point_init_from_point" point-init-from-point)
+(cffi:defcfun ("graphene_point_init_from_point" point-init-from-point)
     (:pointer (:struct point-t))
  #+liber-documentation
  "@version{#2022-9-19}
@@ -402,7 +402,7 @@
 ;;; graphene_point_init_from_vec2 ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point_init_from_vec2" point-init-from-vec2)
+(cffi:defcfun ("graphene_point_init_from_vec2" point-init-from-vec2)
    (:pointer (:struct point-t))
  #+liber-documentation
  "@version{#2022-9-19}
@@ -438,10 +438,10 @@
   @end{dictionary}
   @see-symbol{point-t}
   @see-symbol{vec2-t}"
-  (foreign-funcall "graphene_point_to_vec2"
-                   (:pointer (:struct point-t)) point
-                   :pointer vector ; vec2-t not known at this point
-                   :void)
+  (cffi:foreign-funcall "graphene_point_to_vec2"
+                        (:pointer (:struct point-t)) point
+                        :pointer vector ; vec2-t not known at this point
+                        :void)
   vector)
 
 (export 'point-to-vec2)
@@ -450,7 +450,7 @@
 ;;; graphene_point_equal ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point_equal" point-equal) :bool
+(cffi:defcfun ("graphene_point_equal" point-equal) :bool
  #+liber-documentation
  "@version{#2022-9-19}
   @argument[a]{a @symbol{point-t} instance}
@@ -489,11 +489,11 @@
   @end{short}
   @see-symbol{point-t}
   @see-function{point-equal}"
-  (foreign-funcall "graphene_point_near"
-                   (:pointer (:struct point-t)) a
-                   (:pointer (:struct point-t)) b
-                   :float (coerce epsilon 'single-float)
-                   :bool))
+  (cffi:foreign-funcall "graphene_point_near"
+                        (:pointer (:struct point-t)) a
+                        (:pointer (:struct point-t)) b
+                        :float (coerce epsilon 'single-float)
+                        :bool))
 
 (export 'point-near)
 
@@ -501,7 +501,7 @@
 ;;; graphene_point_distance ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_point_distance" %point-distance) :float
+(cffi:defcfun ("graphene_point_distance" %point-distance) :float
   (a (:pointer (:struct point-t)))
   (b (:pointer (:struct point-t)))
   (dx (:pointer :float))
@@ -518,10 +518,10 @@
   @argument[dy]{a single float with the distance component of the y axis}
   @short{Computes the distance between the two given points.}
   @see-symbol{point-t}"
-  (with-foreign-objects ((dx :float) (dy :float))
+  (cffi:with-foreign-objects ((dx :float) (dy :float))
     (values (%point-distance a b dx dy)
-            (mem-ref dx :float)
-            (mem-ref dy :float))))
+            (cffi:mem-ref dx :float)
+            (cffi:mem-ref dy :float))))
 
 (export 'point-distance)
 
@@ -552,12 +552,12 @@
     @end{pre}
   @end{dictionary}
   @see-symbol{point-t}"
-  (foreign-funcall "graphene_point_interpolate"
-                   (:pointer (:struct point-t)) a
-                   (:pointer (:struct point-t)) b
-                   :double (coerce factor 'double-float)
-                   (:pointer (:struct point-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_point_interpolate"
+                        (:pointer (:struct point-t)) a
+                        (:pointer (:struct point-t)) b
+                        :double (coerce factor 'double-float)
+                        (:pointer (:struct point-t)) result
+                        :void)
   result)
 
 (export 'point-interpolate)

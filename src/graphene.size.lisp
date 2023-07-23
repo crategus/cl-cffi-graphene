@@ -2,29 +2,29 @@
 ;;; graphene.size.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library.
-;;; See <https://ebassi.github.io/graphene/docs/>.
-;;; The API documentation of the Lisp binding is available from
-;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;; and modified to document the Lisp binding to the Graphene library. See 
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 Dieter Kaiser
+;;; Copyright (C) 2022 - 2023 Dieter Kaiser
 ;;;
-;;; This program is free software: you can redistribute it and/or modify
-;;; it under the terms of the GNU Lesser General Public License for Lisp
-;;; as published by the Free Software Foundation, either version 3 of the
-;;; License, or (at your option) any later version and with a preamble to
-;;; the GNU Lesser General Public License that clarifies the terms for use
-;;; with Lisp programs and is referred as the LLGPL.
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the "Software"),
+;;; to deal in the Software without restriction, including without limitation
+;;; the rights to use, copy, modify, merge, publish, distribute, sublicense,
+;;; and/or sell copies of the Software, and to permit persons to whom the
+;;; Software is furnished to do so, subject to the following conditions:
 ;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU Lesser General Public License for more details.
+;;; The above copyright notice and this permission notice shall be included in
+;;; all copies or substantial portions of the Software.
 ;;;
-;;; You should have received a copy of the GNU Lesser General Public
-;;; License along with this program and the preamble to the Gnu Lesser
-;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
-;;; and <http://opensource.franz.com/preamble.html>.
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+;;; DEALINGS IN THE SOFTWARE.
 ;;; ----------------------------------------------------------------------------
 ;;;
 ;;; Size
@@ -170,7 +170,7 @@
 ;;; graphene_size_t
 ;;; ----------------------------------------------------------------------------
 
-(defcstruct size-t
+(cffi:defcstruct size-t
   (width :float)
   (height :float))
 
@@ -184,7 +184,7 @@
     size with two components width and height of type single float.
   @end{short}
   @begin{pre}
-(defcstruct size-t
+(cffi:defcstruct size-t
   (width :float)
   (height :float))
   @end{pre}
@@ -201,10 +201,10 @@
 ;;;     size-width
 
 (defun (setf size-width) (value size)
-  (setf (foreign-slot-value size '(:struct size-t) 'width) value))
+  (setf (cffi:foreign-slot-value size '(:struct size-t) 'width) value))
 
 (defun size-width (size)
-  (foreign-slot-value size '(:struct size-t) 'width))
+  (cffi:foreign-slot-value size '(:struct size-t) 'width))
 
 #+liber-documentation
 (setf (liber:alias-for-function 'size-width)
@@ -225,10 +225,10 @@
 ;;;     size-heigth
 
 (defun (setf size-height) (value size)
-  (setf (foreign-slot-value size '(:struct size-t) 'height) value))
+  (setf (cffi:foreign-slot-value size '(:struct size-t) 'height) value))
 
 (defun size-height (size)
-  (foreign-slot-value size '(:struct size-t) 'height))
+  (cffi:foreign-slot-value size '(:struct size-t) 'height))
 
 #+liber-documentation
 (setf (liber:alias-for-function 'size-height)
@@ -250,8 +250,7 @@
 ;;; graphene_size_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_size_alloc" size-alloc)
-    (:pointer (:struct size-t))
+(cffi:defcfun ("graphene_size_alloc" size-alloc) (:pointer (:struct size-t))
  #+liber-documentation
  "@version{#2022-10-1}
   @return{The newly allocated @symbol{size-t} instance.}
@@ -270,7 +269,7 @@
 ;;; graphene_size_free ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_size_free" size-free) :void
+(cffi:defcfun ("graphene_size_free" size-free) :void
  #+liber-documentation
  "@version{#2022-10-1}
   @argument[size]{a @symbol{size-t} instance}
@@ -287,8 +286,7 @@
 ;;; graphene_size_zero ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_size_zero" size-zero)
-    (:pointer (:struct size-t))
+(cffi:defcfun ("graphene_size_zero" size-zero) (:pointer (:struct size-t))
  #+liber-documentation
  "@version{#2022-10-1}
   @return{The @symbol{size-t} instance with a zero size.}
@@ -323,11 +321,11 @@
   @end{short}
   It is safe to call this function multiple times.
   @see-symbol{size-t}"
-  (foreign-funcall "graphene_size_init"
-                   (:pointer (:struct size-t)) size
-                   :float (coerce width 'single-float)
-                   :float (coerce height 'single-float)
-                   (:pointer (:struct size-t))))
+  (cffi:foreign-funcall "graphene_size_init"
+                        (:pointer (:struct size-t)) size
+                        :float (coerce width 'single-float)
+                        :float (coerce height 'single-float)
+                        (:pointer (:struct size-t))))
 
 (export 'size-init)
 
@@ -335,7 +333,7 @@
 ;;; graphene_size_init_from_size ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_size_init_from_size" size-init-from-size)
+(cffi:defcfun ("graphene_size_init_from_size" size-init-from-size)
     (:pointer (:struct size-t))
  #+liber-documentation
  "@version{#2022-10-1}
@@ -354,7 +352,7 @@
 ;;; graphene_size_equal ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_size_equal" size-equal) :bool
+(cffi:defcfun ("graphene_size_equal" size-equal) :bool
  #+liber-documentation
  "@version{#2022-10-1}
   @argument[a]{a @symbol{size-t} instance}
@@ -388,12 +386,12 @@
     given @arg{factor}.
   @end{short}
   @see-symbol{size-t}"
-  (foreign-funcall "graphene_size_interpolate"
-                   (:pointer (:struct size-t)) a
-                   (:pointer (:struct size-t)) b
-                   :double (coerce factor 'double-float)
-                   (:pointer (:struct size-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_size_interpolate"
+                        (:pointer (:struct size-t)) a
+                        (:pointer (:struct size-t)) b
+                        :double (coerce factor 'double-float)
+                        (:pointer (:struct size-t)) result
+                        :void)
   result)
 
 (export 'size-interpolate)
@@ -414,11 +412,11 @@
     factor.
   @end{short}
   @see-symbol{size-t}"
-  (foreign-funcall "graphene_size_scale"
-                   (:pointer (:struct size-t)) size
-                   :float (coerce factor 'single-float)
-                   (:pointer (:struct size-t)) result
-                   :void)
+  (cffi:foreign-funcall "graphene_size_scale"
+                        (:pointer (:struct size-t)) size
+                        :float (coerce factor 'single-float)
+                        (:pointer (:struct size-t)) result
+                        :void)
   result)
 
 (export 'size-scale)

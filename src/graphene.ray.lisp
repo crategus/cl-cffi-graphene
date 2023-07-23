@@ -2,29 +2,29 @@
 ;;; graphene.ray.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library.
-;;; See <https://ebassi.github.io/graphene/docs/>.
-;;; The API documentation of the Lisp binding is available from
-;;; <http://www.crategus.com/books/cl-cffi-graphene/>.
+;;; and modified to document the Lisp binding to the Graphene library. See 
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 Dieter Kaiser
+;;; Copyright (C) 2022 - 2023 Dieter Kaiser
 ;;;
-;;; This program is free software: you can redistribute it and/or modify
-;;; it under the terms of the GNU Lesser General Public License for Lisp
-;;; as published by the Free Software Foundation, either version 3 of the
-;;; License, or (at your option) any later version and with a preamble to
-;;; the GNU Lesser General Public License that clarifies the terms for use
-;;; with Lisp programs and is referred as the LLGPL.
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the "Software"),
+;;; to deal in the Software without restriction, including without limitation
+;;; the rights to use, copy, modify, merge, publish, distribute, sublicense,
+;;; and/or sell copies of the Software, and to permit persons to whom the
+;;; Software is furnished to do so, subject to the following conditions:
 ;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU Lesser General Public License for more details.
+;;; The above copyright notice and this permission notice shall be included in
+;;; all copies or substantial portions of the Software.
 ;;;
-;;; You should have received a copy of the GNU Lesser General Public
-;;; License along with this program and the preamble to the Gnu Lesser
-;;; General Public License.  If not, see <http://www.gnu.org/licenses/>
-;;; and <http://opensource.franz.com/preamble.html>.
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+;;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+;;; DEALINGS IN THE SOFTWARE.
 ;;; ----------------------------------------------------------------------------
 ;;;
 ;;; Ray
@@ -166,7 +166,7 @@
 ;;; graphene_ray_intersection_kind_t
 ;;; ----------------------------------------------------------------------------
 
-(defcenum ray-intersection-kind-t
+(cffi:defcenum ray-intersection-kind-t
   :none
   :enter
   :leave)
@@ -178,7 +178,7 @@
  "@version{#2022-9-20}
   @short{The type of intersection.}
   @begin{pre}
-(defcenum ray-intersection-kind-t
+(cffi:defcenum ray-intersection-kind-t
   :none
   :enter
   :leave)
@@ -196,7 +196,7 @@
 ;;; graphene_ray_t
 ;;; ----------------------------------------------------------------------------
 
-(defcstruct ray-t)
+(cffi:defcstruct ray-t)
 
 #+liber-documentation
 (setf (liber:alias-for-symbol 'ray-t)
@@ -218,7 +218,7 @@
 ;;;graphene_ray_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_ray_alloc" ray-alloc)
+(cffi:defcfun ("graphene_ray_alloc" ray-alloc)
     (:pointer (:struct ray-t))
  #+liber-documentation
  "@version{#2022-9-20}
@@ -237,7 +237,7 @@
 ;;;graphene_ray_free ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_ray_free" ray-free) :void
+(cffi:defcfun ("graphene_ray_free" ray-free) :void
  #+liber-documentation
  "@version{#2022-9-20}
   @argument[ray]{a @symbol{ray-t} instance}
@@ -254,7 +254,7 @@
 ;;;graphene_ray_init ()
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_ray_init" ray-init) (:pointer (:struct ray-t))
+(cffi:defcfun ("graphene_ray_init" ray-init) (:pointer (:struct ray-t))
  #+liber-documentation
  "@version{#2022-9-20}
   @argument[ray]{a @symbol{rayt-t} instance to be initialized}
@@ -297,7 +297,7 @@
 ;;;Since: 1.4
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_ray_init_from_ray" ray-init-from-ray)
+(cffi:defcfun ("graphene_ray_init_from_ray" ray-init-from-ray)
     (:pointer (:struct ray-t))
   (ray (:pointer (:struct ray-t)))
   (source (:pointer (:struct ray-t))))
@@ -331,7 +331,7 @@
 ;;;Since: 1.4
 ;;; ----------------------------------------------------------------------------
 
-(defcfun ("graphene_ray_init_from_vec3" ray-init-from-vec3)
+(cffi:defcfun ("graphene_ray_init_from_vec3" ray-init-from-vec3)
     (:pointer (:struct ray-t))
   (ray (:pointer (:struct ray-t)))
   (origin (:pointer (:struct vec3-t)))
@@ -359,10 +359,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun ray-origin (ray origin)
-  (foreign-funcall "graphene_ray_get_origin"
-                   (:pointer (:struct ray-t)) ray
-                   (:pointer (:struct point3d-t)) origin
-                   :void)
+  (cffi:foreign-funcall "graphene_ray_get_origin"
+                        (:pointer (:struct ray-t)) ray
+                        (:pointer (:struct point3d-t)) origin
+                        :void)
   origin)
 
 (export 'ray-origin)
@@ -387,10 +387,10 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun ray-direction (ray direction)
-  (foreign-funcall "graphene_ray_get_direction"
-                   (:pointer (:struct ray-t)) ray
-                   (:pointer (:struct vec3-t)) direction
-                   :void)
+  (cffi:foreign-funcall "graphene_ray_get_direction"
+                        (:pointer (:struct ray-t)) ray
+                        (:pointer (:struct vec3-t)) direction
+                        :void)
   direction)
 
 (export 'ray-direction)
