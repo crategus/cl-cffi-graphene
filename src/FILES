@@ -1,8 +1,14 @@
 Graphene
 
-Point — A point with 2 coordinates
-Point3D — A point with 3 coordinates
-Size — Size representation
+Graphene is a library of data types commonly used to implement 2D-in-3D or full
+3D canvases. Graphene only contains math data types, like vectors and matrices;
+it does not deal with windowing system calls, event handling, drawing, or a full
+scene graph.
+
+  graphene.point.lisp               Point with 2 coordinates     Graphene 1.0  +
+  graphene.point3d.lisp             Point with 3 coordinates     Graphene 1.0  +
+  graphene.size.lisp                Size representation          Graphene 1.0  +
+
 Rectangle — Rectangular shape type
 Quad — Four-vertex quadrilateral
 Triangle — A triangle described by 3D points
@@ -20,10 +26,4 @@ Ray — A ray emitted from an origin in a given direction
 Versioning information — Detemining the version of Graphene in use
 GObject integration — Types for GObject properties and signals
 
-Graphene is a library of data types commonly used to implement 2D-in-3D or full
-3D canvases.
-
-Graphene only contains math data types, like vectors and matrices; it does not
-deal with windowing system calls, event handling, drawing, or a full scene
-graph.
-
+;;; 2023-9-24

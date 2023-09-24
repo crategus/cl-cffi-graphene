@@ -2,8 +2,8 @@
 ;;; graphene.rectangle.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -143,111 +143,148 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_t
-;;;
-;;; typedef struct {
-;;;   graphene_point_t origin;
-;;;   graphene_size_t size;
-;;; } graphene_rect_t;
-;;;
-;;; The location and size of a rectangle region.
-;;;
-;;; The width and height of a graphene_rect_t can be negative; for instance, a
-;;; graphene_rect_t with an origin of [ 0, 0 ] and a size of [ 10, 10 ] is
-;;; equivalent to a graphene_rect_t with an origin of [ 10, 10 ] and a size of
-;;; [ -10, -10 ].
-;;;
-;;; Application code can normalize rectangles using graphene_rect_normalize();
-;;; this function will ensure that the width and height of a rectangle are
-;;; positive values. All functions taking a graphene_rect_t as an argument will
-;;; internally operate on a normalized copy; all functions returning a
-;;; graphene_rect_t will always return a normalized rectangle.
-;;;
-;;; graphene_point_t origin;
-;;;     the coordinates of the origin of the rectangle
-;;;
-;;; graphene_size_t size;
-;;;     the size of the rectangle
-;;;
-;;; Since 1.0
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcstruct rect-t
-  (origin (:pointer (:struct point-t)))
-  (size (:pointer (:struct size-t))))
+  (origin (:struct point-t))
+  (size (:struct size-t)))
+
+#+liber-documentation
+(setf (liber:alias-for-symbol 'rect-t)
+      "CStruct"
+      (liber:symbol-documentation 'rect-t)
+ "@version{2023-9-22}
+  @begin{short}
+    The location and size of a rectangle region.
+  @end{short}
+  The width and height of a @symbol{graphene:rect-t} instance can be negative.
+  For instance, a @symbol{graphene:rect-t} instance with an origin of [ 0, 0 ]
+  and a size of [ 10, 10 ] is equivalent to a @symbol{graphene:rect-t} instance
+  with an origin of [ 10, 10 ] and a size of [ -10, -10 ].
+
+  Application code can normalize rectangles using the
+  @fun{graphene:rect-normalize} function. This function will ensure that the
+  width and height of a rectangle are positive values. All functions taking a
+  @symbol{graphene:rect-t} instance as an argument will internally operate on a
+  normalized copy. All functions returning a @symbol{graphene:rect-t} instance
+  will always return a normalized rectangle.
+  @begin{pre}
+(cffi:defcstruct rect-t
+  (origin (:struct point-t))
+  (size (:struct size-t)))
+  @end{pre}
+  @begin[code]{table}
+    @entry[origin]{A @symbol{graphene:point-t} instance with the coordinates
+      of the origin of the rectangle.}
+    @entry[size]{A @symbol{graphene:size-t} instance with the size of the
+      rectangle.}
+  @end{table}
+  @see-symbol{graphene:point-t}
+  @see-symbol{graphene:size-t}
+  @see-function{graphene:rect-normalize}")
 
 (export 'rect-t)
+
+;;; --- rect-origin ------------------------------------------------------------
 
 (defun rect-origin (rect)
   (cffi:foreign-slot-pointer rect '(:struct rect-t) 'origin))
 
+#+liber-documentation
+(setf (liber:alias-for-function 'rect-origin)
+      "Accessor"
+      (documentation 'rect-origin 'function)
+ "@version{2023-9-22}
+  @syntax[]{(graphene:rect-origin rect) => origin}
+  @syntax[]{(setf (graphene:rect-origin rect) origin)}
+  @argument[rect]{a @symbol{graphene:rect-t} instance}
+  @argument[origin]{a @symbol{graphene:point-t} instance with the origin of
+    the rectangle}
+  @begin{short}
+    Accessor of the @code{origin} slot of the @symbol{graphene:rect-t}
+    structure.
+  @end{short}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:point-t}")
+
 (export 'rect-origin)
+
+;;; --- rect-size --------------------------------------------------------------
 
 (defun rect-size (rect)
   (cffi:foreign-slot-pointer rect '(:struct rect-t) 'size))
 
+#+liber-documentation
+(setf (liber:alias-for-function 'rect-size)
+      "Accessor"
+      (documentation 'rect-size 'function)
+ "@version{2023-9-22}
+  @syntax[]{(graphene:rect-size rect) => size}
+  @syntax[]{(setf (graphene:rect-size rect) size)}
+  @argument[rect]{a @symbol{graphene:rect-t} instance}
+  @argument[size]{a @symbol{graphene:size-t} instance with the size of
+    the rectangle}
+  @begin{short}
+    Accessor of the @code{size} slot of the @symbol{graphene:rect-t}
+    structure.
+  @end{short}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:size-t}")
+
 (export 'rect-size)
 
 ;;; ----------------------------------------------------------------------------
-;;;GRAPHENE_RECT_INIT()
-;;;#define             GRAPHENE_RECT_INIT(_x,_y,_w,_h)
-;;;Initializes a graphene_rect_t when declaring it.
-
-;;;Parameters
-;;;_x
-
-;;;the X coordinate of the origin
-
-;;;_y
-
-;;;the Y coordinate of the origin
-
-;;;_w
-
-;;;the width
-
-;;;_h
-
-;;;the height
-
-;;;Since: 1.0
+;;; GRAPHENE_RECT_INIT()
+;;;
+;;; #define GRAPHENE_RECT_INIT(_x,_y,_w,_h)
+;;;
+;;; Initializes a graphene_rect_t when declaring it.
+;;;
+;;; _x :
+;;;     the X coordinate of the origin
+;;;
+;;; _y :
+;;;     the Y coordinate of the origin
+;;;
+;;; _w :
+;;;     the width
+;;;
+;;; _h :
+;;;     the height
+;;;
+;;; Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_alloc ()
-;;;graphene_rect_t *
-;;;graphene_rect_alloc (void);
-;;;Allocates a new graphene_rect_t.
-
-;;;The contents of the returned rectangle are undefined.
-
-;;;Returns
-;;;the newly allocated rectangle.
-
-;;;[transfer full]
-
-;;;Since: 1.0
+;;; graphene_rect_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(cffi:defcfun ("graphene_rect_alloc" rect-alloc) (:pointer (:struct rect-t)))
+(cffi:defcfun ("graphene_rect_alloc" rect-alloc) (:pointer (:struct rect-t))
+ #+liber-documentation
+ "@version{2023-9-22}
+  @return{A new @symbol{graphene:rect-t} instance.}
+  @begin{short}
+    Allocates a new @symbol{graphene:rect-t} instance.
+  @end{short}
+  The contents of the returned rectangle are undefined.
+ @see-symbol{graphene:rect-t}")
 
 (export 'rect-alloc)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_free ()
-;;;void
-;;;graphene_rect_free (graphene_rect_t *r);
-;;;Frees the resources allocated by graphene_rect_alloc().
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;Since: 1.0
+;;; graphene_rect_free ()
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_free" rect-free) :void
-  (point (:pointer (:struct rect-t))))
+ #+liber-documentation
+ "@version{2023-9-22}
+  @argument[rect]{a @symbol{graphene:rect-t} instance}
+  @begin{short}
+    Frees the resources allocated by the @fun{graphene:rect-alloc} function.
+  @end{short}
+  @see-symbol{graphene:rect-t}
+  @see-function{graphene:rect-alloc}"
+  (rect (:pointer (:struct rect-t))))
 
 (export 'rect-free)
 
@@ -299,7 +336,8 @@
 (export 'rect-init)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_init_from_rect ()
+;;; graphene_rect_init_from_rect ()
+;;;
 ;;;graphene_rect_t *
 ;;;graphene_rect_init_from_rect (graphene_rect_t *r,
 ;;;                              const graphene_rect_t *src);
@@ -332,7 +370,8 @@
 (export 'rect-init-from-rect)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_equal ()
+;;; graphene_rect_equal ()
+;;;
 ;;;bool
 ;;;graphene_rect_equal (const graphene_rect_t *a,
 ;;;                     const graphene_rect_t *b);
@@ -360,7 +399,8 @@
 (export 'rect-equal)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_normalize ()
+;;; graphene_rect_normalize ()
+;;;
 ;;;graphene_rect_t *
 ;;;graphene_rect_normalize (graphene_rect_t *r);
 ;;;Normalizes the passed rectangle.

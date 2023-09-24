@@ -2,8 +2,8 @@
 ;;; graphene.size.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -51,53 +51,53 @@
 
 (defmacro with-graphene-size ((var &rest args) &body body)
  #+liber-documentation
- "@version{#2022-10-1}
-  @syntax[]{with-graphene-size (s) body => result}
-  @syntax[]{with-graphene-size (s width height) body => result}
-  @syntax[]{with-graphene-size (s s1) body => result}
-  @argument[s]{a @symbol{size-t} instance to create and initialize}
+ "@version{2023-9-22}
+  @syntax[]{(with-graphene-size (s) body) => result}
+  @syntax[]{(with-graphene-size (s width height) body) => result}
+  @syntax[]{(with-graphene-size (s s1) body) => result}
+  @argument[s]{a @symbol{graphene:size-t} instance to create and initialize}
   @argument[width]{a number coerced to a single float for the width component}
   @argument[height]{a number coerced to a single float for the height component}
-  @argument[s1]{a @symbol{size-t} instance to use for initialization}
+  @argument[s1]{a @symbol{graphene:size-t} instance to use for initialization}
   @begin{short}
-    The @sym{with-gaphene-size} macro allocates a new @symbol{size-t} instance,
-    initializes the @symbol{size-t} instance with the given values and executes
-    the body that uses the size.
+    The @fun{graphene:with-graphene-size} macro allocates a new
+    @symbol{graphene:size-t} instance, initializes the @symbol{graphene:size-t}
+    instance with the given values and executes the body that uses the size.
   @end{short}
   After execution of the body the allocated memory for the size is released.
 
-  When no argument is given the components of the @sym{sizte-t} instance are
-  initialized to zero. The initialization with two single float values uses the
-  @fun{size-init} function. The initialization from another size is done with
-  the @fun{size-init-from-size} function.
+  When no argument is given the components of the @symbol{graphene:size-t}
+  instance are initialized to zero. The initialization with two single float
+  values uses the @fun{graphene:size-init} function. The initialization from
+  another size is done with the @fun{graphene:size-init-from-size} function.
   @begin[Note]{dictionary}
-    The memory is allocated with the @fun{size-alloc} function and released
-    with the @fun{size-free} function.
+    The memory is allocated with the @fun{graphene:size-alloc} function and
+    released with the @fun{graphene:size-free} function.
   @end{dictionary}
   @begin[Examples]{dictionary}
-    Initialize a @symbol{size-t} instance with no value and two single float
-    values.
+    Initialize a @symbol{graphene:size-t} instance with no value and two single
+    float values.
     @begin{pre}
 (with-graphene-size (s)
   (list (size-width s) (size-height s)))
 => (0.0 0.0)
-(with-graphene-size (s 1.5 1.7)
-  (list (size-width s) (size-height s)))
+(graphene:with-graphene-size (s 1.5 1.7)
+  (list (graphene:size-width s) (graphene:size-height s)))
 => (1.5 1.7)
     @end{pre}
-    This examples uses the @fun{with-graphene-sizes} macro to initialize
-    two @symbol{size-t} instances. The second instance is intialized with the
-    values from the first instance.
+    This examples uses the @fun{graphene:with-graphene-sizes} macro to
+    initialize two @symbol{graphene:size-t} instances. The second instance is
+    intialized with the values from the first instance.
     @begin{pre}
-(with-graphene-sizes ((s1 0.3 0.5) (s2 s1))
-  (list (size-width s2) (size-height s2)))
+(graphene:with-graphene-sizes ((s1 0.3 0.5) (s2 s1))
+  (list (graphene:size-width s2) (graphene:size-height s2)))
 => (0.3 0.5)
     @end{pre}
   @end{dictionary}
-  @see-symbol{size-t}
-  @see-macro{with-graphene-sizes}
-  @see-function{size-alloc}
-  @see-function{size-free}"
+  @see-symbol{graphene:size-t}
+  @see-macro{graphene:with-graphene-sizes}
+  @see-function{graphene:size-alloc}
+  @see-function{graphene:size-free}"
   (cond ((not args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (size-alloc)))
@@ -133,30 +133,30 @@
 
 (defmacro with-graphene-sizes (vars &body body)
  #+liber-documentation
- "@version{#2022-10-1}
-  @syntax[]{with-graphene-sizes (s1 s2 s3 ... sn) body => result}
-  @argument[s1 ... sn]{the newly created @symbol{size-t} instances}
-  @argument[body]{a body that uses the bindings @arg{s1} ... @arg{sn}}
+ "@version{2023-9-22}
+  @syntax[]{(with-graphene-sizes (s1 s2 s3 ... sn) body) => result}
+  @argument[s1 ... sn]{the newly created @symbol{graphene:size-t} instances}
+  @argument[body]{a body that uses the bindings @arg{s1 ... sn}}
   @begin{short}
-    The @sym{with-graphene-sizes} macro creates new variable bindings and
-    executes the body that use these bindings.
+    The @fun{graphene:with-graphene-sizes} macro creates new variable bindings
+    and executes the body that use these bindings.
   @end{short}
   The macro performs the bindings sequentially, like the @sym{let*} macro.
 
   Each point can be initialized with values using the syntax for the
-  @fun{with-graphene-size} macro. See also the @fun{within-graphene-size}
-  documentation.
+  @fun{graphene:with-graphene-size} macro. See also the
+  @fun{graphene:with-graphene-size} documentation.
   @begin[Examples]{dictionary}
     @begin{pre}
-(with-graphene-sizes (s1 (s2 1.2 1.3) (s3 s2))
-  (list (list (size-width s1) (size-height s1))
-        (list (size-width s2) (size-height s2))
-        (list (size-width s3) (size-height s3))))
+(graphene:with-graphene-sizes (s1 (s2 1.2 1.3) (s3 s2))
+  (list (list (graphene:size-width s1) (graphene:size-height s1))
+        (list (graphene:size-width s2) (graphene:size-height s2))
+        (list (graphene:size-width s3) (graphene:size-height s3))))
 => ((0.0 0.0) (1.2 1.3) (1.2 1.3))
     @end{pre}
   @end{dictionary}
-  @see-symbol{size-t}
-  @see-macro{with-graphene-size}"
+  @see-symbol{graphene:size-t}
+  @see-macro{graphene:with-graphene-size}"
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
         `(with-graphene-size ,var
@@ -178,21 +178,21 @@
 (setf (liber:alias-for-symbol 'size-t)
       "CStruct"
       (liber:symbol-documentation 'size-t)
- "@version{#2022-10-1}
+ "@version{2023-9-22}
   @begin{short}
-    The @sym{size-t} structure is a data structure capable of describing a
-    size with two components width and height of type single float.
+    The @symbol{graphene:size-t} structure is a data structure capable of
+    describing a size with two components width and height of type single float.
   @end{short}
   @begin{pre}
 (cffi:defcstruct size-t
   (width :float)
   (height :float))
   @end{pre}
-  Access the coordinates with the @fun{size-width} and @fun{size-height}
-  functions.
-  @see-symbol{size-t}
-  @see-function{size-width}
-  @see-function{size-height}")
+  Access the coordinates with the @fun{graphene:size-width} and
+  @fun{graphene:size-height} functions.
+  @see-symbol{graphene:size-t}
+  @see-function{graphene:size-width}
+  @see-function{graphene:size-height}")
 
 (export 'size-t)
 
@@ -201,7 +201,8 @@
 ;;;     size-width
 
 (defun (setf size-width) (value size)
-  (setf (cffi:foreign-slot-value size '(:struct size-t) 'width) value))
+  (setf (cffi:foreign-slot-value size '(:struct size-t) 'width)
+        (coerce value 'single-float)))
 
 (defun size-width (size)
   (cffi:foreign-slot-value size '(:struct size-t) 'width))
@@ -210,22 +211,23 @@
 (setf (liber:alias-for-function 'size-width)
       "Accessor"
       (documentation 'size-width 'function)
- "@version{#2022-10-1}
-  @syntax[]{(size-width size) => width}
-  @syntax[]{(setf (size-width size) width)}
-  @argument[size]{a @symbol{size-t} instance}
+ "@version{2023-9-22}
+  @syntax[]{(graphene:size-width size) => width}
+  @syntax[]{(setf (graphene:size-width size) width)}
+  @argument[size]{a @symbol{graphene:size-t} instance}
   @argument[width]{a single float with the width component}
   @begin{short}
-    Accessor of the @code{width} slot of the @symbol{size-t} structure.
+    Accessor of the @code{width} slot of the @symbol{graphene:size-t} structure.
   @end{short}
-  @see-symbol{size-t}")
+  @see-symbol{graphene:size-t}")
 
 (export 'size-width)
 
 ;;;     size-heigth
 
 (defun (setf size-height) (value size)
-  (setf (cffi:foreign-slot-value size '(:struct size-t) 'height) value))
+  (setf (cffi:foreign-slot-value size '(:struct size-t) 'height)
+        (coerce value 'single-float)))
 
 (defun size-height (size)
   (cffi:foreign-slot-value size '(:struct size-t) 'height))
@@ -234,15 +236,16 @@
 (setf (liber:alias-for-function 'size-height)
       "Accessor"
       (documentation 'size-height 'function)
- "@version{#2022-10-1}
-  @syntax[]{(size-height size) => height}
-  @syntax[]{(setf (size-height size) height)}
-  @argument[size]{a @symbol{size-t} instance}
+ "@version{2023-9-22}
+  @syntax[]{(graphene:size-height size) => height}
+  @syntax[]{(setf (graphene:size-height size) height)}
+  @argument[size]{a @symbol{graphene:size-t} instance}
   @argument[width]{a single float with the height component}
   @begin{short}
-    Accessor of the @code{height} slot of the @symbol{size-t} structure.
+    Accessor of the @code{height} slot of the @symbol{graphene:size-t}
+    structure.
   @end{short}
-  @see-symbol{size-t}")
+  @see-symbol{graphene:size-t}")
 
 (export 'size-height)
 
@@ -252,16 +255,16 @@
 
 (cffi:defcfun ("graphene_size_alloc" size-alloc) (:pointer (:struct size-t))
  #+liber-documentation
- "@version{#2022-10-1}
-  @return{The newly allocated @symbol{size-t} instance.}
+ "@version{2023-9-22}
+  @return{The newly allocated @symbol{graphene:size-t} instance.}
   @begin{short}
-    Allocates a new @symbol{size-t} instance.
+    Allocates a new @symbol{graphene:size-t} instance.
   @end{short}
-  The components of the returned @symbol{size-t} instance are initialized to
-  zero. Use the @fun{size-free} function to free the resources allocated by
-  this function.
-  @see-symbol{size-t}
-  @see-function{size-free}")
+  The components of the returned @symbol{graphene:size-t} instance are
+  initialized to zero. Use the @fun{graphene:size-free} function to free the
+  resources allocated by this function.
+  @see-symbol{graphene:size-t}
+  @see-function{graphene:size-free}")
 
 (export 'size-alloc)
 
@@ -271,13 +274,13 @@
 
 (cffi:defcfun ("graphene_size_free" size-free) :void
  #+liber-documentation
- "@version{#2022-10-1}
-  @argument[size]{a @symbol{size-t} instance}
+ "@version{2023-9-22}
+  @argument[size]{a @symbol{graphene:size-t} instance}
   @begin{short}
-    Frees the resources allocated by the @fun{size-alloc} function.
+    Frees the resources allocated by the @fun{graphene:size-alloc} function.
   @end{short}
-  @see-symbol{size-t}
-  @see-function{size-alloc}"
+  @see-symbol{graphene:size-t}
+  @see-function{graphene:size-alloc}"
   (size (:pointer (:struct size-t))))
 
 (export 'size-free)
@@ -288,19 +291,21 @@
 
 (cffi:defcfun ("graphene_size_zero" size-zero) (:pointer (:struct size-t))
  #+liber-documentation
- "@version{#2022-10-1}
-  @return{The @symbol{size-t} instance with a zero size.}
+ "@version{2023-9-22}
+  @return{The @symbol{graphene:size-t} instance with a zero size.}
   @begin{short}
-    Returns a @symbol{size-t} instance with all two components set to zero.
+    Returns a @symbol{graphene:size-t} instance with all two components set to
+    zero.
   @end{short}
   @begin[Examples]{dictionary}
     @begin{pre}
-(values (size-width (size-zero)) (size-height (size-zero)))
+(values (graphene:size-width (graphene:size-zero))
+        (graphene:size-height (graphene:size-zero)))
 => 0.0
 => 0.0
     @end{pre}
   @end{dictionary}
-  @see-symbol{point-t}")
+  @see-symbol{graphene:point-t}")
 
 (export 'size-zero)
 
@@ -309,18 +314,18 @@
 ;;; ----------------------------------------------------------------------------
 
 (defun size-init (size width height)
- "@version{#2022-10-1}
-  @argument[size]{a @symbol{size-t} instance}
+ "@version{2023-9-22}
+  @argument[size]{a @symbol{graphene:size-t} instance}
   @argument[width]{a number coerced to a single float with the width component}
   @argument[height]{a number coerced to a single float with the height
     component}
-  @return{The initialized @symbol{size-t} instance.}
+  @return{The initialized @symbol{graphene:size-t} instance.}
   @begin{short}
-    Initializes the @symbol{size-t} instance to the given @arg{width} and
-    @arg{height} values.
+    Initializes the @symbol{graphene:size-t} instance to the given @arg{width}
+    and @arg{height} values.
   @end{short}
   It is safe to call this function multiple times.
-  @see-symbol{size-t}"
+  @see-symbol{graphene:size-t}"
   (cffi:foreign-funcall "graphene_size_init"
                         (:pointer (:struct size-t)) size
                         :float (coerce width 'single-float)
@@ -336,13 +341,13 @@
 (cffi:defcfun ("graphene_size_init_from_size" size-init-from-size)
     (:pointer (:struct size-t))
  #+liber-documentation
- "@version{#2022-10-1}
-  @argument[size]{a @symbol{size-t} instance}
-  @argument[source]{a @symbol{size-t} instance to use}
-  @return{The initialized @symbol{size-t} instance.}
-  @short{Initializes the @symbol{sizet} instance using the values of
+ "@version{2023-9-22}
+  @argument[size]{a @symbol{graphene:size-t} instance}
+  @argument[source]{a @symbol{graphene:size-t} instance to use}
+  @return{The initialized @symbol{graphene:size-t} instance.}
+  @short{Initializes the @symbol{graphene:size-t} instance using the values of
     @arg{source}.}
-  @see-symbol{size-t}"
+  @see-symbol{graphene:size-t}"
   (size (:pointer (:struct size-t)))
   (source (:pointer (:struct size-t))))
 
@@ -354,15 +359,15 @@
 
 (cffi:defcfun ("graphene_size_equal" size-equal) :bool
  #+liber-documentation
- "@version{#2022-10-1}
-  @argument[a]{a @symbol{size-t} instance}
-  @argument[b]{a @symbol{size-t} instance}
-  @return{@em{True}, if the @symbol{size-t} instances have the same components,
-    otherwise @em{false}.}
+ "@version{2023-9-22}
+  @argument[a]{a @symbol{graphene:size-t} instance}
+  @argument[b]{a @symbol{graphene:size-t} instance}
+  @return{@em{True}, if the @symbol{graphene:size-t} instances have the same
+    components, otherwise @em{false}.}
   @begin{short}
-    Checks whether two given @symbol{size-t} instances are equal.
+    Checks whether two given @symbol{graphene:size-t} instances are equal.
   @end{short}
-  @see-symbol{size-t}"
+  @see-symbol{graphene:size-t}"
   (a (:pointer (:struct size-t)))
   (b (:pointer (:struct size-t))))
 
@@ -374,18 +379,19 @@
 
 (defun size-interpolate (a b factor result)
  #+liber-documentation
- "@version{#2022-10-1}
-  @argument[a]{a @symbol{size-t} instance}
-  @argument[b]{a @symbol{size-t} instance}
+ "@version{2023-9-22}
+  @argument[a]{a @symbol{graphene:size-t} instance}
+  @argument[b]{a @symbol{graphene:size-t} instance}
   @argument[factor]{a number coerced to a double float with the linear
     interpolation factor}
-  @argument[result]{a @symbol{size-t} instance for the interpolated size}
-  @return{The @symbol{size-t} instance with the interpolated size.}
+  @argument[result]{a @symbol{graphene:size-t} instance for the interpolated
+    size}
+  @return{The @symbol{graphene:size-t} instance with the interpolated size.}
   @begin{short}
     Linearly interpolates the components of @arg{a} and @arg{b} using the
     given @arg{factor}.
   @end{short}
-  @see-symbol{size-t}"
+  @see-symbol{graphene:size-t}"
   (cffi:foreign-funcall "graphene_size_interpolate"
                         (:pointer (:struct size-t)) a
                         (:pointer (:struct size-t)) b
@@ -402,16 +408,16 @@
 
 (defun size-scale (size factor result)
  #+liber-documentation
- "@version{#2022-10-1}
-  @argument[size]{a @symbol{size-t} instance}
+ "@version{2023-9-22}
+  @argument[size]{a @symbol{graphene:size-t} instance}
   @argument[factor]{a number coerced to a single float with the scaling factor}
-  @argument[result]{a @symbol{size-t} instance for the scaled size}
-  @return{The @symbol{size-t} instance with the scaled size.}
+  @argument[result]{a @symbol{graphene:size-t} instance for the scaled size}
+  @return{The @symbol{graphene:size-t} instance with the scaled size.}
   @begin{short}
-    Scales the components of the given @symbol{size-t} instance by the given
-    factor.
+    Scales the components of the given @symbol{graphene:size-t} instance by the
+    given factor.
   @end{short}
-  @see-symbol{size-t}"
+  @see-symbol{graphene:size-t}"
   (cffi:foreign-funcall "graphene_size_scale"
                         (:pointer (:struct size-t)) size
                         :float (coerce factor 'single-float)

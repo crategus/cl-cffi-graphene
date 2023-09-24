@@ -7,6 +7,18 @@
 
 ;;;     graphene_point3d_t
 
+(test graphene-point3d-t-structure
+  (is (= 12 (cffi:foreign-type-size '(:struct graphene:point3d-t))))
+  (is (equal '(graphene::x graphene::y graphene::z)
+             (cffi:foreign-slot-names '(:struct graphene:point3d-t))))
+  (cffi:with-foreign-object (point '(:struct graphene:point3d-t))
+    (is (= 0 (setf (graphene:point3d-x point) 0)))
+    (is (= 0 (graphene:point3d-x point)))
+    (is (= 0 (setf (graphene:point3d-y point) 0)))
+    (is (= 0 (graphene:point3d-y point)))
+    (is (= 0 (setf (graphene:point3d-z point) 0)))
+    (is (= 0 (graphene:point3d-z point)))))
+
 ;;; --- Macros -----------------------------------------------------------------
 
 ;;;     with-graphene-point3d
@@ -83,18 +95,18 @@
 
 ;;; --- Functions --------------------------------------------------------------
 
-;;;     (graphene:point3d-x
-;;;     (graphene:point3d-y
-;;;     (graphene:point3d-z
+;;;     graphene:point3d-x
+;;;     graphene:point3d-y
+;;;     graphene:point3d-z
 
-(test point3d-x/y/z
+(test graphene-point3d-x/y/z
   (graphene:with-graphene-point3d (p 1 2 3)
     (is (= 1.0 (graphene:point3d-x p)))
     (is (= 2.0 (graphene:point3d-y p)))
     (is (= 3.0 (graphene:point3d-z p)))
-    (is (= 1.5 (setf (graphene:point3d-x p) 1.5)))
-    (is (= 2.5 (setf (graphene:point3d-y p) 2.5)))
-    (is (= 3.5 (setf (graphene:point3d-z p) 3.5)))
+    (is (= 1.5 (setf (graphene:point3d-x p) (/ 3 2))))
+    (is (= 2.5 (setf (graphene:point3d-y p) (/ 5 2))))
+    (is (= 3.5 (setf (graphene:point3d-z p) (/ 7 2))))
     (is (= 1.5 (graphene:point3d-x p)))
     (is (= 2.5 (graphene:point3d-y p)))
     (is (= 3.5 (graphene:point3d-z p)))))
@@ -102,7 +114,7 @@
 ;;;     graphene_point3d_alloc
 ;;;     graphene_point3d_free
 
-(test point3d-alloc/free
+(test graphene-point3d-alloc/free
   (let ((point nil))
     (is (cffi:pointerp (setf point (graphene:point3d-alloc))))
     (is (= 0.0 (graphene:point3d-x point)))
@@ -112,19 +124,19 @@
 
 ;;;     graphene_point3d_zero
 
-(test point3d-zero.1
+(test graphene-point3d-zero.1
   (is (= 0.0 (graphene:point3d-x (graphene:point3d-zero))))
   (is (= 0.0 (graphene:point3d-y (graphene:point3d-zero))))
   (is (= 0.0 (graphene:point3d-z (graphene:point3d-zero)))))
 
-(test point3d-zero.2
+(test graphene-point3d-zero.2
   (graphene:with-graphene-point3ds (p1 (p2 1 2 3))
     (is (graphene:point3d-equal p1 (graphene:point3d-zero)))
     (is (not (graphene:point3d-equal p2 (graphene:point3d-zero))))))
 
 ;;;     graphene_point3d_init
 
-(test point3d-init
+(test graphene-point3d-init
   (graphene:with-graphene-point3d (p)
     (is (graphene:point3d-equal p (graphene:point3d-zero)))
     (is (cffi:pointer-eq p (graphene:point3d-init p 1 2 3)))
@@ -138,7 +150,7 @@
 
 ;;;     graphene_point3d_init_from_point
 
-(test point3d-init-from-point
+(test graphene-point3d-init-from-point
   (graphene:with-graphene-point3ds (p (p1 1 2 3))
     (is (cffi:pointer-eq p (graphene:point3d-init-from-point p p1)))
     (is (= 1.0 (graphene:point3d-x p)))
@@ -147,7 +159,7 @@
 
 ;;;     graphene_point3d_init_from_vec3
 
-(test point3d-init-from-vec3
+(test graphene-point3d-init-from-vec3
   (graphene:with-graphene-vec3 (v 1 2 3)
     (graphene:with-graphene-point3d (p)
       (is (cffi:pointer-eq p (graphene:point3d-init-from-vec3 p v)))
@@ -157,7 +169,7 @@
 
 ;;;     graphene_point3d_to_vec3
 
-(test point3d-to-vec3
+(test graphene-point3d-to-vec3
   (graphene:with-graphene-vec3 (v)
     (graphene:with-graphene-point3d (p 1 2 3)
       (is (cffi:pointer-eq v (graphene:point3d-to-vec3 p v)))
@@ -165,7 +177,7 @@
 
 ;;;     graphene_point3d_equal
 
-(test point3d-equal
+(test graphene-point3d-equal
   (graphene:with-graphene-point3ds ((p1 1 2 3) (p2 1 2 3) (p3 4 5 6))
     (is (graphene:point3d-equal p1 p2))
     (is (not (graphene:point3d-equal p1 p3)))
@@ -173,10 +185,10 @@
 
 ;;;     graphene_point3d_near
 
-(test point3d-near
+(test graphene-point3d-near
   (graphene:with-graphene-point3ds ((p1 0.000 0.000 0.000)
-                           (p2 0.001 0.000 0.000)
-                           (p3 0.000 0.001 0.000))
+                                    (p2 0.001 0.000 0.000)
+                                    (p3 0.000 0.001 0.000))
     (is (graphene:point3d-near p1 p2 0.01))
     (is (graphene:point3d-near p1 p3 0.01))
     (is (not (graphene:point3d-near p1 p2 0.001)))
@@ -184,7 +196,7 @@
 
 ;;;     graphene_point3d_distance
 
-(test point3d-distance
+(test graphene-point3d-distance
   (graphene:with-graphene-point3ds ((p1 1 0 0) (p2 0 1 0) (p3 0 0 1) delta)
     (multiple-value-bind (dist delta)
         (graphene:point3d-distance p1 p2 delta)
@@ -207,7 +219,7 @@
 
 ;;;     graphene_point3d_interpolate
 
-(test point3d-interpolate
+(test graphene-point3d-interpolate
   (graphene:with-graphene-point3ds ((p1 0.0 0.0 0.0)
                                     (p2 1.0 0.0 0.0)
                                     (p3 0.0 1.0 0.0)
@@ -227,14 +239,14 @@
 
 ;;;     graphene_point3d_scale
 
-(test point3d-scale.1
+(test graphene-point3d-scale.1
   (graphene:with-graphene-point3ds ((p 1 2 3) result)
     (is (cffi:pointer-eq result (graphene:point3d-scale p 2 result)))
     (is (= 2.0 (graphene:point3d-x result)))
     (is (= 4.0 (graphene:point3d-y result)))
     (is (= 6.0 (graphene:point3d-z result)))))
 
-(test point3d-scale.2
+(test graphene-point3d-scale.2
   (graphene:with-graphene-point3ds ((p 1 2 3) result)
     (is (cffi:pointer-eq result (graphene:point3d-scale p 1/2 result)))
     (is (= 0.5 (graphene:point3d-x result)))
@@ -243,7 +255,7 @@
 
 ;;;     graphene_point3d_cross
 
-(test point3d-cross
+(test graphene-point3d-cross
   (graphene:with-graphene-point3ds ((p1 1 0 0) (p2 0 1 0) (p3 0 0 1) result)
     (is (cffi:pointer-eq result (graphene:point3d-cross p1 p2 result)))
     (is (=  0.0 (graphene:point3d-x result)))
@@ -260,7 +272,7 @@
 
 ;;;     graphene_point3d_dot
 
-(test point3d-dot
+(test graphene-point3d-dot
   (graphene:with-graphene-point3ds ((p1 1 1 1) (p2 2 2 2))
     (is (=  3.0 (graphene:point3d-dot p1 p1)))
     (is (= 12.0 (graphene:point3d-dot p2 p2)))
@@ -268,14 +280,14 @@
 
 ;;;     graphene_point3d_length
 
-(test point3d-length
+(test graphene-point3d-length
   (graphene:with-graphene-point3ds ((p1 1 1 1) (p2 2 2 2))
     (is (= (sqrt  3.0) (graphene:point3d-length p1)))
     (is (= (sqrt 12.0) (graphene:point3d-length p2)))))
 
 ;;;     graphene_point3d_normalize
 
-(test point3d-normalize
+(test graphene-point3d-normalize
   (graphene:with-graphene-point3ds ((p1 4 0 0) (p2 0 5 0) (p3 0 0 6) result)
     (is (cffi:pointer-eq result (graphene:point3d-normalize p1 result)))
     (is (approx-equal 1.0 (graphene:point3d-length result)))
@@ -286,13 +298,13 @@
 
 ;;;     graphene_point3d_normalize_viewport
 
-(test point3d-normalize-viewport
+(test graphene-point3d-normalize-viewport
   (graphene:with-graphene-point3ds ((p 1 1 0) result)
     (graphene:with-graphene-rect (viewport 0 0 4 4)
         (is (cffi:pointer-eq result
-                        (graphene:point3d-normalize-viewport p viewport 0 1 result)))
+                (graphene:point3d-normalize-viewport p viewport 0 1 result)))
         (is (= -0.5 (graphene:point3d-x result)))
         (is (= -0.5 (graphene:point3d-y result)))
         (is (= -1.0 (graphene:point3d-z result))))))
 
-;;; 2022-10-1
+;;; --- 2023-9-22 --------------------------------------------------------------
