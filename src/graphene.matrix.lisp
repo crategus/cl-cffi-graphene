@@ -2,8 +2,8 @@
 ;;; graphene.matrix.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -331,7 +331,7 @@ res = ⎡ A.x × B ⎤
 ;;; graphene_matrix_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(cffi:defcfun ("graphene_matrix_alloc" matrix-alloc) 
+(cffi:defcfun ("graphene_matrix_alloc" matrix-alloc)
     (:pointer (:struct matrix-t))
  #+liber-documentation
  "@version{#2022-9-23}
@@ -396,7 +396,7 @@ res = ⎡ A.x × B ⎤
   (cffi:with-foreign-object (values-ar :float 16)
     (loop for i from 0 below 16
           for value in args
-          do (setf (cffi:mem-aref values-ar :float i) 
+          do (setf (cffi:mem-aref values-ar :float i)
                    (coerce value 'single-float)))
     (%matrix-init-from-float matrix values-ar)
     matrix))
@@ -723,13 +723,11 @@ res = ⎡ A.x × B ⎤
 
 (cffi:defcfun ("graphene_matrix_is_identity" matrix-is-identity) :bool
  #+liber-documentation
- "@version{#2022-9-29}
-  @argument[matrix]{a @symbol{matrix-t} instance}
+ "@version{#2023-10-31}
+  @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{@em{True} if the matrix is the identity matrix.}
-  @begin{short}
-    Checks whether the given matrix is the identity matrix.
-  @end{short}
-  @see-symbol{matrix-t}"
+  @short{Checks whether the given matrix is the identity matrix.}
+  @see-symbol{graphene:matrix-t}"
   (matrix (:pointer (:struct matrix-t))))
 
 (export 'matrix-is-identity)
@@ -740,15 +738,15 @@ res = ⎡ A.x × B ⎤
 
 (cffi:defcfun ("graphene_matrix_is_2d" matrix-is-2d) :bool
  #+liber-documentation
- "@version{#2022-9-29}
-  @argument[matrix]{a @symbol{matrix-t} instance}
+ "@version{#2023-10-31}
+  @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{@em{True} if the matrix is compatible with an affine transformation
     matrix.}
   @begin{short}
-    Checks whether the given matrix is the identity matrix is compatible with
-    an a 2D affine transformation matrix.
+    Checks whether the given matrix is compatible with an a 2D affine
+    transformation matrix.
   @end{short}
-  @see-symbol{matrix-t}"
+  @see-symbol{graphene:matrix-t}"
   (matrix (:pointer (:struct matrix-t))))
 
 (export 'matrix-is-2d)
@@ -760,13 +758,11 @@ res = ⎡ A.x × B ⎤
 (cffi:defcfun ("graphene_matrix_is_backface_visible" matrix-is-backface-visible)
     :bool
  #+liber-documentation
- "@version{#2022-9-29}
-  @argument[matrix]{a @symbol{matrix-t} instance}
+ "@version{#2023-10-31}
+  @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{@em{True} if the back face of the matrix is visible.}
-  @begin{short}
-    Checks whether the matrix has a visible back face.
-  @end{short}
-  @see-symbol{matrix-t}"
+  @short{Checks whether the matrix has a visible back face.}
+  @see-symbol{graphene:matrix-t}"
   (matrix (:pointer (:struct matrix-t))))
 
 (export 'matrix-is-backface-visible)
@@ -777,13 +773,11 @@ res = ⎡ A.x × B ⎤
 
 (cffi:defcfun ("graphene_matrix_is_singular" matrix-is-singular) :bool
  #+liber-documentation
- "@version{#2022-9-29}
-  @argument[matrix]{a @symbol{matrix-t} instance}
+ "@version{#2023-10-31}
+  @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{@em{True} if the matrix is singular.}
-  @begin{short}
-    Checks whether the matrix is singular.
-  @end{short}
-  @see-symbol{matrix-t}"
+  @short{Checks whether the matrix is singular.}
+  @see-symbol{graphene:matrix-t}"
   (matrix (:pointer (:struct matrix-t))))
 
 (export 'matrix-is-singular)
