@@ -33,6 +33,8 @@
        (t (:default "libgraphene-1.0")))
 
     (cffi:use-foreign-library graphene)
+    ;; push the hostname on *features*
+    (pushnew (intern (string-upcase (machine-instance)) :keyword) *features*)
     (pushnew :graphene *features*))
 
 ;;; --- End of file graphene.init.lisp -----------------------------------------
