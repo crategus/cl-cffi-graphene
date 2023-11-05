@@ -24,7 +24,7 @@
 
 (defsystem :cl-cffi-graphene
   :name "cl-cffi-graphene"
-  :version "0.2.0"
+  :version "0.3.0"
   :author  "Dieter Kaiser"
   :license "MIT"
   :depends-on (:cffi)
@@ -55,6 +55,9 @@
 
 (defsystem :cl-cffi-graphene/test
   :name "cl-cffi-graphene/test"
+  :version "0.3.0"
+  :author  "Dieter Kaiser"
+  :license "MIT"
   :depends-on (:cl-cffi-graphene :fiveam)
   :perform (test-op (o c)
                (uiop:symbol-call :fiveam :run!
