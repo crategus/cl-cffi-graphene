@@ -49,7 +49,9 @@
      (:file "graphene.frustum")
      (:file "graphene.quaternion")
      (:file "graphene.euler")
-     (:file "graphene.ray")))))
+     (:file "graphene.ray")
+     (:file "graphene.utils")
+     ))))
 
 ;; Definine a test operation for the library
 
