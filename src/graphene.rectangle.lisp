@@ -87,6 +87,42 @@
 (in-package :graphene)
 
 (defmacro with-graphene-rect ((var &rest args) &body body)
+
+ #+liber-documentation
+ "@version{2023-11-19}
+  @syntax[]{(with-graphene-rect (r) body) => result}
+  @syntax[]{(with-graphene-rect (r src) body) => result}
+  @syntax[]{(with-graphene-point (r x y width height) body) => result}
+  @argument[r]{a @symbol{graphene:rect-t} instance to create and initialize}
+  @argument[x]{a number coerced to a single float for the x coordinate of the
+    rectangle}
+  @argument[y]{a number coerced to a single float for the y coerced of the
+    rectangle}
+  @argument[width]{a number coerced to a single float with the width of the
+    rectangle}
+  @argument[height]{a number coerced to a single float with the height of the
+    rectangle}
+  @argument[src]{a @symbol{graphene:rect-t} instance to use for initialization}
+  @begin{short}
+    The @fun{graphene:with-graphene-rect} macro allocates a new
+    @symbol{graphene:rect-t} instance, initializes the rectangle with the given
+    values and executes the body that uses the rectangle.
+  @end{short}
+  After execution of the body the allocated memory for the rectangle is
+  released.
+
+  When no argument is given the components of the rectangle are initialized to
+  zero. The initialization with four single float values uses the
+  @fun{graphene:rect-init} function. The initialization from another rectangle
+  is done with the @fun{graphene:rect-init-from-rect} function.
+  @begin[Note]{dictionary}
+    The memory is allocated with the @fun{graphene:rect-alloc} function and
+    released with the @fun{graphene:rect-free} function.
+  @end{dictionary}
+  @see-symbol{graphene:rect-t}
+  @see-macro{graphene:with-graphene-rects}
+  @see-function{graphene:rect-alloc}
+  @see-function{graphene:rect-free}"
   (cond ((not args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (rect-alloc)))
@@ -121,6 +157,23 @@
 (export 'with-graphene-rect)
 
 (defmacro with-graphene-rects (vars &body body)
+
+ #+liber-documentation
+ "@version{2023-11-19}
+  @syntax[]{(with-graphene-rects (r1 r2 r3 ... rn) body) => result}
+  @argument[r1 ... rn]{the newly created @symbol{graphene:rect-t} instances}
+  @argument[body]{a body that uses the bindings @arg{r1 ... rn}}
+  @begin{short}
+    The @fun{graphene:with-graphene-rects} macro creates new variable bindings
+    and executes the body that use these bindings.
+  @end{short}
+  The macro performs the bindings sequentially, like the @sym{let*} macro.
+
+  Each rectangle can be initialized with values using the syntax for the
+  @fun{graphene:with-graphene-rectangle} macro. See also the
+  @fun{graphene:with-graphene-rectangle} documentation.
+  @see-symbol{graphene:rectangle-t}
+  @see-macro{graphene:with-graphene-rectangle}"
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
         `(with-graphene-rect ,var
@@ -290,41 +343,26 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_init ()
-;;;
-;;; graphene_rect_t *
-;;; graphene_rect_init (graphene_rect_t *r,
-;;;                     float x,
-;;;                     float y,
-;;;                     float width,
-;;;                     float height);
-;;;
-;;; Initializes the given graphene_rect_t with the given values.
-;;;
-;;; This function will implicitly normalize the graphene_rect_t before
-;;; returning.
-;;;
-;;; r :
-;;;     a graphene_rect_t
-;;;
-;;; x :
-;;;     the X coordinate of the graphene_rect_t.origin
-;;;
-;;; y :
-;;;     the Y coordinate of the graphene_rect_t.origin
-;;;
-;;; width :
-;;;     the width of the graphene_rect_t.size
-;;;
-;;; height :
-;;;     the height of the graphene_rect_t.size
-;;;
-;;; Returns :
-;;;     the initialized rectangle.
-;;;
-;;; Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-init (r x y width height)
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[x]{a number coerced to a single float with the x coordinate of the
+    rectangle}
+  @argument[y]{a number coerced to a single float with the y coordinate of the
+    rectangle}
+  @argument[width]{a number coerced to a single float with the width of the
+    rectangle}
+  @argument[height]{a number coerced to a single float with the height of the
+    rectangle}
+  @return{The initialized @symbol{graphene:rect-t} instance.}
+  @begin{short}
+    Initializes the given rectangle with the given values.
+  @end{short}
+  This function will implicitly normalize the rectangle before returning.
+  @see-class{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_rect_init"
                         (:pointer (:struct rect-t)) r
                         :float (coerce x 'single-float)
@@ -337,33 +375,21 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_init_from_rect ()
-;;;
-;;;graphene_rect_t *
-;;;graphene_rect_init_from_rect (graphene_rect_t *r,
-;;;                              const graphene_rect_t *src);
-;;;Initializes r using the given src rectangle.
-
-;;;This function will implicitly normalize the graphene_rect_t before returning.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;src
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;the initialized rectangle.
-
-;;;[transfer none]
-
-;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_init_from_rect" rect-init-from-rect)
     (:pointer (:struct rect-t))
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[src]{a @symbol{graphene:rect-t} instance}
+  @return{The initialized @symbol{graphene:rect-t} instance.}
+  @begin{short}
+    Initializes @arg{r} using the given @arg{src} rectangle.
+  @end{short}
+  This function will implicitly normalize the rectangle before returning.
+  @see-class{graphene:rect-t}
+  @see-function{graphene:rect-init}"
   (r (:pointer (:struct rect-t)))
   (src (:pointer (:struct rect-t))))
 
@@ -371,28 +397,16 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_equal ()
-;;;
-;;;bool
-;;;graphene_rect_equal (const graphene_rect_t *a,
-;;;                     const graphene_rect_t *b);
-;;;Checks whether the two given rectangle are equal.
-
-;;;Parameters
-;;;a
-
-;;;a graphene_rect_t
-
-;;;b
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;true if the rectangles are equal
-
-;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_equal" rect-equal) :bool
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[a]{a @symbol{graphene:rect-t} instance}
+  @argument[b]{a @symbol{graphene:rect-t} instance}
+  @return{@em{True} if the rectangles are equal.}
+  @short{Checks whether the two given rectangle are equal.}
+  @see-symbol{graphene:rect-t}"
   (a (:pointer (:struct rect-t)))
   (b (:pointer (:struct rect-t))))
 
@@ -400,75 +414,58 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_normalize ()
-;;;
-;;;graphene_rect_t *
-;;;graphene_rect_normalize (graphene_rect_t *r);
-;;;Normalizes the passed rectangle.
-
-;;;This function ensures that the size of the rectangle is made of positive values, and that the origin is the top-left corner of the rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;the normalized rectangle.
-
-;;;[transfer none]
-
-;;;Since: 1.0
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_normalize" rect-normalize)
     (:pointer (:struct rect-t))
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @return{The normalized @symbol{graphene:rect-t} instance.}
+  @begin{short}
+    Normalizes the passed rectangle.
+  @end{short}
+  This function ensures that the size of the rectangle is made of positive
+  values, and that the origin is the top-left corner of the rectangle.
+  @see-symbol{graphene:rect-t}"
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-normalize)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_normalize_r ()
-;;;void
-;;;graphene_rect_normalize_r (const graphene_rect_t *r,
-;;;                           graphene_rect_t *res);
-;;;Normalizes the passed rectangle.
-
-;;;This function ensures that the size of the rectangle is made of positive values, and that the origin is in the top-left corner of the rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;res
-
-;;;the return location for the normalized rectangle.
-
-;;;Since: 1.4
+;;; graphene_rect_normalize_r ()
+;;;
+;;; void
+;;; graphene_rect_normalize_r (const graphene_rect_t *r,
+;;;                            graphene_rect_t *res);
+;;;
+;;; Normalizes the passed rectangle.
+;;;
+;;; This function ensures that the size of the rectangle is made of positive
+;;; values, and that the origin is in the top-left corner of the rectangle.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; res
+;;;     the return location for the normalized rectangle.
 ;;; ----------------------------------------------------------------------------
 
-;; not needed, see RECT-NORMALIZE
-
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_center ()
-;;;void
-;;;graphene_rect_get_center (const graphene_rect_t *r,
-;;;                          graphene_point_t *p);
-;;;Retrieves the coordinates of the center of the given rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;p
-
-;;;return location for a graphene_point_t.
-
-;;;Since: 1.0
+;;; graphene_rect_get_center ()
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-center (r p)
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @return{The @symbol{graphene:point-t} instance.}
+  @begin{short}
+    Retrieves the coordinates of the center of the given rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:point-t}"
   (cffi:foreign-funcall "graphene_rect_get_center"
                         (:pointer (:struct rect-t)) r
                         (:pointer (:struct point-t)) p
@@ -478,25 +475,20 @@
 (export 'rect-center)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_top_left ()
-;;;void
-;;;graphene_rect_get_top_left (const graphene_rect_t *r,
-;;;                            graphene_point_t *p);
-;;;Retrieves the coordinates of the top-left corner of the given rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;p
-
-;;;return location for a graphene_point_t.
-
-;;;Since: 1.0
+;;; graphene_rect_get_top_left ()
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-top-left (r p)
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @return{The @symbol{graphene:point-t} instance}
+  @begin{short}
+    Retrieves the coordinates of the top-left corner of the given rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:point-t}"
   (cffi:foreign-funcall "graphene_rect_get_top_left"
                         (:pointer (:struct rect-t)) r
                         (:pointer (:struct point-t)) p
@@ -506,25 +498,20 @@
 (export 'rect-top-left)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_top_right ()
-;;;void
-;;;graphene_rect_get_top_right (const graphene_rect_t *r,
-;;;                             graphene_point_t *p);
-;;;Retrieves the coordinates of the top-right corner of the given rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;p
-
-;;;return location for a graphene_point_t.
-
-;;;Since: 1.0
+;;; graphene_rect_get_top_right ()
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-top-right (r p)
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @return{The @symbol{graphene:point-t} instance}
+  @begin{short}
+    Retrieves the coordinates of the top-right corner of the given rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:point-t}"
   (cffi:foreign-funcall "graphene_rect_get_top_right"
                         (:pointer (:struct rect-t)) r
                         (:pointer (:struct point-t)) p
@@ -534,25 +521,20 @@
 (export 'rect-top-right)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_bottom_right ()
-;;;void
-;;;graphene_rect_get_bottom_right (const graphene_rect_t *r,
-;;;                                graphene_point_t *p);
-;;;Retrieves the coordinates of the bottom-right corner of the given rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;p
-
-;;;return location for a graphene_point_t.
-
-;;;Since: 1.0
+;;; graphene_rect_get_bottom_right ()
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-bottom-right (r p)
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @return{The @symbol{graphene:point-t} instance}
+  @begin{short}
+    Retrieves the coordinates of the bottom-right corner of the given rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:point-t}"
   (cffi:foreign-funcall "graphene_rect_get_bottom_right"
                         (:pointer (:struct rect-t)) r
                         (:pointer (:struct point-t)) p
@@ -562,25 +544,20 @@
 (export 'rect-bottom-right)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_bottom_left ()
-;;;void
-;;;graphene_rect_get_bottom_left (const graphene_rect_t *r,
-;;;                               graphene_point_t *p);
-;;;Retrieves the coordinates of the bottom-left corner of the given rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;p
-
-;;;return location for a graphene_point_t.
-
-;;;Since: 1.0
+;;; graphene_rect_get_bottom_left ()
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-bottom-left (r p)
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @return{The @symbol{graphene:point-t} instance}
+  @begin{short}
+    Retrieves the coordinates of the bottom-left corner of the given rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:point-t}"
   (cffi:foreign-funcall "graphene_rect_get_bottom_left"
                         (:pointer (:struct rect-t)) r
                         (:pointer (:struct point-t)) p
@@ -590,163 +567,125 @@
 (export 'rect-bottom-left)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_x ()
-;;;float
-;;;graphene_rect_get_x (const graphene_rect_t *r);
-;;;Retrieves the normalized X coordinate of the origin of the given rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;the normalized X coordinate of the rectangle
-
-;;;Since: 1.0
+;;; graphene_rect_get_x ()
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_get_x" rect-x) :float
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @return{A single float with the normalized x coordinate of the rectangle.}
+  @begin{short}
+    Retrieves the normalized x coordinate of the origin of the given rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}"
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-x)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_y ()
-;;;float
-;;;graphene_rect_get_y (const graphene_rect_t *r);
-;;;Retrieves the normalized Y coordinate of the origin of the given rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;the normalized Y coordinate of the rectangle
-
-;;;Since: 1.0
+;;; graphene_rect_get_y ()
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_get_y" rect-y) :float
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @return{A single float with the normalized y coordinate of the rectangle.}
+  @begin{short}
+    Retrieves the normalized y coordinate of the origin of the given rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}"
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-y)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_width ()
-;;;float
-;;;graphene_rect_get_width (const graphene_rect_t *r);
-;;;Retrieves the normalized width of the given rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;the normalized width of the rectangle
-
-;;;Since: 1.0
+;;; graphene_rect_get_width ()
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_get_width" rect-width) :float
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @return{A single float with the normalized width of the rectangle.}
+  @begin{short}
+    Retrieves the normalized width of the given rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}"
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-width)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_height ()
-;;;float
-;;;graphene_rect_get_height (const graphene_rect_t *r);
-;;;Retrieves the normalized height of the given rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;the normalized height of the rectangle
-
-;;;Since: 1.0
+;;; graphene_rect_get_height ()
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_get_height" rect-height) :float
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @return{A single float with the normalized height of the rectangle.}
+  @begin{short}
+    Retrieves the normalized height of the given rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}"
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-height)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_area ()
-;;;float
-;;;graphene_rect_get_area (const graphene_rect_t *r);
-;;;Compute the area of given normalized rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;the area of the normalized rectangle
-
-;;;Since: 1.10
+;;; graphene_rect_get_area ()
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_get_area" rect-area) :float
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @return{A single float with the area of the given normalized rectangle.}
+  @begin{short}
+    Compute the area of the given normalized rectangle.
+  @end{short}
+  @see-symbol{graphene:rect-t}"
   (r (:pointer (:struct rect-t))))
 
 (export 'rect-area)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_get_vertices ()
-;;;void
-;;;graphene_rect_get_vertices (const graphene_rect_t *r,
-;;;                            graphene_vec2_t vertices[]);
-;;;Computes the four vertices of a graphene_rect_t.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;vertices
-
-;;;return location for an array of 4 graphene_vec2_t.
-
-;;;Since: 1.4
+;;; graphene_rect_get_vertices ()
+;;;
+;;; void
+;;; graphene_rect_get_vertices (const graphene_rect_t *r,
+;;;                             graphene_vec2_t vertices[]);
+;;;
+;;; Computes the four vertices of a graphene_rect_t.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; vertices
+;;;     return location for an array of 4 graphene_vec2_t.
+;;;
+;;; Since 1.4
 ;;; ----------------------------------------------------------------------------
 
+;; TODO: Implement the function
+
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_union ()
-;;;void
-;;;graphene_rect_union (const graphene_rect_t *a,
-;;;                     const graphene_rect_t *b,
-;;;                     graphene_rect_t *res);
-;;;Computes the union of the two given rectangles.
-
-
-
-;;;The union in the image above is the blue outline.
-
-;;;Parameters
-;;;a
-
-;;;a graphene_rect_t
-
-;;;b
-
-;;;a graphene_rect_t
-
-;;;res
-
-;;;return location for a graphene_rect_t.
-
-;;;Since: 1.0
+;;; graphene_rect_union ()
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-union (a b result)
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[a]{a @symbol{graphene:rect-t} instance}
+  @argument[b]{a @symbol{graphene:rect-t} instance}
+  @argument[result]{a @symbol{graphene:rect-t} instance}
+  @return{A @symbol{graphene:rect-t} instance.}
+  @begin{short}
+    Computes the union of the two given rectangles.
+  @end{short}
+  @see-symbol{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_rect_union"
                         (:pointer (:struct rect-t)) a
                         (:pointer (:struct rect-t)) b
@@ -757,68 +696,50 @@
 (export 'rect-union)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_intersection ()
-;;;bool
-;;;graphene_rect_intersection (const graphene_rect_t *a,
-;;;                            const graphene_rect_t *b,
-;;;                            graphene_rect_t *res);
-;;;Computes the intersection of the two given rectangles.
-
-
-
-;;;The intersection in the image above is the blue outline.
-
-;;;If the two rectangles do not intersect, res will contain a degenerate rectangle with origin in (0, 0) and a size of 0.
-
-;;;Parameters
-;;;a
-
-;;;a graphene_rect_t
-
-;;;b
-
-;;;a graphene_rect_t
-
-;;;res
-
-;;;return location for a graphene_rect_t.
-
-;;;Returns
-;;;true if the two rectangles intersect
-
-;;;Since: 1.0
+;;; graphene_rect_intersection ()
 ;;; ----------------------------------------------------------------------------
 
+;; TODO: Returns true if the two rectangles intersect. Change the implemenation?
+
 (defun rect-intersection (a b result)
+ #+liber-documentation
+ "@version{#2023-11-19}
+  @argument[a]{a @symbol{graphene:rect-t} instance}
+  @argument[b]{a @symbol{graphene:rect-t} instance}
+  @argument[result]{a @symbol{graphene:rect-t} instance}
+  @return{A @symbol{graphene:rect-t} instance with the result.}
+  @begin{short}
+    Computes the intersection of the two given rectangles.
+  @end{short}
+  If the two rectangles do not intersect, @arg{result} will contain a degenerate
+  rectangle with origin in (0, 0) and a size of 0.
+  @see-symbol{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_rect_intersection"
                         (:pointer (:struct rect-t)) a
                         (:pointer (:struct rect-t)) b
                         (:pointer (:struct rect-t)) result
-                        :void)
+                        :bool)
   result)
 
 (export 'rect-intersection)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_contains_point ()
-;;;bool
-;;;graphene_rect_contains_point (const graphene_rect_t *r,
-;;;                              const graphene_point_t *p);
-;;;Checks whether a graphene_rect_t contains the given coordinates.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;p
-
-;;;a graphene_point_t
-
-;;;Returns
-;;;true if the rectangle contains the point
-
-;;;Since: 1.0
+;;; graphene_rect_contains_point ()
+;;;
+;;; bool
+;;; graphene_rect_contains_point (const graphene_rect_t *r,
+;;;                               const graphene_point_t *p);
+;;;
+;;; Checks whether a graphene_rect_t contains the given coordinates.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; p
+;;;     a graphene_point_t
+;;;
+;;; Returns
+;;;     true if the rectangle contains the point
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_contains_point" rect-contains-point) :bool
@@ -828,25 +749,22 @@
 (export 'rect-contains-point)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_contains_rect ()
-;;;bool
-;;;graphene_rect_contains_rect (const graphene_rect_t *a,
-;;;                             const graphene_rect_t *b);
-;;;Checks whether a graphene_rect_t fully contains the given rectangle.
-
-;;;Parameters
-;;;a
-
-;;;a graphene_rect_t
-
-;;;b
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;true if the rectangle a fully contains b
-
-;;;Since: 1.0
+;;; graphene_rect_contains_rect ()
+;;;
+;;; bool
+;;; graphene_rect_contains_rect (const graphene_rect_t *a,
+;;;                              const graphene_rect_t *b);
+;;;
+;;; Checks whether a graphene_rect_t fully contains the given rectangle.
+;;;
+;;; a
+;;;     a graphene_rect_t
+;;;
+;;; b
+;;;     a graphene_rect_t
+;;;
+;;; Returns
+;;;     true if the rectangle a fully contains b
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_contains_rect" rect-contains-rect) :bool
@@ -856,34 +774,28 @@
 (export 'rect-contains-rect)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_offset ()
-;;;graphene_rect_t *
-;;;graphene_rect_offset (graphene_rect_t *r,
-;;;                      float d_x,
-;;;                      float d_y);
-;;;Offsets the origin by d_x and d_y .
-
-;;;The size of the rectangle is unchanged.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;d_x
-
-;;;the horizontal offset
-
-;;;d_y
-
-;;;the vertical offset
-
-;;;Returns
-;;;the offset rectangle.
-
-;;;[transfer none]
-
-;;;Since: 1.0
+;;; graphene_rect_offset ()
+;;;
+;;; graphene_rect_t *
+;;; graphene_rect_offset (graphene_rect_t *r,
+;;;                       float d_x,
+;;;                       float d_y);
+;;;
+;;; Offsets the origin by d_x and d_y .
+;;;
+;;; The size of the rectangle is unchanged.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; d_x
+;;;     the horizontal offset
+;;;
+;;; d_y
+;;;     the vertical offset
+;;;
+;;; Returns
+;;;     the offset rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-offset (r dx dy)
@@ -896,71 +808,64 @@
 (export 'rect-offset)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_offset_r ()
-;;;void
-;;;graphene_rect_offset_r (const graphene_rect_t *r,
-;;;                        float d_x,
-;;;                        float d_y,
-;;;                        graphene_rect_t *res);
-;;;Offsets the origin of the given rectangle by d_x and d_y .
-
-;;;The size of the rectangle is left unchanged.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;d_x
-
-;;;the horizontal offset
-
-;;;d_y
-
-;;;the vertical offset
-
-;;;res
-
-;;;return location for the offset rectangle.
-
-;;;Since: 1.4
+;;; graphene_rect_offset_r ()
+;;;
+;;; void
+;;; graphene_rect_offset_r (const graphene_rect_t *r,
+;;;                         float d_x,
+;;;                         float d_y,
+;;;                         graphene_rect_t *res);
+;;;
+;;; Offsets the origin of the given rectangle by d_x and d_y .
+;;;
+;;; The size of the rectangle is left unchanged.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; d_x
+;;;     the horizontal offset
+;;;
+;;; d_y
+;;;     the vertical offset
+;;;
+;;; res
+;;;     return location for the offset rectangle.
 ;;; ----------------------------------------------------------------------------
 
-;; not needed, see RECT-OFFSET
-
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_inset ()
-;;;graphene_rect_t *
-;;;graphene_rect_inset (graphene_rect_t *r,
-;;;                     float d_x,
-;;;                     float d_y);
-;;;Changes the given rectangle to be smaller, or larger depending on the given inset parameters.
-
-;;;To create an inset rectangle, use positive d_x or d_y values; to create a larger, encompassing rectangle, use negative d_x or d_y values.
-
-;;;The origin of the rectangle is offset by d_x and d_y , while the size is adjusted by (2 * @d_x, 2 * @d_y). If d_x and d_y are positive values, the size of the rectangle is decreased; if d_x and d_y are negative values, the size of the rectangle is increased.
-
-;;;If the size of the resulting inset rectangle has a negative width or height then the size will be set to zero.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;d_x
-
-;;;the horizontal inset
-
-;;;d_y
-
-;;;the vertical inset
-
-;;;Returns
-;;;the inset rectangle.
-
-;;;[transfer none]
-
-;;;Since: 1.0
+;;; graphene_rect_inset ()
+;;;
+;;; graphene_rect_t *
+;;; graphene_rect_inset (graphene_rect_t *r,
+;;;                      float d_x,
+;;;                      float d_y);
+;;;
+;;; Changes the given rectangle to be smaller, or larger depending on the given
+;;; inset parameters.
+;;;
+;;; To create an inset rectangle, use positive d_x or d_y values; to create a
+;;; larger, encompassing rectangle, use negative d_x or d_y values.
+;;;
+;;; The origin of the rectangle is offset by d_x and d_y , while the size is
+;;; adjusted by (2 * @d_x, 2 * @d_y). If d_x and d_y are positive values, the
+;;; size of the rectangle is decreased; if d_x and d_y are negative values, the
+;;; size of the rectangle is increased.
+;;;
+;;; If the size of the resulting inset rectangle has a negative width or height
+;;; then the size will be set to zero.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; d_x
+;;;     the horizontal inset
+;;;
+;;; d_y
+;;;     the vertical inset
+;;;
+;;; Returns
+;;;     the inset rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-inset (r dx dy)
@@ -973,115 +878,125 @@
 (export 'rect-inset)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_inset_r ()
-;;;void
-;;;graphene_rect_inset_r (const graphene_rect_t *r,
-;;;                       float d_x,
-;;;                       float d_y,
-;;;                       graphene_rect_t *res);
-;;;Changes the given rectangle to be smaller, or larger depending on the given inset parameters.
-
-;;;To create an inset rectangle, use positive d_x or d_y values; to create a larger, encompassing rectangle, use negative d_x or d_y values.
-
-;;;The origin of the rectangle is offset by d_x and d_y , while the size is adjusted by (2 * @d_x, 2 * @d_y). If d_x and d_y are positive values, the size of the rectangle is decreased; if d_x and d_y are negative values, the size of the rectangle is increased.
-
-;;;If the size of the resulting inset rectangle has a negative width or height then the size will be set to zero.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;d_x
-
-;;;the horizontal inset
-
-;;;d_y
-
-;;;the vertical inset
-
-;;;res
-
-;;;return location for the inset rectangle.
-
-;;;Since: 1.4
+;;; graphene_rect_inset_r ()
+;;;
+;;; void
+;;; graphene_rect_inset_r (const graphene_rect_t *r,
+;;;                        float d_x,
+;;;                        float d_y,
+;;;                        graphene_rect_t *res);
+;;;
+;;; Changes the given rectangle to be smaller, or larger depending on the given
+;;; inset parameters.
+;;;
+;;; To create an inset rectangle, use positive d_x or d_y values; to create a
+;;; larger, encompassing rectangle, use negative d_x or d_y values.
+;;;
+;;; The origin of the rectangle is offset by d_x and d_y , while the size is
+;;; adjusted by (2 * @d_x, 2 * @d_y). If d_x and d_y are positive values, the
+;;; size of the rectangle is decreased; if d_x and d_y are negative values, the
+;;; size of the rectangle is increased.
+;;;
+;;; If the size of the resulting inset rectangle has a negative width or height
+;;; then the size will be set to zero.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; d_x
+;;;     the horizontal inset
+;;;
+;;; d_y
+;;;     the vertical inset
+;;;
+;;; res
+;;;     return location for the inset rectangle.
 ;;; ----------------------------------------------------------------------------
 
-;; not needed, see RECT-INSET
-
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_round_to_pixel ()
-;;;graphene_rect_t *
-;;;graphene_rect_round_to_pixel (graphene_rect_t *r);
-;;;graphene_rect_round_to_pixel has been deprecated since version 1.4 and should not be used in newly-written code.
-
-;;;Use graphene_rect_round() instead
-
-;;;Rounds the origin and the size of the given rectangle to their nearest integer values; the rounding is guaranteed to be large enough to contain the original rectangle.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;Returns
-;;;the pixel-aligned rectangle.
-
-;;;[transfer none]
-
-;;;Since: 1.0
-;;; ----------------------------------------------------------------------------
-
-;; deprecated and not implemented
-
-;;; ----------------------------------------------------------------------------
-;;;graphene_rect_round ()
-;;;void
-;;;graphene_rect_round (const graphene_rect_t *r,
-;;;                     graphene_rect_t *res);
-;;;graphene_rect_round has been deprecated since version 1.10 and should not be used in newly-written code.
-
-;;;Use graphene_rect_round_extents() instead
-
-;;;Rounds the origin and size of the given rectangle to their nearest integer values; the rounding is guaranteed to be large enough to have an area bigger or equal to the original rectangle, but might not fully contain its extents. Use graphene_rect_round_extents() in case you need to round to a rectangle that covers fully the original one.
-
-;;;This function is the equivalent of calling floor on the coordinates of the origin, and ceil on the size.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;res
-
-;;;return location for the rounded rectangle.
-
-;;;Since: 1.4
+;;; graphene_rect_round_to_pixel ()
+;;;
+;;; graphene_rect_t *
+;;; graphene_rect_round_to_pixel (graphene_rect_t *r);
+;;;
+;;; graphene_rect_round_to_pixel has been deprecated since version 1.4 and
+;;; should not be used in newly-written code.
+;;;
+;;; Use graphene_rect_round() instead
+;;;
+;;; Rounds the origin and the size of the given rectangle to their nearest
+;;; integer values; the rounding is guaranteed to be large enough to contain
+;;; the original rectangle.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; Returns
+;;;     the pixel-aligned rectangle.
 ;;; ----------------------------------------------------------------------------
 
 ;; deprecated and not implemented
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_round_extents ()
-;;;void
-;;;graphene_rect_round_extents (const graphene_rect_t *r,
-;;;                             graphene_rect_t *res);
-;;;Rounds the origin of the given rectangle to its nearest integer value and and recompute the size so that the rectangle is large enough to contain all the conrners of the original rectangle.
+;;; graphene_rect_round ()
+;;;
+;;; void
+;;; graphene_rect_round (const graphene_rect_t *r,
+;;;                      graphene_rect_t *res);
+;;;
+;;; graphene_rect_round has been deprecated since version 1.10 and should not
+;;; be used in newly-written code.
+;;;
+;;; Use graphene_rect_round_extents() instead
+;;;
+;;; Rounds the origin and size of the given rectangle to their nearest integer
+;;; values; the rounding is guaranteed to be large enough to have an area bigger
+;;; or equal to the original rectangle, but might not fully contain its extents.
+;;; Use graphene_rect_round_extents() in case you need to round to a rectangle
+;;; that covers fully the original one.
+;;;
+;;; This function is the equivalent of calling floor on the coordinates of the
+;;; origin, and ceil on the size.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; res
+;;;     return location for the rounded rectangle.
+;;; ----------------------------------------------------------------------------
 
-;;;This function is the equivalent of calling floor on the coordinates of the origin, and recomputing the size calling ceil on the bottom-right coordinates.
+;; deprecated and not implemented
 
-;;;If you want to be sure that the rounded rectangle completely covers the area that was covered by the original rectangle — i.e. you want to cover the area including all its corners — this function will make sure that the size is recomputed taking into account the ceiling of the coordinates of the bottom-right corner. If the difference between the original coordinates and the coordinates of the rounded rectangle is greater than the difference between the original size and and the rounded size, then the move of the origin would not be compensated by a move in the anti-origin, leaving the corners of the original rectangle outside the rounded one.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;res
-
-;;;return location for the rectangle with rounded extents.
-
-;;;Since: 1.10
+;;; ----------------------------------------------------------------------------
+;;; graphene_rect_round_extents ()
+;;;
+;;; void
+;;; graphene_rect_round_extents (const graphene_rect_t *r,
+;;;                              graphene_rect_t *res);
+;;;
+;;; Rounds the origin of the given rectangle to its nearest integer value and
+;;; and recompute the size so that the rectangle is large enough to contain all
+;;; the conrners of the original rectangle.
+;;;
+;;; This function is the equivalent of calling floor on the coordinates of the
+;;; origin, and recomputing the size calling ceil on the bottom-right
+;;; coordinates.
+;;;
+;;; If you want to be sure that the rounded rectangle completely covers the area
+;;; that was covered by the original rectangle — i.e. you want to cover the area
+;;; including all its corners — this function will make sure that the size is
+;;; recomputed taking into account the ceiling of the coordinates of the
+;;; bottom-right corner. If the difference between the original coordinates and
+;;; the coordinates of the rounded rectangle is greater than the difference
+;;; between the original size and and the rounded size, then the move of the
+;;; origin would not be compensated by a move in the anti-origin, leaving the
+;;; corners of the original rectangle outside the rounded one.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; res
+;;;     return location for the rectangle with rounded extents.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-round-extents (r result)
@@ -1094,27 +1009,23 @@
 (export 'rect-round-extents)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_expand ()
-;;;void
-;;;graphene_rect_expand (const graphene_rect_t *r,
-;;;                      const graphene_point_t *p,
-;;;                      graphene_rect_t *res);
-;;;Expands a graphene_rect_t to contain the given graphene_point_t.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;p
-
-;;;a graphene_point_t
-
-;;;res
-
-;;;return location for the expanded rectangle.
-
-;;;Since: 1.4
+;;; graphene_rect_expand ()
+;;;
+;;; void
+;;; graphene_rect_expand (const graphene_rect_t *r,
+;;;                       const graphene_point_t *p,
+;;;                       graphene_rect_t *res);
+;;;
+;;; Expands a graphene_rect_t to contain the given graphene_point_t.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; p
+;;;     a graphene_point_t
+;;;
+;;; res
+;;;     return location for the expanded rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-expand (r p result)
@@ -1128,32 +1039,27 @@
 (export 'rect-expand)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_interpolate ()
-;;;void
-;;;graphene_rect_interpolate (const graphene_rect_t *a,
-;;;                           const graphene_rect_t *b,
-;;;                           double factor,
-;;;                           graphene_rect_t *res);
-;;;Linearly interpolates the origin and size of the two given rectangles.
+;;; graphene_rect_interpolate ()
 
-;;;Parameters
-;;;a
-
-;;;a graphene_rect_t
-
-;;;b
-
-;;;a graphene_rect_t
-
-;;;factor
-
-;;;the linear interpolation factor
-
-;;;res
-
-;;;return location for the interpolated rectangle.
-
-;;;Since: 1.0
+;;; void
+;;; graphene_rect_interpolate (const graphene_rect_t *a,
+;;;                            const graphene_rect_t *b,
+;;;                            double factor,
+;;;                            graphene_rect_t *res);
+;;;
+;;; Linearly interpolates the origin and size of the two given rectangles.
+;;;
+;;; a
+;;;     a graphene_rect_t
+;;;
+;;; b
+;;;     a graphene_rect_t
+;;;
+;;; factor
+;;;     the linear interpolation factor
+;;;
+;;; res
+;;;     return location for the interpolated rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-interpolate (a b factor result)
@@ -1168,17 +1074,16 @@
 (export 'rect-interpolate)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_zero ()
-;;;const graphene_rect_t *
-;;;graphene_rect_zero (void);
-;;;Returns a degenerate rectangle with origin fixed at (0, 0) and a size of 0, 0.
-
-;;;Returns
-;;;a fixed rectangle.
-
-;;;[transfer none]
-
-;;;Since: 1.4
+;;; graphene_rect_zero ()
+;;;
+;;; const graphene_rect_t *
+;;; graphene_rect_zero (void);
+;;;
+;;; Returns a degenerate rectangle with origin fixed at (0, 0) and a size of
+;;; 0, 0.
+;;;
+;;; Returns
+;;;     a fixed rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_zero" rect-zero)
@@ -1187,32 +1092,28 @@
 (export 'rect-zero)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_rect_scale ()
-;;;void
-;;;graphene_rect_scale (const graphene_rect_t *r,
-;;;                     float s_h,
-;;;                     float s_v,
-;;;                     graphene_rect_t *res);
-;;;Scales the size and origin of a rectangle horizontaly by s_h , and vertically by s_v . The result res is normalized.
-
-;;;Parameters
-;;;r
-
-;;;a graphene_rect_t
-
-;;;s_h
-
-;;;horizontal scale factor
-
-;;;s_v
-
-;;;vertical scale factor
-
-;;;res
-
-;;;return location for the scaled rectangle.
-
-;;;Since: 1.10
+;;; graphene_rect_scale ()
+;;;
+;;; void
+;;; graphene_rect_scale (const graphene_rect_t *r,
+;;;                      float s_h,
+;;;                      float s_v,
+;;;                      graphene_rect_t *res);
+;;;
+;;; Scales the size and origin of a rectangle horizontaly by s_h , and
+;;; vertically by s_v . The result res is normalized.
+;;;
+;;; r
+;;;     a graphene_rect_t
+;;;
+;;; s_h
+;;;     horizontal scale factor
+;;;
+;;; s_v
+;;;     vertical scale factor
+;;;
+;;; res
+;;;     return location for the scaled rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-scale (r sh sv result)
