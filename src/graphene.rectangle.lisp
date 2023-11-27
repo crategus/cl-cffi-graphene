@@ -87,12 +87,11 @@
 (in-package :graphene)
 
 (defmacro with-graphene-rect ((var &rest args) &body body)
-
  #+liber-documentation
  "@version{2023-11-19}
   @syntax[]{(with-graphene-rect (r) body) => result}
   @syntax[]{(with-graphene-rect (r src) body) => result}
-  @syntax[]{(with-graphene-point (r x y width height) body) => result}
+  @syntax[]{(with-graphene-rect (r x y width height) body) => result}
   @argument[r]{a @symbol{graphene:rect-t} instance to create and initialize}
   @argument[x]{a number coerced to a single float for the x coordinate of the
     rectangle}
@@ -157,7 +156,6 @@
 (export 'with-graphene-rect)
 
 (defmacro with-graphene-rects (vars &body body)
-
  #+liber-documentation
  "@version{2023-11-19}
   @syntax[]{(with-graphene-rects (r1 r2 r3 ... rn) body) => result}
@@ -725,24 +723,17 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_contains_point ()
-;;;
-;;; bool
-;;; graphene_rect_contains_point (const graphene_rect_t *r,
-;;;                               const graphene_point_t *p);
-;;;
-;;; Checks whether a graphene_rect_t contains the given coordinates.
-;;;
-;;; r
-;;;     a graphene_rect_t
-;;;
-;;; p
-;;;     a graphene_point_t
-;;;
-;;; Returns
-;;;     true if the rectangle contains the point
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_contains_point" rect-contains-point) :bool
+ #+liber-documentation
+ "@version{#2023-11-20}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @return{@em{True} if the rectangle contains the point.}
+  @short{Checks whether a rectangle contains the given coordinates.}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:point-t}"
   (r (:pointer (:struct rect-t)))
   (p (:pointer (:struct point-t))))
 
@@ -750,24 +741,16 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_contains_rect ()
-;;;
-;;; bool
-;;; graphene_rect_contains_rect (const graphene_rect_t *a,
-;;;                              const graphene_rect_t *b);
-;;;
-;;; Checks whether a graphene_rect_t fully contains the given rectangle.
-;;;
-;;; a
-;;;     a graphene_rect_t
-;;;
-;;; b
-;;;     a graphene_rect_t
-;;;
-;;; Returns
-;;;     true if the rectangle a fully contains b
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_contains_rect" rect-contains-rect) :bool
+ #+liber-documentation
+ "@version{#2023-11-20}
+  @argument[a]{a @symbol{graphene:rect-t} instance}
+  @argument[b]{a @symbol{graphene:rect-t} instance}
+  @return{@em{True} if the rectangle @arg{a} fully contains @arg{b}.}
+  @short{Checks whether a rectangle contains the given rectangle.}
+  @see-symbol{graphene:rect-t}"
   (a (:pointer (:struct rect-t)))
   (b (:pointer (:struct rect-t))))
 
@@ -775,30 +758,20 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_offset ()
-;;;
-;;; graphene_rect_t *
-;;; graphene_rect_offset (graphene_rect_t *r,
-;;;                       float d_x,
-;;;                       float d_y);
-;;;
-;;; Offsets the origin by d_x and d_y .
-;;;
-;;; The size of the rectangle is unchanged.
-;;;
-;;; r
-;;;     a graphene_rect_t
-;;;
-;;; d_x
-;;;     the horizontal offset
-;;;
-;;; d_y
-;;;     the vertical offset
-;;;
-;;; Returns
-;;;     the offset rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-offset (r dx dy)
+ #+liber-documentation
+ "@version{#2023-11-20}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[dx]{a number coerced to a single float with the horizontal offset}
+  @argument[dy]{a number coerced to a single float with the vertical offset}
+  @return{The offset @symbol{graphene:rect-t} instance.}
+  @begin{short}
+    Offsets the origin by @arg{dx} and @arg{dy}.
+  @end{short}
+  The size of the rectangle is unchanged.
+  @see-symbol{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_rect_offset"
                         (:pointer (:struct rect-t)) r
                         :float (coerce dx 'single-float)
@@ -835,40 +808,31 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_inset ()
-;;;
-;;; graphene_rect_t *
-;;; graphene_rect_inset (graphene_rect_t *r,
-;;;                      float d_x,
-;;;                      float d_y);
-;;;
-;;; Changes the given rectangle to be smaller, or larger depending on the given
-;;; inset parameters.
-;;;
-;;; To create an inset rectangle, use positive d_x or d_y values; to create a
-;;; larger, encompassing rectangle, use negative d_x or d_y values.
-;;;
-;;; The origin of the rectangle is offset by d_x and d_y , while the size is
-;;; adjusted by (2 * @d_x, 2 * @d_y). If d_x and d_y are positive values, the
-;;; size of the rectangle is decreased; if d_x and d_y are negative values, the
-;;; size of the rectangle is increased.
-;;;
-;;; If the size of the resulting inset rectangle has a negative width or height
-;;; then the size will be set to zero.
-;;;
-;;; r
-;;;     a graphene_rect_t
-;;;
-;;; d_x
-;;;     the horizontal inset
-;;;
-;;; d_y
-;;;     the vertical inset
-;;;
-;;; Returns
-;;;     the inset rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-inset (r dx dy)
+ #+liber-documentation
+ "@version{#2023-11-20}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[dx]{a number coerced to a single float with the horizontal inset}
+  @argument[dy]{a number coerced to a single float with the vertical inset}
+  @return{A @symbol{graphene:rect-t} instance with the inset rectangle}
+  @begin{short}
+    Changes the given rectangle to be smaller, or larger depending on the given
+    inset parameters.
+  @end{short}
+  To create an inset rectangle, use positive @arg{dx} or @arg{dy} values. To
+  create a larger, encompassing rectangle, use negative @arg{dx} or @arg{dy}
+  values.
+
+  The origin of the rectangle is offset by @arg{dx} and @arg{dy}, while the size
+  is adjusted by @arg{(2 * dx, 2 * dy)}. If @arg{dx} and @arg{dy}are positive
+  values, the size of the rectangle is decreased. If @arg{dx} and @arg{dy} are
+  negative values, the size of the rectangle is increased.
+
+  If the size of the resulting inset rectangle has a negative width or height
+  then the size will be set to zero.
+  @see-symbol{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_rect_inset"
                         (:pointer (:struct rect-t)) r
                         :float (coerce dx 'single-float)
@@ -969,37 +933,34 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_round_extents ()
-;;;
-;;; void
-;;; graphene_rect_round_extents (const graphene_rect_t *r,
-;;;                              graphene_rect_t *res);
-;;;
-;;; Rounds the origin of the given rectangle to its nearest integer value and
-;;; and recompute the size so that the rectangle is large enough to contain all
-;;; the conrners of the original rectangle.
-;;;
-;;; This function is the equivalent of calling floor on the coordinates of the
-;;; origin, and recomputing the size calling ceil on the bottom-right
-;;; coordinates.
-;;;
-;;; If you want to be sure that the rounded rectangle completely covers the area
-;;; that was covered by the original rectangle — i.e. you want to cover the area
-;;; including all its corners — this function will make sure that the size is
-;;; recomputed taking into account the ceiling of the coordinates of the
-;;; bottom-right corner. If the difference between the original coordinates and
-;;; the coordinates of the rounded rectangle is greater than the difference
-;;; between the original size and and the rounded size, then the move of the
-;;; origin would not be compensated by a move in the anti-origin, leaving the
-;;; corners of the original rectangle outside the rounded one.
-;;;
-;;; r
-;;;     a graphene_rect_t
-;;;
-;;; res
-;;;     return location for the rectangle with rounded extents.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-round-extents (r result)
+ #+liber-documentation
+ "@version{#2023-11-20}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[result]{a @symbol{graphene:rect-t} instance}
+  @return{A @symbol{graphene:rect-t} instance with the rectangle with
+    rounded extents.}
+  @begin{short}
+    Rounds the origin of the given rectangle to its nearest integer value and
+    and recompute the size so that the rectangle is large enough to contain all
+    the conrners of the original rectangle.
+  @end{short}
+
+  This function is the equivalent of calling floor on the coordinates of the
+  origin, and recomputing the size calling ceil on the bottom-right coordinates.
+
+  If you want to be sure that the rounded rectangle completely covers the area
+  that was covered by the original rectangle - i.e. you want to cover the area
+  including all its corners - this function will make sure that the size is
+  recomputed taking into account the ceiling of the coordinates of the
+  bottom-right corner. If the difference between the original coordinates and
+  the coordinates of the rounded rectangle is greater than the difference
+  between the original size and and the rounded size, then the move of the
+  origin would not be compensated by a move in the anti-origin, leaving the
+  corners of the original rectangle outside the rounded one.
+  @see-symbol{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_rect_round_extents"
                         (:pointer (:struct rect-t)) r
                         (:pointer (:struct rect-t)) result
@@ -1010,25 +971,18 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_expand ()
-;;;
-;;; void
-;;; graphene_rect_expand (const graphene_rect_t *r,
-;;;                       const graphene_point_t *p,
-;;;                       graphene_rect_t *res);
-;;;
-;;; Expands a graphene_rect_t to contain the given graphene_point_t.
-;;;
-;;; r
-;;;     a graphene_rect_t
-;;;
-;;; p
-;;;     a graphene_point_t
-;;;
-;;; res
-;;;     return location for the expanded rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-expand (r p result)
+ #+liber-documentation
+ "@version{#2023-11-20}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @argument[result]{a @symbol{graphene:rect-t} instance}
+  @return{The @symbol{graphene:rect-t} instance with the expanded rectangle.}
+  @short{Expands a rectangle to contain the given point.}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:point-t}"
   (cffi:foreign-funcall "graphene_rect_expand"
                         (:pointer (:struct rect-t)) r
                         (:pointer (:struct point-t)) p
@@ -1040,29 +994,22 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_interpolate ()
-
-;;; void
-;;; graphene_rect_interpolate (const graphene_rect_t *a,
-;;;                            const graphene_rect_t *b,
-;;;                            double factor,
-;;;                            graphene_rect_t *res);
-;;;
-;;; Linearly interpolates the origin and size of the two given rectangles.
-;;;
-;;; a
-;;;     a graphene_rect_t
-;;;
-;;; b
-;;;     a graphene_rect_t
-;;;
-;;; factor
-;;;     the linear interpolation factor
-;;;
-;;; res
-;;;     return location for the interpolated rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-interpolate (a b factor result)
+ #+liber-documentation
+ "@version{#2023-11-20}
+  @argument[a]{a @symbol{graphene:rect-t} instance}
+  @argument[b]{a @symbol{graphene:rect-t} instance}
+  @argument[factor]{a number coerced to a double float with the linear
+    interpolation factor}
+  @argument[result]{a @symbol{graphene:rect-t} instance}
+  @return{The @symbol{graphene:rect-t} instance with the interpolated
+    rectanle.}
+  @begin{short}
+    Linearly interpolates the origin and size of the two given rectangles.
+  @end{short}
+  @see-symbol{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_rect_interpolate"
                         (:pointer (:struct rect-t)) a
                         (:pointer (:struct rect-t)) b
@@ -1075,48 +1022,41 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_zero ()
-;;;
-;;; const graphene_rect_t *
-;;; graphene_rect_zero (void);
-;;;
-;;; Returns a degenerate rectangle with origin fixed at (0, 0) and a size of
-;;; 0, 0.
-;;;
-;;; Returns
-;;;     a fixed rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_zero" rect-zero)
-    (:pointer (:struct rect-t)))
+    (:pointer (:struct rect-t))
+ #+liber-documentation
+ "@version{#2023-11-20}
+  @return{The fixed @symbol{graphene:rect-t} instance.}
+  @begin{short}
+    Returns a degenerate rectangle with origin fixed at @code{(0, 0)} and a
+    size of @code{0, 0}.
+  @end{short}
+  @see-symbol{graphene:rect-t}")
 
 (export 'rect-zero)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_scale ()
-;;;
-;;; void
-;;; graphene_rect_scale (const graphene_rect_t *r,
-;;;                      float s_h,
-;;;                      float s_v,
-;;;                      graphene_rect_t *res);
-;;;
-;;; Scales the size and origin of a rectangle horizontaly by s_h , and
-;;; vertically by s_v . The result res is normalized.
-;;;
-;;; r
-;;;     a graphene_rect_t
-;;;
-;;; s_h
-;;;     horizontal scale factor
-;;;
-;;; s_v
-;;;     vertical scale factor
-;;;
-;;; res
-;;;     return location for the scaled rectangle.
 ;;; ----------------------------------------------------------------------------
 
 (defun rect-scale (r sh sv result)
+ #+liber-documentation
+ "@version{#2023-11-20}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[sh]{a number coerced to a single float with the horizontal scale
+    factor}
+  @argument[sc]{a number coerced to a single float with the vertical scale
+    factor}
+  @argument[result]{a @symbol{graphene:rect-t} instance}
+  @return{The @symbol{graphene:rect-t} instance with the scaled rectangle.}
+  @begin{short}
+    Scales the size and origin of a rectangle horizontaly by @arg{sh}, and
+    vertically by @arg{sv}.
+  @end{short}
+  The @arg{result} parameter is normalized.
+  @see-symbol{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_rect_scale"
                         (:pointer (:struct rect-t)) r
                         :float (coerce sh 'single-float)

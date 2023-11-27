@@ -2,8 +2,8 @@
 ;;; graphene.box.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -150,9 +150,9 @@
       (liber:symbol-documentation 'box-t)
  "@version{#2022-9-22}
   @begin{short}
-    The @sym{box-t} structure provides a representation of an axis aligned
-    minimum bounding box using the coordinates of its minimum and maximum
-    vertices.
+    The @sym{graphene:box-t} structure provides a representation of an axis
+    aligned minimum bounding box using the coordinates of its minimum and
+    maximum vertices.
   @end{short}")
 
 (export 'box-t)
@@ -164,14 +164,15 @@
 (cffi:defcfun ("graphene_box_alloc" box-alloc) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-22}
-  @return{The newly allocated @symbol{box-t} instance. Use the
-    @fun{box-free} function to free the resources allocated by this function.}
+  @return{The newly allocated @symbol{graphene:box-t} instance. Use the
+    @fun{graphene:box-free} function to free the resources allocated by this
+    function.}
   @begin{short}
-    Allocates a new @symbol{box-t} instance.
+    Allocates a new @symbol{graphene:box-t} instance.
   @end{short}
   The contents of the returned instance are undefined.
-  @see-symbol{box-t}
-  @see-function{box-free}")
+  @see-symbol{graphene:box-t}
+  @see-function{graphene:box-free}")
 
 (export 'box-alloc)
 
@@ -182,12 +183,12 @@
 (cffi:defcfun ("graphene_box_free" box-free) :void
  #+liber-documentation
  "@version{#2022-9-22}
-  @argument[box]{a @symbol{box-t} instance}
+  @argument[box]{a @symbol{graphene:box-t} instance}
   @begin{short}
-    Frees the resources allocated by the @fun{box-alloc} function.
+    Frees the resources allocated by the @fun{graphene:box-alloc} function.
   @end{short}
-  @see-symbol{box-t}
-  @see-function{box-alloc}"
+  @see-symbol{graphene:box-t}
+  @see-function{graphene:box-alloc}"
   (box (:pointer (:struct box-t))))
 
 (export 'box-free)
@@ -199,17 +200,17 @@
 (cffi:defcfun ("graphene_box_init" box-init) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-22}
-  @argument[box]{a @symbol{box-t} instance to initialize}
-  @argument[min]{a @symbol{point3d-t} instance with the coordinates of the
-    minimum vertex}
-  @argument[max]{a @symbol{point3d-t} instance with the coordinates of the
-    maximum vertex}
-  @return{The initialized @symbol{box-t} instance.}
+  @argument[box]{a @symbol{graphene:box-t} instance to initialize}
+  @argument[min]{a @symbol{graphene:point3d-t} instance with the coordinates of
+    the minimum vertex}
+  @argument[max]{a @symbol{graphene:point3d-t} instance with the coordinates of
+    the maximum vertex}
+  @return{The initialized @symbol{graphene:box-t} instance.}
   @begin{short}
-    Initializes the given @symbol{box-t} instance with two vertices.
+    Initializes the given @symbol{graphene:box-t} instance with two vertices.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{point3d-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:point3d-t}"
   (box (:pointer (:struct box-t)))
   (min (:pointer (:struct point3d-t)))
   (max (:pointer (:struct point3d-t))))
@@ -224,14 +225,14 @@
     (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-22}
-  @argument[box]{a @symbol{box-t} instance to initialize}
-  @argument[source]{a @symbol{box-t} instance}
-  @return{The initialized @symbol{box-t} instance.}
+  @argument[box]{a @symbol{graphene:box-t} instance to initialize}
+  @argument[source]{a @symbol{graphene:box-t} instance}
+  @return{The initialized @symbol{grpahene:box-t} instance.}
   @begin{short}
-    Initializes the given @symbol{box-t} instance with the vertices of
-    another @symbol{box-t} instance.
+    Initializes the given @symbol{graphene:box-t} instance with the vertices of
+    another @symbol{graphene:box-t} instance.
   @end{short}
-  @see-symbol{box-t}"
+  @see-symbol{graphene:box-t}"
   (box (:pointer (:struct box-t)))
   (source (:pointer (:struct box-t))))
 
@@ -244,15 +245,15 @@
 (defun box-init-from-points (box arg)
  #+liber-documentation
  "@version{#2022-9-22}
-  @argument[box]{a @symbol{box-t} instance to initialize}
-  @argument[arg]{a list with two @symbol{point3d-t} instances}
-  @return{The initialized @symbol{box-t} instance.}
+  @argument[box]{a @symbol{graphene:box-t} instance to initialize}
+  @argument[arg]{a list with two @symbol{graphene:point3d-t} instances}
+  @return{The initialized @symbol{graphene:box-t} instance.}
   @begin{short}
-    Initializes the given @symbol{box-t} instance with the vertices of
-    the given @symbol{point3d-t} instances.
+    Initializes the given @symbol{graphene:box-t} instance with the vertices of
+    the given @symbol{graphene:point3d-t} instances.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{point3d-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:point3d-t}"
   (apply #'box-init box arg))
 
 (export 'box-init-from-points)
@@ -265,17 +266,17 @@
     (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-22}
-  @argument[box]{a @symbol{box-t} instance to initialize}
-  @argument[min]{a @symbol{vec3-t} instance with the coordinates of the
-    minimum vertex}
-  @argument[max]{a @symbol{vec3-t} instance with the coordinates of the
-    maximum vertex}
-  @return{The initialized @symbol{box-t} instance.}
+  @argument[box]{a @symbol{graphene:box-t} instance to initialize}
+  @argument[min]{a @symbol{graphene:vec3-t} instance with the coordinates of
+    the minimum vertex}
+  @argument[max]{a @symbol{graphene:vec3-t} instance with the coordinates of
+    the maximum vertex}
+  @return{The initialized @symbol{graphene:box-t} instance.}
   @begin{short}
-    Initializes the given @symbol{box-t} instance with two vertices.
+    Initializes the given @symbol{graphene:box-t} instance with two vertices.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{vec3-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:vec3-t}"
   (box (:pointer (:struct box-t)))
   (min (:pointer (:struct vec3-t)))
   (max (:pointer (:struct vec3-t))))
@@ -289,15 +290,15 @@
 (defun box-init-from-vectors (box arg)
  #+liber-documentation
  "@version{#2022-9-22}
-  @argument[box]{a @symbol{box-t} instance to initialize}
-  @argument[arg]{a list with two @symbol{vec3-t} instances}
-  @return{The initialized @symbol{box-t} instance.}
+  @argument[box]{a @symbol{graphene:box-t} instance to initialize}
+  @argument[arg]{a list with two @symbol{graphene:vec3-t} instances}
+  @return{The initialized @symbol{graphene:box-t} instance.}
   @begin{short}
-    Initializes the given @symbol{box-t} instance with the vertices of
-    the given @symbol{vec3-t} instances.
+    Initializes the given @symbol{graphene:box-t} instance with the vertices of
+    the given @symbol{graphene:vec3-t} instances.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{vec3-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:vec3-t}"
   (apply #'box-init-from-vec3 box arg))
 
 (export 'box-init-from-vectors)
@@ -309,13 +310,13 @@
 (cffi:defcfun ("graphene_box_equal" box-equal) :bool
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[a]{a @symbol{box-t} instance to initialize}
-  @argument[b]{a @symbol{box-t} instance to initialize}
+  @argument[a]{a @symbol{graphene:box-t} instance to initialize}
+  @argument[b]{a @symbol{graphene:box-t} instance to initialize}
   @return{@em{True} if the boxes are equal, otherwise @em{false}}
   @begin{short}
     Checks whether the two given boxes are equal.
   @end{short}
-  @see-symbol{box-t}"
+  @see-symbol{graphene:box-t}"
   (a (:pointer (:struct box-t)))
   (b (:pointer (:struct box-t))))
 
@@ -328,17 +329,17 @@
 (defun box-expand (box point result)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance to expand}
-  @argument[point]{a @symbol{point3d-t} instance with the coordinates of the
-    point to include}
-  @argument[result]{a @symbol{box-t} instance for the result}
-  @return{A @symbol{box-t} instance with the result.}
+  @argument[box]{a @symbol{graphene:box-t} instance to expand}
+  @argument[point]{a @symbol{graphene:point3d-t} instance with the coordinates
+    of the point to include}
+  @argument[result]{a @symbol{graphene:box-t} instance for the result}
+  @return{A @symbol{graphene:box-t} instance with the result.}
   @begin{short}
     Expands the dimensions of @arg{box} to include the coordinates at
     @arg{point}.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{point3d-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:point3d-t}"
   (cffi:foreign-funcall "graphene_box_expand"
                         (:pointer (:struct box-t)) box
                         (:pointer (:struct point3d-t)) point
@@ -355,16 +356,16 @@
 (defun box-expand-scalar (box scalar result)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance to expand}
+  @argument[box]{a @symbol{graphene:box-t} instance to expand}
   @argument[scalar]{a single float with the scalar value}
-  @argument[result]{a @symbol{box-t} instance for the result}
-  @return{A @symbol{box-t} instance with the result.}
+  @argument[result]{a @symbol{graphene:box-t} instance for the result}
+  @return{A @symbol{graphene:box-t} instance with the result.}
   @begin{short}
     Expands the dimensions of @arg{box} by the given scalar value.
   @end{short}
   If the @arg{scalar} argument is positive, the box will grow. If the
   @arg{scalar} argument is negative, the box will shrink.
-  @see-symbol{box-t}"
+  @see-symbol{graphene:box-t}"
   (cffi:foreign-funcall "graphene_box_expand_scalar"
                         (:pointer (:struct box-t)) box
                         :float (coerce scalar 'single-float)
@@ -381,17 +382,17 @@
 (defun box-expand-vec3 (box vector result)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance to expand}
-  @argument[vector]{a @symbol{vec3-t} instance with the coordinates of the
-    point to include}
-  @argument[result]{a @symbol{box-t} instance for the result}
-  @return{A @symbol{box-t} instance with the result.}
+  @argument[box]{a @symbol{graphene:box-t} instance to expand}
+  @argument[vector]{a @symbol{graphene:vec3-t} instance with the coordinates of
+    the point to include}
+  @argument[result]{a @symbol{graphene:box-t} instance for the result}
+  @return{A @symbol{graphene:box-t} instance with the result.}
   @begin{short}
     Expands the dimensions of @arg{box} to include the coordinates of the
     given vector.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{vec3-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:vec3-t}"
   (cffi:foreign-funcall "graphene_box_expand_vec3"
                         (:pointer (:struct box-t)) box
                         (:pointer (:struct vec3-t)) vector
@@ -408,14 +409,14 @@
 (defun box-min (box min)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
-  @argument[min]{a @symbol{point3d-t} instance with the minimum point}
-  @return{A @symbol{point3d-t} instance with the result.}
+  @argument[box]{a @symbol{graphene:box-t} instance}
+  @argument[min]{a @symbol{graphene:point3d-t} instance with the minimum point}
+  @return{A @symbol{graphene:point3d-t} instance with the result.}
   @begin{short}
     Retrieves the coordinates of the minimum point of the given box.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{point3d-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:point3d-t}"
   (cffi:foreign-funcall "graphene_box_get_min"
                         (:pointer (:struct box-t)) box
                         (:pointer (:struct point3d-t)) min
@@ -431,14 +432,14 @@
 (defun box-max (box max)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
-  @argument[max]{a @symbol{point3d-t} instance with the maximum point}
-  @return{A @symbol{point3d-t} instance with the result.}
+  @argument[box]{a @symbol{graphene:box-t} instance}
+  @argument[max]{a @symbol{graphene:point3d-t} instance with the maximum point}
+  @return{A @symbol{graphene:point3d-t} instance with the result.}
   @begin{short}
     Retrieves the coordinates of the maximum point of the given box.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{point3d-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:point3d-t}"
   (cffi:foreign-funcall "graphene_box_get_max"
                         (:pointer (:struct box-t)) box
                         (:pointer (:struct point3d-t)) max
@@ -454,15 +455,15 @@
 (defun box-center (box center)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
-  @argument[center]{a @symbol{point3d-t} instance for the coordinates of the
-    center}
-  @return{A @symbol{point3d-t} instance with the result.}
+  @argument[box]{a @symbol{graphene:box-t} instance}
+  @argument[center]{a @symbol{graphene:point3d-t} instance for the coordinates
+    of the center}
+  @return{A @symbol{graphene:point3d-t} instance with the result.}
   @begin{short}
     Retrieves the coordinates of the center of the box.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{point3d-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:point3d-t}"
   (cffi:foreign-funcall "graphene_box_get_center"
                         (:pointer (:struct box-t)) box
                         (:pointer (:struct point3d-t)) center
@@ -478,12 +479,12 @@
 (cffi:defcfun ("graphene_box_get_depth" box-depth) :float
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
+  @argument[box]{a @symbol{graphene:box-t} instance}
   @return{A single float with the depth of the box.}
   @begin{short}
     Retrieves the size of the box on the z axis.
   @end{short}
-  @see-symbol{box-t}"
+  @see-symbol{graphene:box-t}"
   (box (:pointer (:struct box-t))))
 
 (export 'box-depth)
@@ -495,12 +496,12 @@
 (cffi:defcfun ("graphene_box_get_height" box-height) :float
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
+  @argument[box]{a @symbol{graphene:box-t} instance}
   @return{A single float with the height of the box.}
   @begin{short}
     Retrieves the size of the box on the y axis.
   @end{short}
-  @see-symbol{box-t}"
+  @see-symbol{graphene:box-t}"
   (box (:pointer (:struct box-t))))
 
 (export 'box-height)
@@ -512,12 +513,12 @@
 (cffi:defcfun ("graphene_box_get_width" box-width) :float
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
+  @argument[box]{a @symbol{graphene:box-t} instance}
   @return{A single float with the width of the box.}
   @begin{short}
     Retrieves the size of the box on the x axis.
   @end{short}
-  @see-symbol{box-t}"
+  @see-symbol{graphene:box-t}"
   (box (:pointer (:struct box-t))))
 
 (export 'box-width)
@@ -529,15 +530,15 @@
 (defun box-size (box size)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
-  @argument[size]{a @symbol{vec3-t} instance for the size}
-  @return{A @symbol{vec3-t} instance with the size.}
+  @argument[box]{a @symbol{graphene:box-t} instance}
+  @argument[size]{a @symbol{graphene:vec3-t} instance for the size}
+  @return{A @symbol{graphene:vec3-t} instance with the size.}
   @begin{short}
     Retrieves the size of the box on all three axes, and stores it into the
     given size vector.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{vec3-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:vec3-t}"
   (cffi:foreign-funcall "graphene_box_get_size"
                         (:pointer (:struct box-t)) box
                         (:pointer (:struct vec3-t)) size
@@ -553,17 +554,18 @@
 (defun box-bounding-sphere (box sphere)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
-  @argument[sphere]{a @symbol{sphere-t} instance for the bounding sphere}
-  @return{A @symbol{sphere-t} instance with the bounding sphere.}
+  @argument[box]{a @symbol{graphene:box-t} instance}
+  @argument[sphere]{a @symbol{graphene:sphere-t} instance for the bounding
+    sphere}
+  @return{A @symbol{graphene:sphere-t} instance with the bounding sphere.}
   @begin{short}
     Computes the bounding sphere capable of containing the given box.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{sphere-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:sphere-t}"
   (cffi:foreign-funcall "graphene_box_get_bounding_sphere"
                         (:pointer (:struct box-t)) box
-                        (:pointer (:struct sphere-t)) sphere
+                        :pointer sphere ; for (:struct sphere-t)
                         :void)
   sphere)
 
@@ -576,9 +578,10 @@
 (defun box-vertices (box vertices)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
-  @argument[vertices]{a list of eigth @symbol{vec3-t} instances}
-  @return{A list of  eight @symbol{vec3-t} instances with the vertices.}
+  @argument[box]{a @symbol{graphene:box-t} instance}
+  @argument[vertices]{a list of eigth @symbol{graphene:vec3-t} instances}
+  @return{A list of  eight @symbol{graphene:vec3-t} instances with the
+    vertices.}
   @begin{short}
     Computes the vertices of the given box.
   @end{short}
@@ -593,8 +596,8 @@
     (1.0 0.0 0.0) (1.0 0.0 1.0) (1.0 1.0 0.0) (1.0 1.0 1.0))
     @end{pre}
   @end{dictionary}
-  @see-symbol{box-t}
-  @see-symbol{vec3-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:vec3-t}"
   (with-graphene-point3ds (min max)
     (box-min box min)
     (box-max box max)
@@ -625,14 +628,14 @@
 (defun box-union (a b result)
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[a]{a @symbol{box-t} instance}
-  @argument[b]{a @symbol{box-t} instance}
-  @argument[result]{a @symbol{box-t} instance for the result}
-  @return{A @symbol{box-t} instance with the result.}
+  @argument[a]{a @symbol{graphene:box-t} instance}
+  @argument[b]{a @symbol{graphene:box-t} instance}
+  @argument[result]{a @symbol{graphene:box-t} instance for the result}
+  @return{A @symbol{graphene:box-t} instance with the result.}
   @begin{short}
     Unions the two given boxes.
   @end{short}
-  @see-symbol{box-t}"
+  @see-symbol{graphene:box-t}"
   (cffi:foreign-funcall "graphene_box_union"
                         (:pointer (:struct box-t)) a
                         (:pointer (:struct box-t)) b
@@ -650,17 +653,17 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @syntax[]{(box-intersection a b result) => result, success}
-  @argument[a]{a @symbol{box-t} instance}
-  @argument[b]{a @symbol{box-t} instance}
-  @argument[result]{a @symbol{box-t} instance for the result}
+  @argument[a]{a @symbol{graphene:box-t} instance}
+  @argument[b]{a @symbol{graphene:box-t} instance}
+  @argument[result]{a @symbol{graphene:box-t} instance for the result}
   @argument[success]{@em{true} if the two boxes intersect}
   @begin{short}
     Intersects the two given boxes.
   @end{short}
   If the two boxes do not intersect, @arg{result} will contain a degenerate box
-  initialized with the @fun{box-empty} values.
-  @see-symbol{box-t}
-  @see-function{box-empty}"
+  initialized with the @fun{graphene:box-empty} values.
+  @see-symbol{graphene:box-t}
+  @see-function{graphene:box-empty}"
   (let ((success (cffi:foreign-funcall "graphene_box_union"
                                        (:pointer (:struct box-t)) a
                                        (:pointer (:struct box-t)) b
@@ -677,13 +680,13 @@
 (cffi:defcfun ("graphene_box_contains_box" box-contains-box) :bool
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[a]{a @symbol{box-t} instance}
-  @argument[b]{a @symbol{box-t} instance}
+  @argument[a]{a @symbol{graphene:box-t} instance}
+  @argument[b]{a @symbol{graphene:box-t} instance}
   @return{@em{True} if @arg{b} is contained in @arg{a}.}
   @begin{short}
     Checks whether the the box @arg{a} contains the given box @arg{b}.
   @end{short}
-  @see-symbol{box-t}"
+  @see-symbol{graphene:box-t}"
   (a (:pointer (:struct box-t)))
   (b (:pointer (:struct box-t))))
 
@@ -696,14 +699,15 @@
 (cffi:defcfun ("graphene_box_contains_point" box-contains-point) :bool
  #+liber-documentation
  "@version{#2022-9-23}
-  @argument[box]{a @symbol{box-t} instance}
-  @argument[point]{a @symbol{point3d-t} instance with the coordiates to check}
+  @argument[box]{a @symbol{graphene:box-t} instance}
+  @argument[point]{a @symbol{graphene:point3d-t} instance with the coordiates
+    to check}
   @return{@em{True} if the point is contained in the box.}
   @begin{short}
     Checks whether the box contains the given point.
   @end{short}
-  @see-symbol{box-t}
-  @see-symbol{point3d-t}"
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:point3d-t}"
   (a (:pointer (:struct box-t)))
   (b (:pointer (:struct point3d-t))))
 
@@ -716,12 +720,12 @@
 (cffi:defcfun ("graphene_box_zero" box-zero) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{box-t} instance.}
+  @return{A @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a box with both the minimum and maximum vertices set at (0, 0, 0).
   @end{short}
   The returned box is owned by Graphene and should not be modified or freed.
-  @see-symbol{box-t}")
+  @see-symbol{graphene:box-t}")
 
 (export 'box-zero)
 
@@ -732,12 +736,12 @@
 (cffi:defcfun ("graphene_box_one" box-one) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{box-t} instance.}
+  @return{A @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a box with both the minimum and maximum vertices set at (1, 1, 1).
   @end{short}
   The returned box is owned by Graphene and should not be modified or freed.
-  @see-symbol{box-t}")
+  @see-symbol{graphene:box-t}")
 
 (export 'box-one)
 
@@ -745,17 +749,17 @@
 ;;; graphene_box_minus_one ()
 ;;; ----------------------------------------------------------------------------
 
-(cffi:defcfun ("graphene_box_minus_one" box-minus-one) 
+(cffi:defcfun ("graphene_box_minus_one" box-minus-one)
     (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{box-t} instance.}
+  @return{A @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a box with the minimum vertex set at (-1, -1, -1) and the maximum
     vertex set at (0, 0, 0).
   @end{short}
   The returned box is owned by Graphene and should not be modified or freed.
-  @see-symbol{box-t}")
+  @see-symbol{graphene:box-t}")
 
 (export 'box-minus-one)
 
@@ -767,13 +771,13 @@
     (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{box-t} instance.}
+  @return{A @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a box the minimum vertex set at (-1, -1, -1) and the maximum
     vertex set at (1, 1, 1).
   @end{short}
   The returned box is owned by Graphene and should not be modified or freed.
-  @see-symbol{box-t}")
+  @see-symbol{graphene:box-t}")
 
 (export 'box-one-minus-one)
 
@@ -784,12 +788,12 @@
 (cffi:defcfun ("graphene_box_empty" box-empty) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{box-t} instance.}
+  @return{A @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a degenerate box that can only be expanded.
   @end{short}
   The returned box is owned by Graphene and should not be modified or freed.
-  @see-symbol{box-t}")
+  @see-symbol{graphene:box-t}")
 
 (export 'box-empty)
 
@@ -800,12 +804,12 @@
 (cffi:defcfun ("graphene_box_infinite" box-infinite) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{box-t} instance.}
+  @return{A @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a degenerate box that cannot be expanded.
   @end{short}
   The returned box is owned by Graphene and should not be modified or freed.
-  @see-symbol{box-t}")
+  @see-symbol{graphene:box-t}")
 
 (export 'box-infinite)
 

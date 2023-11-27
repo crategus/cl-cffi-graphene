@@ -2,8 +2,8 @@
 ;;; graphene.utils.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2023 Dieter Kaiser
@@ -32,10 +32,14 @@
 (defmacro with-graphene-object ((var type &rest args) &body body)
   (cond ((eq 'box-t type)
          `(with-graphene-box (,var ,@args) ,@body))
+        ((eq 'point-t type)
+         `(with-graphene-point (,var ,@args) ,@body))
         ((eq 'rect-t type)
          `(with-graphene-rect (,var ,@args) ,@body))
         ((eq 'size-t type)
          `(with-graphene-size (,var ,@args) ,@body))
+        ((eq 'quad-t type)
+         `(with-graphene-quad (,var ,@args) ,@body))
         (t
          (error "WITH-GRAPHENE-OBJECT: Unknown type"))))
 

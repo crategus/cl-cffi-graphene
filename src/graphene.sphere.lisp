@@ -2,8 +2,8 @@
 ;;; graphene.sphere.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -124,19 +124,19 @@
 ;;; graphene_sphere_alloc ()
 ;;; ----------------------------------------------------------------------------
 
-(cffi:defcfun ("graphene_sphere_alloc" sphere-alloc) 
+(cffi:defcfun ("graphene_sphere_alloc" sphere-alloc)
     (:pointer (:struct sphere-t))
  #+liber-documentation
  "@version{#2022-9-24}
-  @return{The newly allocated @symbol{sphere-t} instance. Use the
-    @fun{sphere-free} function to free the resources allocated by this
+  @return{The newly allocated @symbol{graphene:sphere-t} instance. Use the
+    @fun{graphene:sphere-free} function to free the resources allocated by this
     function.}
   @begin{short}
-    Allocates a new @symbol{sphere-t} instance.
+    Allocates a new @symbol{graphene:sphere-t} instance.
   @end{short}
   The contents of the returned instance are undefined.
-  @see-symbol{sphere-t}
-  @see-function{sphere-free}")
+  @see-symbol{graphene:sphere-t}
+  @see-function{graphene:sphere-free}")
 
 (export 'sphere-alloc)
 
@@ -147,12 +147,12 @@
 (cffi:defcfun ("graphene_sphere_free" sphere-free) :void
  #+liber-documentation
  "@version{#2022-9-24}
-  @argument[sphere]{a @symbol{sphere-t} instance}
+  @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @begin{short}
-    Frees the resources allocated by the @fun{sphere-alloc} function.
+    Frees the resources allocated by the @fun{graphene:sphere-alloc} function.
   @end{short}
-  @see-symbol{sphere-t}
-  @see-function{sphere-alloc}"
+  @see-symbol{graphene:sphere-t}
+  @see-function{graphene:sphere-alloc}"
   (sphere (:pointer (:struct sphere-t))))
 
 (export 'sphere-free)
@@ -164,17 +164,17 @@
 (defun sphere-init (sphere center radius)
  #+liber-documentation
  "@version{#2022-9-24}
-  @argument[sphere]{a @symbol{sphere-t} instance to initialize}
-  @argument[center]{a @symbol{point3d-t} instance with the coordinates of the
-    center of the sphere}
+  @argument[sphere]{a @symbol{graphene:sphere-t} instance to initialize}
+  @argument[center]{a @symbol{graphene:point3d-t} instance with the coordinates
+    of the center of the sphere}
   @argument[radius]{a single float the radius of the sphere}
-  @return{The initialized @symbol{sphere-t} instance.}
+  @return{The initialized @symbol{graphene:sphere-t} instance.}
   @begin{short}
-    Initializes the given @symbol{sphere-t} instance with the given center and
-    radius.
+    Initializes the given @symbol{graphene:sphere-t} instance with the given
+    center and radius.
   @end{short}
-  @see-symbol{sphere-t}
-  @see-symbol{point3d-t}"
+  @see-symbol{graphene:sphere-t}
+  @see-symbol{graphene:point3d-t}"
   (cffi:foreign-funcall "graphene_sphere_init"
                         (:pointer (:struct sphere-t)) sphere
                         (:pointer (:struct point3d-t)) center
@@ -214,6 +214,17 @@
 ;;;     the initialized graphene_sphere_t.
 ;;; ----------------------------------------------------------------------------
 
+;; TODO: Finish the implemenation and pass a list of points
+
+(cffi:defcfun ("graphene_sphere_init_from_points" sphere-init-from-points)
+    (:pointer (:struct sphere-t))
+  (s (:pointer (:struct sphere-t)))
+  (n-points :uint)
+  (points (:pointer (:struct point3d-t)))
+  (center (:pointer (:struct point3d-t))))
+
+(export 'sphere-init-from-points)
+
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_sphere_init_from_vectors ()
 ;;;
@@ -245,22 +256,31 @@
 ;;;     the initialized graphene_sphere_t.
 ;;; ----------------------------------------------------------------------------
 
+;; TODO: Finish the implemenation and pass a list of vectors
+
+(cffi:defcfun ("graphene_sphere_init_from_vectors" sphere-init-from-vectors)
+    (:pointer (:struct sphere-t))
+  (s (:pointer (:struct sphere-t)))
+  (n-vectors :uint)
+  (vectors (:pointer (:struct vec3-t)))
+  (center (:pointer (:struct point3d-t))))
+
+(export 'sphere-init-from-vectors)
+
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_sphere_get_center ()
 ;;;
-;;;void
-;;;graphene_sphere_get_center (const graphene_sphere_t *s,
-;;;                            graphene_point3d_t *center);
-;;;Retrieves the coordinates of the center of a graphene_sphere_t.
-
-;;;Parameters
-;;;s
-
-;;;a graphene_sphere_t
-
-;;;center
-
-;;;return location for the coordinates of the center.
+;;; void
+;;; graphene_sphere_get_center (const graphene_sphere_t *s,
+;;;                             graphene_point3d_t *center);
+;;;
+;;; Retrieves the coordinates of the center of a graphene_sphere_t.
+;;;
+;;; s
+;;;     a graphene_sphere_t
+;;;
+;;; center
+;;;     return location for the coordinates of the center.
 ;;; ----------------------------------------------------------------------------
 
 (defun sphere-center (sphere center)
@@ -275,14 +295,13 @@
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_sphere_get_radius ()
 ;;;
-;;;float
-;;;graphene_sphere_get_radius (const graphene_sphere_t *s);
-;;;Retrieves the radius of a graphene_sphere_t.
-
-;;;Parameters
-;;;s
-
-;;;a graphene_sphere_t
+;;; float
+;;; graphene_sphere_get_radius (const graphene_sphere_t *s);
+;;;
+;;; Retrieves the radius of a graphene_sphere_t.
+;;;
+;;; s
+;;;     a graphene_sphere_t
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_get_radius" sphere-radius) :float
@@ -291,129 +310,158 @@
 (export 'sphere-radius)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_sphere_get_bounding_box ()
-;;;void
-;;;graphene_sphere_get_bounding_box (const graphene_sphere_t *s,
-;;;                                  graphene_box_t *box);
-;;;Computes the bounding box capable of containing the given graphene_sphere_t.
-
-;;;Parameters
-;;;s
-
-;;;a graphene_sphere_t
-
-;;;box
-
-;;;return location for the bounding box.
-
-;;;Since: 1.2
+;;; graphene_sphere_get_bounding_box ()
+;;;
+;;; void
+;;; graphene_sphere_get_bounding_box (const graphene_sphere_t *s,
+;;;                                   graphene_box_t *box);
+;;;
+;;; Computes the bounding box capable of containing the given graphene_sphere_t.
+;;;
+;;; s
+;;;     a graphene_sphere_t
+;;;
+;;; box
+;;;     return location for the bounding box.
 ;;; ----------------------------------------------------------------------------
 
-;;; ----------------------------------------------------------------------------
-;;;graphene_sphere_is_empty ()
-;;;bool
-;;;graphene_sphere_is_empty (const graphene_sphere_t *s);
-;;;Checks whether the sphere has a zero radius.
+(cffi:defcfun ("graphene_sphere_get_bounding_box" %sphere-bounding-box) :void
+  (s (:pointer (:struct sphere-t)))
+  (box (:pointer (:struct box-t))))
 
-;;;Parameters
-;;;s
+(defun sphere-bounding-box (s box)
+  (%sphere-bounding-box s box)
+  box)
 
-;;;a graphene_sphere_t
-
-;;;Returns
-;;;true if the sphere is empty
-
-;;;Since: 1.2
-;;; ----------------------------------------------------------------------------
+(export 'sphere-bounding-box)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_sphere_distance ()
-;;;float
-;;;graphene_sphere_distance (const graphene_sphere_t *s,
-;;;                          const graphene_point3d_t *point);
-;;;Computes the distance of the given point from the surface of a graphene_sphere_t.
-
-;;;Parameters
-;;;s
-
-;;;a graphene_sphere_t
-
-;;;point
-
-;;;a graphene_point3d_t
-
-;;;Returns
-;;;the distance of the point
-
-;;;Since: 1.2
+;;; graphene_sphere_is_empty ()
+;;;
+;;; bool
+;;; graphene_sphere_is_empty (const graphene_sphere_t *s);
+;;;
+;;; Checks whether the sphere has a zero radius.
+;;;
+;;; s
+;;;     a graphene_sphere_t
+;;;
+;;; Returns
+;;;     true if the sphere is empty
 ;;; ----------------------------------------------------------------------------
 
-;;; ----------------------------------------------------------------------------
-;;;graphene_sphere_contains_point ()
-;;;bool
-;;;graphene_sphere_contains_point (const graphene_sphere_t *s,
-;;;                                const graphene_point3d_t *point);
-;;;Checks whether the given point is contained in the volume of a graphene_sphere_t.
+(cffi:defcfun ("graphene_sphere_is_empty" sphere-is-empty) :bool
+  (s (:pointer (:struct sphere-t))))
 
-;;;Parameters
-;;;s
-
-;;;a graphene_sphere_t
-
-;;;point
-
-;;;a graphene_point3d_t
-
-;;;Returns
-;;;true if the sphere contains the point
-
-;;;Since: 1.2
-;;; ----------------------------------------------------------------------------
+(export 'sphere-is-empty)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_sphere_translate ()
-;;;void
-;;;graphene_sphere_translate (const graphene_sphere_t *s,
-;;;                           const graphene_point3d_t *point,
-;;;                           graphene_sphere_t *res);
-;;;Translates the center of the given graphene_sphere_t using the point coordinates as the delta of the translation.
-
-;;;Parameters
-;;;s
-
-;;;a graphene_sphere_t
-
-;;;point
-
-;;;the coordinates of the translation
-
-;;;res
-
-;;;return location for the translated sphere.
-
-;;;Since: 1.2
+;;; graphene_sphere_distance ()
+;;;
+;;; float
+;;; graphene_sphere_distance (const graphene_sphere_t *s,
+;;;                           const graphene_point3d_t *point);
+;;;
+;;; Computes the distance of the given point from the surface of a
+;;; graphene_sphere_t.
+;;;
+;;; s
+;;;     a graphene_sphere_t
+;;;
+;;; point
+;;;     a graphene_point3d_t
+;;;
+;;; Returns
+;;;     the distance of the point
 ;;; ----------------------------------------------------------------------------
 
+(cffi:defcfun ("graphene_sphere_distance" sphere-distance) :float
+  (s (:pointer (:struct sphere-t)))
+  (point (:pointer (:struct point3d-t))))
+
+(export 'sphere-distance)
+
 ;;; ----------------------------------------------------------------------------
-;;;graphene_sphere_equal ()
-;;;bool
-;;;graphene_sphere_equal (const graphene_sphere_t *a,
-;;;                       const graphene_sphere_t *b);
-;;;Checks whether two graphene_sphere_t are equal.
-
-;;;Parameters
-;;;a
-
-;;;a graphene_sphere_t
-
-;;;b
-
-;;;a graphene_sphere_t
-
-;;;Returns
-;;;true if the spheres are equal
-
-;;;Since: 1.2
+;;; graphene_sphere_contains_point ()
+;;;
+;;; bool
+;;; graphene_sphere_contains_point (const graphene_sphere_t *s,
+;;;                                 const graphene_point3d_t *point);
+;;;
+;;; Checks whether the given point is contained in the volume of a
+;;; graphene_sphere_t.
+;;;
+;;; s
+;;;     a graphene_sphere_t
+;;;
+;;; point
+;;;     a graphene_point3d_t
+;;;
+;;; Returns
+;;;     true if the sphere contains the point
 ;;; ----------------------------------------------------------------------------
+
+(cffi:defcfun ("graphene_sphere_contains_point" sphere-contains-point) :bool
+  (s (:pointer (:struct sphere-t)))
+  (point (:pointer (:struct point3d-t))))
+
+(export 'sphere-contains-point)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_sphere_translate ()
+;;;
+;;; void
+;;; graphene_sphere_translate (const graphene_sphere_t *s,
+;;;                            const graphene_point3d_t *point,
+;;;                            graphene_sphere_t *res);
+;;;
+;;; Translates the center of the given graphene_sphere_t using the point
+;;; coordinates as the delta of the translation.
+;;;
+;;; s
+;;;     a graphene_sphere_t
+;;;
+;;; point
+;;;     the coordinates of the translation
+;;;
+;;; res
+;;;     return location for the translated sphere.
+;;; ----------------------------------------------------------------------------
+
+(cffi:defcfun ("graphene_sphere_translate" %sphere-translate) :void
+  (s (:pointer (:struct sphere-t)))
+  (point (:pointer (:struct point3d-t)))
+  (result (:pointer (:struct sphere-t))))
+
+(defun sphere-translate (s point result)
+  (%sphere-translate s point result)
+  result)
+
+(export 'sphere-translate)
+
+;;; ----------------------------------------------------------------------------
+;;; graphene_sphere_equal ()
+;;;
+;;; bool
+;;; graphene_sphere_equal (const graphene_sphere_t *a,
+;;;                        const graphene_sphere_t *b);
+;;;
+;;; Checks whether two graphene_sphere_t are equal.
+;;;
+;;; a
+;;;     a graphene_sphere_t
+;;;
+;;; b
+;;;     a graphene_sphere_t
+;;;
+;;; Returns
+;;;     true if the spheres are equal
+;;; ----------------------------------------------------------------------------
+
+(cffi:defcfun ("graphene_sphere_equal" sphere-equal) :bool
+  (a (:pointer (:struct sphere-t)))
+  (b (:pointer (:struct sphere-t))))
+
+(export 'sphere-equal)
 
 ;;; --- End of file graphene.sphere.lisp ---------------------------------------
