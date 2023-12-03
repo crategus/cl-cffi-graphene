@@ -248,14 +248,16 @@
 
 ;; FIXME: The implementation does not work.
 
+#+nil
 (cffi:defcfun ("graphene_frustum_get_planes" %frustum-planes) :void
   (frustum (:pointer (:struct frustum-t)))
   (values-ar :pointer))
 
+#+nil
 (defun frustum-planes (frustum planes)
  #+liber-documentation
  "@version{#2022-9-29}
-  @argument[frustum]{a @symbol{graphene:frustum-t} instance to initialize}
+  @argument[frustum]{a @symbol{graphene:frustum-t} instance}
   @argument[planes]{a list with the @symbol{graphene:plane-t} instances}
   @return{The list of @symbol{graphene:plane-t} instances.}
   @begin{short}
@@ -266,6 +268,7 @@
   @see-symbol{graphene:plane-t}"
   (format t "~& in FRUSTUM-PLANES with ~a~%" planes)
   (with-vec3 (result)
+  ;; FIXME: This is wrong. We have to allocate memory for 6 planes.
   (cffi:with-foreign-object (planes-ar :pointer 6)
     (loop for i from 0 below 6
           for plane in planes
@@ -278,6 +281,7 @@
     (%frustum-planes frustum planes-ar)
     planes)))
 
+#+nil
 (export 'frustum-planes)
 
 ;;; ----------------------------------------------------------------------------

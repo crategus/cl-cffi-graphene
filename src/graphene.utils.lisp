@@ -30,18 +30,22 @@
 (in-package :graphene)
 
 (defmacro with-object ((var type &rest args) &body body)
-  (cond ((eq 'box-t type)
-         `(with-box (,var ,@args) ,@body))
-        ((eq 'point-t type)
+  (cond ((eq 'point-t type)
          `(with-point (,var ,@args) ,@body))
+        ((eq 'point3d-t type)
+         `(with-point3d (,var ,@args) ,@body))
         ((eq 'rect-t type)
          `(with-rect (,var ,@args) ,@body))
         ((eq 'size-t type)
          `(with-size (,var ,@args) ,@body))
+        ((eq 'vec2-t type)
+         `(with-vec2 (,var ,@args) ,@body))
         ((eq 'quad-t type)
          `(with-quad (,var ,@args) ,@body))
+        ((eq 'box-t type)
+         `(with-box (,var ,@args) ,@body))
         (t
-         (error "GRAPHENE:WITH-OBJECT: Unknown type"))))
+         (error "GRAPHENE:WITH-OBJECT: Unknown ~a type" type))))
 
 (export 'with-object)
 

@@ -56,8 +56,8 @@
   @syntax[]{(graphene:with-size (s width height) body) => result}
   @syntax[]{(graphene:with-size (s s1) body) => result}
   @argument[s]{a @symbol{graphene:size-t} instance to create and initialize}
-  @argument[width]{a number coerced to a single float for the width component}
-  @argument[height]{a number coerced to a single float for the height component}
+  @argument[width]{a number coerced to a float for the width component}
+  @argument[height]{a number coerced to a float for the height component}
   @argument[s1]{a @symbol{graphene:size-t} instance to use for initialization}
   @begin{short}
     The @fun{graphene:with-size} macro allocates a new
@@ -67,16 +67,16 @@
   After execution of the body the allocated memory for the size is released.
 
   When no argument is given the components of the @symbol{graphene:size-t}
-  instance are initialized to zero. The initialization with two single float
-  values uses the @fun{graphene:size-init} function. The initialization from
-  another size is done with the @fun{graphene:size-init-from-size} function.
+  instance are initialized to zero. The initialization with two float values
+  uses the @fun{graphene:size-init} function. The initialization from another
+  size is done with the @fun{graphene:size-init-from-size} function.
   @begin[Note]{dictionary}
     The memory is allocated with the @fun{graphene:size-alloc} function and
     released with the @fun{graphene:size-free} function.
   @end{dictionary}
   @begin[Examples]{dictionary}
-    Initialize a @symbol{graphene:size-t} instance with no value and two single
-    float values.
+    Initialize a @symbol{graphene:size-t} instance with no value and two float
+    values.
     @begin{pre}
 (graphene:with-size (s)
   (list (size-width s) (size-height s)))
@@ -181,7 +181,7 @@
  "@version{2023-9-22}
   @begin{short}
     The @symbol{graphene:size-t} structure is a data structure capable of
-    describing a size with two components width and height of type single float.
+    describing a size with two components width and height of type float.
   @end{short}
   @begin{pre}
 (cffi:defcstruct size-t
@@ -215,7 +215,7 @@
   @syntax[]{(graphene:size-width size) => width}
   @syntax[]{(setf (graphene:size-width size) width)}
   @argument[size]{a @symbol{graphene:size-t} instance}
-  @argument[width]{a single float with the width component}
+  @argument[width]{a float with the width component}
   @begin{short}
     Accessor of the @code{width} slot of the @symbol{graphene:size-t} structure.
   @end{short}
@@ -240,7 +240,7 @@
   @syntax[]{(graphene:size-height size) => height}
   @syntax[]{(setf (graphene:size-height size) height)}
   @argument[size]{a @symbol{graphene:size-t} instance}
-  @argument[width]{a single float with the height component}
+  @argument[width]{a float with the height component}
   @begin{short}
     Accessor of the @code{height} slot of the @symbol{graphene:size-t}
     structure.
@@ -316,8 +316,8 @@
 (defun size-init (size width height)
  "@version{2023-9-22}
   @argument[size]{a @symbol{graphene:size-t} instance}
-  @argument[width]{a number coerced to a single float with the width component}
-  @argument[height]{a number coerced to a single float with the height
+  @argument[width]{a number coerced to a float with the width component}
+  @argument[height]{a number coerced to a float with the height
     component}
   @return{The initialized @symbol{graphene:size-t} instance.}
   @begin{short}
@@ -410,7 +410,7 @@
  #+liber-documentation
  "@version{2023-9-22}
   @argument[size]{a @symbol{graphene:size-t} instance}
-  @argument[factor]{a number coerced to a single float with the scaling factor}
+  @argument[factor]{a number coerced to a float with the scaling factor}
   @argument[result]{a @symbol{graphene:size-t} instance for the scaled size}
   @return{The @symbol{graphene:size-t} instance with the scaled size.}
   @begin{short}
@@ -428,3 +428,4 @@
 (export 'size-scale)
 
 ;;; --- End of file graphene.size.lisp -----------------------------------------
+

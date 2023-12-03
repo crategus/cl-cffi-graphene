@@ -28,7 +28,7 @@
 ;;; ----------------------------------------------------------------------------
 
 (defpackage :graphene
-  (:use :common-lisp)
+  (:use :iterate :common-lisp)
   (:import-from :cffi))
 
 (in-package :graphene)

@@ -228,38 +228,34 @@
 (export 'quaternion-free)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_quaternion_init ()
-;;;graphene_quaternion_t *
-;;;graphene_quaternion_init (graphene_quaternion_t *q,
-;;;                          float x,
-;;;                          float y,
-;;;                          float z,
-;;;                          float w);
-;;;Initializes a graphene_quaternion_t using the given four values.
-
-;;;Parameters
-;;;q
-
-;;;a graphene_quaternion_t
-
-;;;x
-
-;;;the first component of the quaternion
-
-;;;y
-
-;;;the second component of the quaternion
-
-;;;z
-
-;;;the third component of the quaternion
-
-;;;w
-
-;;;the fourth component of the quaternion
-
-;;;Returns
-;;;the initialized quaternion.
+;;; graphene_quaternion_init ()
+;;;
+;;; graphene_quaternion_t *
+;;; graphene_quaternion_init (graphene_quaternion_t *q,
+;;;                           float x,
+;;;                           float y,
+;;;                           float z,
+;;;                           float w);
+;;;
+;;; Initializes a graphene_quaternion_t using the given four values.
+;;;
+;;; q
+;;;     a graphene_quaternion_t
+;;;
+;;; x
+;;;     the first component of the quaternion
+;;;
+;;; y
+;;;     the second component of the quaternion
+;;;
+;;; z
+;;;     the third component of the quaternion
+;;;
+;;; w
+;;;     the fourth component of the quaternion
+;;;
+;;; Returns
+;;;     the initialized quaternion.
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init (quaternion x y z w)
@@ -378,35 +374,33 @@
 (export 'quaternion-init-from-matrix)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_quaternion_init_from_angles ()
-;;;graphene_quaternion_t *
-;;;graphene_quaternion_init_from_angles (graphene_quaternion_t *q,
-;;;                                      float deg_x,
-;;;                                      float deg_y,
-;;;                                      float deg_z);
-;;;Initializes a graphene_quaternion_t using the values of the Euler angles on each axis.
-
-;;;See also: graphene_quaternion_init_from_euler()
-
-;;;Parameters
-;;;q
-
-;;;a graphene_quaternion_t
-
-;;;deg_x
-
-;;;rotation angle on the X axis (yaw), in degrees
-
-;;;deg_y
-
-;;;rotation angle on the Y axis (pitch), in degrees
-
-;;;deg_z
-
-;;;rotation angle on the Z axis (roll), in degrees
-
-;;;Returns
-;;;the initialized quaternion.
+;;; graphene_quaternion_init_from_angles ()
+;;;
+;;; graphene_quaternion_t *
+;;; graphene_quaternion_init_from_angles (graphene_quaternion_t *q,
+;;;                                       float deg_x,
+;;;                                       float deg_y,
+;;;                                       float deg_z);
+;;;
+;;; Initializes a graphene_quaternion_t using the values of the Euler angles on
+;;; each axis.
+;;;
+;;; See also: graphene_quaternion_init_from_euler()
+;;;
+;;; q
+;;;     a graphene_quaternion_t
+;;;
+;;; deg_x
+;;;     rotation angle on the X axis (yaw), in degrees
+;;;
+;;; deg_y
+;;;     rotation angle on the Y axis (pitch), in degrees
+;;;
+;;; deg_z
+;;;     rotation angle on the Z axis (roll), in degrees
+;;;
+;;; Returns
+;;;     the initialized quaternion.
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init-from-angles (quaternion xdeg ydeg zdeg wdeg)
@@ -421,35 +415,33 @@
 (export 'quaternion-init-from-angles)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_quaternion_init_from_radians ()
-;;;graphene_quaternion_t *
-;;;graphene_quaternion_init_from_radians (graphene_quaternion_t *q,
-;;;                                       float rad_x,
-;;;                                       float rad_y,
-;;;                                       float rad_z);
-;;;Initializes a graphene_quaternion_t using the values of the Euler angles on each axis.
-
-;;;See also: graphene_quaternion_init_from_euler()
-
-;;;Parameters
-;;;q
-
-;;;a graphene_quaternion_t
-
-;;;rad_x
-
-;;;rotation angle on the X axis (yaw), in radians
-
-;;;rad_y
-
-;;;rotation angle on the Y axis (pitch), in radians
-
-;;;rad_z
-
-;;;rotation angle on the Z axis (roll), in radians
-
-;;;Returns
-;;;the initialized quaternion.
+;;; graphene_quaternion_init_from_radians ()
+;;;
+;;; graphene_quaternion_t *
+;;; graphene_quaternion_init_from_radians (graphene_quaternion_t *q,
+;;;                                        float rad_x,
+;;;                                        float rad_y,
+;;;                                        float rad_z);
+;;;
+;;; Initializes a graphene_quaternion_t using the values of the Euler angles on
+;;; each axis.
+;;;
+;;; See also: graphene_quaternion_init_from_euler()
+;;;
+;;; q
+;;;     a graphene_quaternion_t
+;;;
+;;; rad_x
+;;;     rotation angle on the X axis (yaw), in radians
+;;;
+;;; rad_y
+;;;     rotation angle on the Y axis (pitch), in radians
+;;;
+;;; rad_z
+;;;     rotation angle on the Z axis (roll), in radians
+;;;
+;;; Returns
+;;;     the initialized quaternion.
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init-from-radians (quaternion xrad yrad zrad wrad)
@@ -464,29 +456,27 @@
 (export 'quaternion-init-from-radians)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_quaternion_init_from_angle_vec3 ()
-;;;graphene_quaternion_t *
-;;;graphene_quaternion_init_from_angle_vec3
-;;;                               (graphene_quaternion_t *q,
-;;;                                float angle,
-;;;                                const graphene_vec3_t *axis);
-;;;Initializes a graphene_quaternion_t using an angle on a specific axis .
-
-;;;Parameters
-;;;q
-
-;;;a graphene_quaternion_t
-
-;;;angle
-
-;;;the rotation on a given axis, in degrees
-
-;;;axis
-
-;;;the axis of rotation, expressed as a vector
-
-;;;Returns
-;;;the initialized quaternion.
+;;; graphene_quaternion_init_from_angle_vec3 ()
+;;;
+;;; graphene_quaternion_t *
+;;; graphene_quaternion_init_from_angle_vec3
+;;;                                (graphene_quaternion_t *q,
+;;;                                 float angle,
+;;;                                 const graphene_vec3_t *axis);
+;;;
+;;; Initializes a graphene_quaternion_t using an angle on a specific axis .
+;;;
+;;; q
+;;;     a graphene_quaternion_t
+;;;
+;;; angle
+;;;     the rotation on a given axis, in degrees
+;;;
+;;; axis
+;;;     the axis of rotation, expressed as a vector
+;;;
+;;; Returns
+;;;     the initialized quaternion.
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init-from-angle-vec3 (quaternion angle axis)

@@ -384,20 +384,21 @@ res = ⎡ A.x × B ⎤
 
 (defun matrix-init-from-float (matrix &rest args)
  #+liber-documentation
- "@version{#2022-9-29}
+ "@version{2023-12-3}
   @argument[matrix]{a @symbol{matrix-t} instance}
-  @argument[values]{16 floating point values}
+  @argument[values]{16 numbers coerced to float values}
   @return{The initialized @symbol{matrix-t} instance.}
   @begin{short}
-    Initializes the matrix with the given floating point values.
+    Initializes the matrix with the given numbers. The numbers are coerced to
+    float values.
   @end{short}
   @see-symbol{matrix-t}"
   (assert (<= 16 (length args)))
   (cffi:with-foreign-object (values-ar :float 16)
-    (loop for i from 0 below 16
-          for value in args
-          do (setf (cffi:mem-aref values-ar :float i)
-                   (coerce value 'single-float)))
+    (iter (for i from 0 below 16)
+          (for value in args)
+          (setf (cffi:mem-aref values-ar :float i)
+                (coerce value 'single-float)))
     (%matrix-init-from-float matrix values-ar)
     matrix))
 
@@ -498,10 +499,11 @@ res = ⎡ A.x × B ⎤
  #+liber-documentation
  "@version{#2022-9-29}
   @argument[matrix]{a @symbol{matrix-t} instance}
-  @argument[fovy]{a single float with the field of view angle, in degrees}
-  @argument[aspect]{a single float with the aspect value}
-  @argument[znear]{a single float with near z plane}
-  @argument[zfar]{a single float with the far z plane}
+  @argument[fovy]{a number coerced to a float with the field of view angle, in
+    degrees}
+  @argument[aspect]{a number coerced to a float with the aspect value}
+  @argument[znear]{a number coerced to a float with near z plane}
+  @argument[zfar]{a number coerced to a float with the far z plane}
   @return{The initialized @symbol{matrix-t} instance.}
   @begin{short}
     Initializes the matrix with a perspective projection.
@@ -792,7 +794,7 @@ res = ⎡ A.x × B ⎤
 
 (defun matrix-to-float (matrix)
  #+liber-documentation
- "@version{#2022-9-29}
+ "@version{2023-12-3}
   @argument[matrix]{a @symbol{matrix-t} instance}
   @return{A list with the floating point values.}
   @begin{short}
@@ -801,8 +803,8 @@ res = ⎡ A.x × B ⎤
   @see-symbol{matrix-t}"
   (cffi:with-foreign-object (values-ar :float 16)
     (%matrix-to-float matrix values-ar)
-    (loop for i from 0 below 16
-          collect (cffi:mem-aref values-ar :float i))))
+    (iter (for i from 0 below 16)
+          (collect (cffi:mem-aref values-ar :float i)))))
 
 (export 'matrix-to-float)
 

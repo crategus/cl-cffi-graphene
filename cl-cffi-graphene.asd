@@ -27,7 +27,7 @@
   :version "0.3.0"
   :author  "Dieter Kaiser"
   :license "MIT"
-  :depends-on (:cffi)
+  :depends-on (:cffi :iterate)
   :in-order-to ((asdf:test-op (test-op "cl-cffi-graphene/test")))
   :components
   ((:module src
@@ -82,6 +82,8 @@
                (:file "rtest-graphene-size")
                (:file "rtest-graphene-sphere")
                (:file "rtest-graphene-triangle")
-               (:file "rtest-graphene-vector")))
+               (:file "rtest-graphene-vector")
+               (:file "rtest-graphene-utils")))
 
 ;;; --- End of file cl-cffi-graphene.asd ---------------------------------------
+

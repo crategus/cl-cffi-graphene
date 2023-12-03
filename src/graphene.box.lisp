@@ -333,7 +333,7 @@
   @argument[point]{a @symbol{graphene:point3d-t} instance with the coordinates
     of the point to include}
   @argument[result]{a @symbol{graphene:box-t} instance for the result}
-  @return{A @symbol{graphene:box-t} instance with the result.}
+  @return{The @symbol{graphene:box-t} instance with the result.}
   @begin{short}
     Expands the dimensions of @arg{box} to include the coordinates at
     @arg{point}.
@@ -357,9 +357,9 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[box]{a @symbol{graphene:box-t} instance to expand}
-  @argument[scalar]{a single float with the scalar value}
+  @argument[scalar]{a number coerced to a float with the scalar value}
   @argument[result]{a @symbol{graphene:box-t} instance for the result}
-  @return{A @symbol{graphene:box-t} instance with the result.}
+  @return{The @symbol{graphene:box-t} instance with the result.}
   @begin{short}
     Expands the dimensions of @arg{box} by the given scalar value.
   @end{short}
@@ -386,7 +386,7 @@
   @argument[vector]{a @symbol{graphene:vec3-t} instance with the coordinates of
     the point to include}
   @argument[result]{a @symbol{graphene:box-t} instance for the result}
-  @return{A @symbol{graphene:box-t} instance with the result.}
+  @return{The @symbol{graphene:box-t} instance with the result.}
   @begin{short}
     Expands the dimensions of @arg{box} to include the coordinates of the
     given vector.
@@ -411,7 +411,7 @@
  "@version{#2022-9-23}
   @argument[box]{a @symbol{graphene:box-t} instance}
   @argument[min]{a @symbol{graphene:point3d-t} instance with the minimum point}
-  @return{A @symbol{graphene:point3d-t} instance with the result.}
+  @return{The @symbol{graphene:point3d-t} instance with the result.}
   @begin{short}
     Retrieves the coordinates of the minimum point of the given box.
   @end{short}
@@ -434,7 +434,7 @@
  "@version{#2022-9-23}
   @argument[box]{a @symbol{graphene:box-t} instance}
   @argument[max]{a @symbol{graphene:point3d-t} instance with the maximum point}
-  @return{A @symbol{graphene:point3d-t} instance with the result.}
+  @return{The @symbol{graphene:point3d-t} instance with the result.}
   @begin{short}
     Retrieves the coordinates of the maximum point of the given box.
   @end{short}
@@ -458,7 +458,7 @@
   @argument[box]{a @symbol{graphene:box-t} instance}
   @argument[center]{a @symbol{graphene:point3d-t} instance for the coordinates
     of the center}
-  @return{A @symbol{graphene:point3d-t} instance with the result.}
+  @return{The @symbol{graphene:point3d-t} instance with the result.}
   @begin{short}
     Retrieves the coordinates of the center of the box.
   @end{short}
@@ -480,7 +480,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[box]{a @symbol{graphene:box-t} instance}
-  @return{A single float with the depth of the box.}
+  @return{The float with the depth of the box.}
   @begin{short}
     Retrieves the size of the box on the z axis.
   @end{short}
@@ -497,7 +497,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[box]{a @symbol{graphene:box-t} instance}
-  @return{A single float with the height of the box.}
+  @return{The float with the height of the box.}
   @begin{short}
     Retrieves the size of the box on the y axis.
   @end{short}
@@ -514,7 +514,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[box]{a @symbol{graphene:box-t} instance}
-  @return{A single float with the width of the box.}
+  @return{The float with the width of the box.}
   @begin{short}
     Retrieves the size of the box on the x axis.
   @end{short}
@@ -532,7 +532,7 @@
  "@version{#2022-9-23}
   @argument[box]{a @symbol{graphene:box-t} instance}
   @argument[size]{a @symbol{graphene:vec3-t} instance for the size}
-  @return{A @symbol{graphene:vec3-t} instance with the size.}
+  @return{The @symbol{graphene:vec3-t} instance with the size.}
   @begin{short}
     Retrieves the size of the box on all three axes, and stores it into the
     given size vector.
@@ -557,7 +557,7 @@
   @argument[box]{a @symbol{graphene:box-t} instance}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance for the bounding
     sphere}
-  @return{A @symbol{graphene:sphere-t} instance with the bounding sphere.}
+  @return{The @symbol{graphene:sphere-t} instance with the bounding sphere.}
   @begin{short}
     Computes the bounding sphere capable of containing the given box.
   @end{short}
@@ -580,7 +580,7 @@
  "@version{#2022-9-23}
   @argument[box]{a @symbol{graphene:box-t} instance}
   @argument[vertices]{a list of eigth @symbol{graphene:vec3-t} instances}
-  @return{A list of  eight @symbol{graphene:vec3-t} instances with the
+  @return{The list of  eight @symbol{graphene:vec3-t} instances with the
     vertices.}
   @begin{short}
     Computes the vertices of the given box.
@@ -631,7 +631,7 @@
   @argument[a]{a @symbol{graphene:box-t} instance}
   @argument[b]{a @symbol{graphene:box-t} instance}
   @argument[result]{a @symbol{graphene:box-t} instance for the result}
-  @return{A @symbol{graphene:box-t} instance with the result.}
+  @return{The @symbol{graphene:box-t} instance with the result.}
   @begin{short}
     Unions the two given boxes.
   @end{short}
@@ -720,7 +720,7 @@
 (cffi:defcfun ("graphene_box_zero" box-zero) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:box-t} instance.}
+  @return{The @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a box with both the minimum and maximum vertices set at (0, 0, 0).
   @end{short}
@@ -736,7 +736,7 @@
 (cffi:defcfun ("graphene_box_one" box-one) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:box-t} instance.}
+  @return{The @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a box with both the minimum and maximum vertices set at (1, 1, 1).
   @end{short}
@@ -753,7 +753,7 @@
     (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:box-t} instance.}
+  @return{The @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a box with the minimum vertex set at (-1, -1, -1) and the maximum
     vertex set at (0, 0, 0).
@@ -771,7 +771,7 @@
     (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:box-t} instance.}
+  @return{The @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a box the minimum vertex set at (-1, -1, -1) and the maximum
     vertex set at (1, 1, 1).
@@ -788,7 +788,7 @@
 (cffi:defcfun ("graphene_box_empty" box-empty) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:box-t} instance.}
+  @return{The @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a degenerate box that can only be expanded.
   @end{short}
@@ -804,7 +804,7 @@
 (cffi:defcfun ("graphene_box_infinite" box-infinite) (:pointer (:struct box-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:box-t} instance.}
+  @return{The @symbol{graphene:box-t} instance.}
   @begin{short}
     Returns a degenerate box that cannot be expanded.
   @end{short}

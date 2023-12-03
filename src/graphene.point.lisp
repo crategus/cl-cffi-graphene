@@ -54,8 +54,8 @@
 
 (defmacro with-point ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-2}
-  @syntax[]{(grahene:with-point (p) body) => result}
+ "@version{2023-12-3}
+  @syntax[]{(graphene:with-point (p) body) => result}
   @syntax[]{(graphene:with-point (p x y) body) => result}
   @syntax[]{(graphene:with-point (p p1) body) => result}
   @syntax[]{(graphene:with-point (p (v graphene:vec2-t)) body) => result}
@@ -83,7 +83,7 @@
     released with the @fun{graphene:point-free} function.
   @end{dictionary}
   @begin[Examples]{dictionary}
-    Initialize a point with no value and two single float values.
+    Initialize a point with no value and two float values.
     @begin{pre}
 (graphene:with-point (p)
   (list (graphene:point-x p) (graphene:point-y p)))
@@ -99,7 +99,7 @@
     (list (graphene:point-x p) (graphene:point-y p))))
 => (3.5 4.5)
     @end{pre}
-    This examples uses the @fun{graphene:with-points} macro to initialize two
+    This example uses the @fun{graphene:with-points} macro to initialize two
     points. The second point is intialized with the values from the first point.
     @begin{pre}
 (grapene:with-points ((p1 0.3 0.5) (p2 p1))
@@ -154,7 +154,7 @@
 
 (defmacro with-points (vars &body body)
  #+liber-documentation
- "@version{2023-12-2}
+ "@version{2023-12-3}
   @syntax[]{(graphene:with-points (p1 p2 p3 ... pn) body) => result}
   @argument[p1 ... pn]{the newly created @symbol{graphene:point-t} instances}
   @argument[body]{a body that uses the bindings @arg{p1 ... pn}}
@@ -167,7 +167,7 @@
   Each point can be initialized with values using the syntax for the
   @fun{graphene:with-point} macro. See also the @fun{graphene:with-point}
   documentation.
-  @begin[Examples]{dictionary}
+  @begin[Example]{dictionary}
     @begin{pre}
 (graphene:with-points (p1 (p2 1.2 1.3) (p3 p2))
   (list (list (graphene:point-x p1) (graphene:point-y p1))
@@ -199,10 +199,10 @@
 (setf (liber:alias-for-symbol 'point-t)
       "CStruct"
       (liber:symbol-documentation 'point-t)
- "@version{2023-7-22}
+ "@version{2023-12-3}
   @begin{short}
     The @symbol{graphene:point-t} structure is a data structure capable of
-    describing a point with two coordinates x and y of type single float.
+    describing a point with two coordinates x and y of type float.
   @end{short}
   @begin{pre}
 (cffi:defcstruct point-t
@@ -210,75 +210,93 @@
   (y :float))
   @end{pre}
   Access the coordinates with the @fun{graphene:point-x} and
-  @fun{graphene:point-y} functions.
+  @fun{graphene:point-y} functions. Use the @macro{graphene:with-point} and
+  @macro{graphene:with-points} macros to allocate a new
+  @symbol{graphene:point-t} instance and initialize the point with values.
+  @begin[Example]{dictionary}
+    Allocate and initialize a point with values.
+    @begin{pre}
+(graphene:with-point (p 1.0 1.5)
+  (list (graphene:point-x p)
+        (graphene:point-y p)))
+=> (1.0 1.5)
+    @end{pre}
+  @end{dictionary}
+  @see-constructor{graphene:point-init}
+  @see-constructor{graphene:point-init-from-point}
+  @see-constructor{graphene:point-init-from-vec2}
+  @see-slot{graphene:point-x}
+  @see-slot{graphene:point-y}
   @see-symbol{graphene:point3d-t}
-  @see-function{graphene:point-x}
-  @see-function{graphene:point-y}")
+  @see-macro{graphene:with-point}
+  @see-macro{graphene:with-points}")
 
 (export 'point-t)
 
 ;;; --- Accessor Implementations -----------------------------------------------
 
-;;; --- point-x ----------------------------------------------------------------
+;;; --- graphene:point-x -------------------------------------------------------
 
-(defun point-x (point)
-  (cffi:foreign-slot-value point '(:struct point-t) 'x))
+(defun point-x (p)
+  (cffi:foreign-slot-value p '(:struct point-t) 'x))
 
-(defun (setf point-x) (value point)
-  (setf (cffi:foreign-slot-value point '(:struct point-t) 'x)
+(defun (setf point-x) (value p)
+  (setf (cffi:foreign-slot-value p '(:struct point-t) 'x)
         (coerce value 'single-float)))
 
 #+liber-documentation
 (setf (liber:alias-for-function 'point-x)
       "Accessor"
       (documentation 'point-x 'function)
- "@version{2023-7-22}
-  @syntax[]{(graphene:point-x point) => x}
-  @syntax[]{(setf (graphene:point-x point) x)}
-  @argument[point]{a @symbol{graphene:point-t} instance}
-  @argument[x]{a single float with the x coordinate}
+ "@version{2023-12-3}
+  @syntax[]{(graphene:point-x p) => x}
+  @syntax[]{(setf (graphene:point-x p) x)}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @argument[x]{a float with the x coordinate}
   @begin{short}
     Accessor of the @code{x} slot of the @symbol{graphene:point-t} structure.
   @end{short}
+  The @arg{x} value is coerced to a float before assignment.
   @begin[Examples]{dictionary}
     @begin{pre}
 (graphene:with-point (p 0.5 1.0) (graphene:point-x p))
 => 0.5
-(graphene:with-point (p) (setf (graphene:point-x p) 2.0))
-=> 2.0
+(graphene:with-point (p) (setf (graphene:point-x p) 3/2))
+=> 1.5
   @end{pre}
   @end{dictionary}
   @see-symbol{graphene:point-t}")
 
 (export 'point-x)
 
-;;; --- point-y ----------------------------------------------------------------
+;;; --- graphene:point-y -------------------------------------------------------
 
-(defun point-y (point)
-  (cffi:foreign-slot-value point '(:struct point-t) 'y))
+(defun point-y (p)
+  (cffi:foreign-slot-value p '(:struct point-t) 'y))
 
-(defun (setf point-y) (value point)
-  (setf (cffi:foreign-slot-value point '(:struct point-t) 'y)
+(defun (setf point-y) (value p)
+  (setf (cffi:foreign-slot-value p '(:struct point-t) 'y)
         (coerce value 'single-float)))
 
 #+liber-documentation
 (setf (liber:alias-for-function 'point-y)
       "Accessor"
       (documentation 'point-y 'function)
- "@version{2023-7-22}
-  @syntax[]{(graphene:point-y point) => y}
-  @syntax[]{(setf (graphene:point-y point) y)}
-  @argument[point]{a @symbol{graphene:point-t} instance}
-  @argument[y]{a single float with the y coordinate}
+ "@version{2023-12-3}
+  @syntax[]{(graphene:point-y p) => y}
+  @syntax[]{(setf (graphene:point-y p) y)}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @argument[y]{a float with the y coordinate}
   @begin{short}
     Accessor of the @code{y} slot of the @symbol{graphene:point-t} structure.
   @end{short}
+  The @arg{y} value is coerced to a float before assignment.
   @begin[Examples]{dictionary}
     @begin{pre}
 (graphene:with-point (p 0.5 1.0) (graphene:point-y p))
 => 1.0
-(graphene:with-point (p) (setf (graphene:point-y p) 2.0))
-=> 2.0
+(graphene:with-point (p) (setf (graphene:point-y p) 3/2))
+=> 1.5
   @end{pre}
   @end{dictionary}
   @see-symbol{graphene:point-t}")
@@ -322,14 +340,14 @@
 
 (cffi:defcfun ("graphene_point_free" point-free) :void
  #+liber-documentation
- "@version{2023-9-22}
-  @argument[point]{a @symbol{graphene:point-t} instance}
+ "@version{2023-12-3}
+  @argument[p]{a @symbol{graphene:point-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:point-alloc} function.
   @end{short}
   @see-symbol{graphene:point-t}
   @see-function{graphene:point-alloc}"
-  (point (:pointer (:struct point-t))))
+  (p (:pointer (:struct point-t))))
 
 (export 'point-free)
 
@@ -339,10 +357,10 @@
 
 (cffi:defcfun ("graphene_point_zero" point-zero) (:pointer (:struct point-t))
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2023-12-3}
   @return{The @symbol{graphene:point-t} instance with a zero point.}
   @begin{short}
-    Returns a point with all two coordiantes set to zero.
+    Returns a point with all two coordinates set to zero.
   @end{short}
   @begin[Examples]{dictionary}
     @begin{pre}
@@ -360,12 +378,12 @@
 ;;; graphene_point_init ()
 ;;; ----------------------------------------------------------------------------
 
-(defun point-init (point x y)
+(defun point-init (p x y)
  #+liber-documentation
- "@version{2023-9-22}
-  @argument[point]{a @symbol{graphene:point-t} instance}
-  @argument[x]{a number coerced to a single float with the x coordinate}
-  @argument[y]{a number coerced to a single float with the y coordinate}
+ "@version{2023-12-3}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @argument[x]{a number coerced to a float with the x coordinate}
+  @argument[y]{a number coerced to a float with the y coordinate}
   @return{The initialized @symbol{graphene:point-t} instance.}
   @begin{short}
     Initializes the point to the given @arg{x} and @arg{y} coordinates.
@@ -373,7 +391,7 @@
   It is safe to call this function multiple times.
   @see-symbol{graphene:point-t}"
   (cffi:foreign-funcall "graphene_point_init"
-                        (:pointer (:struct point-t)) point
+                        (:pointer (:struct point-t)) p
                         :float (coerce x 'single-float)
                         :float (coerce y 'single-float)
                         (:pointer (:struct point-t))))
@@ -387,14 +405,14 @@
 (cffi:defcfun ("graphene_point_init_from_point" point-init-from-point)
     (:pointer (:struct point-t))
  #+liber-documentation
- "@version{2023-9-22}
-  @argument[point]{a @symbol{graphene:point-t} instance}
-  @argument[source]{a @symbol{graphene:point-t} instance to use}
+ "@version{2023-12-3}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @argument[src]{a @symbol{graphene:point-t} instance to use}
   @return{The initialized @symbol{graphene:point-t} instance.}
-  @short{Initializes the point using the coordinates of @arg{source}.}
+  @short{Initializes the point using the coordinates of @arg{src}.}
   @see-symbol{graphene:point-t}"
-  (point (:pointer (:struct point-t)))
-  (source (:pointer (:struct point-t))))
+  (p (:pointer (:struct point-t)))
+  (src (:pointer (:struct point-t))))
 
 (export 'point-init-from-point)
 
@@ -405,15 +423,15 @@
 (cffi:defcfun ("graphene_point_init_from_vec2" point-init-from-vec2)
    (:pointer (:struct point-t))
  #+liber-documentation
- "@version{2023-9-22}
-  @argument[point]{a @symbol{graphene:point-t} instance}
-  @argument[vector]{a @symbol{graphene:vec2-t} vector to use}
+ "@version{2023-12-3}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @argument[v]{a @symbol{graphene:vec2-t} instance to use}
   @return{The initialized @symbol{graphene:point-t} instance.}
   @short{Initializes the point using the components of the given vector.}
   @see-symbol{graphene:point-t}
   @see-symbol{graphene:vec2-t}"
-  (point (:pointer (:struct point-t)))
-  (vector :pointer)) ; vec2-t not known at this point
+  (p (:pointer (:struct point-t)))
+  (v :pointer)) ; vec2-t not known at this point
 
 (export 'point-init-from-vec2)
 
@@ -421,11 +439,11 @@
 ;;; graphene_point_to_vec2 ()
 ;;; ----------------------------------------------------------------------------
 
-(defun point-to-vec2 (point vector)
+(defun point-to-vec2 (p v)
  #+liber-documentation
- "@version{2023-9-22}
-  @argument[point]{a @symbol{graphene:point-t} instance}
-  @argument[vector]{a @symbol{graphene:vec2-t} instance}
+ "@version{2023-12-3}
+  @argument[p]{a @symbol{graphene:point-t} instance}
+  @argument[v]{a @symbol{graphene:vec2-t} instance}
   @return{The @symbol{graphene:vec2-t} instance with the coordinates of the
     point.}
   @short{Stores the coordinates of the given point into a vector.}
@@ -440,10 +458,10 @@
   @see-symbol{graphene:point-t}
   @see-symbol{graphene:vec2-t}"
   (cffi:foreign-funcall "graphene_point_to_vec2"
-                        (:pointer (:struct point-t)) point
-                        :pointer vector ; vec2-t not known at this point
+                        (:pointer (:struct point-t)) p
+                        :pointer v ; vec2-t not known at this point
                         :void)
-  vector)
+  v)
 
 (export 'point-to-vec2)
 
@@ -477,11 +495,11 @@
 
 (defun point-near (a b epsilon)
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2023-12-3}
   @argument[a]{a @symbol{graphene:point-t} instance}
   @argument[b]{a @symbol{graphene:point-t} instance}
-  @argument[epsilon]{a number coerced to a single float with the threshold
-    between the two points}
+  @argument[epsilon]{a number coerced to a float with the threshold between the
+    two points}
   @return{@em{True}, if the distance between the points is within
     @arg{epsilon}.}
   @begin{short}
@@ -510,13 +528,13 @@
 
 (defun point-distance (a b)
  #+liber-documentation
- "@version{2023-9-22}
-  @syntax[]{(graphene:point-distance a b) => distance, dx, dy}
+ "@version{2023-12-3}
+  @syntax[]{(graphene:point-distance a b) => dist, dx, dy}
   @argument[a]{a @symbol{graphene:point-t} instance}
   @argument[b]{a @symbol{graphene:point-t} instance}
-  @argument[distance]{a single float with the distance between the two points}
-  @argument[dx]{a single float with the distance component of the x axis}
-  @argument[dy]{a single float with the distance component of the y axis}
+  @argument[dist]{a float with the distance between the two points}
+  @argument[dx]{a float with the distance component of the x axis}
+  @argument[dy]{a float with the distance component of the y axis}
   @short{Computes the distance between the two given points.}
   @see-symbol{graphene:point-t}"
   (cffi:with-foreign-objects ((dx :float) (dy :float))
@@ -565,3 +583,4 @@
 (export 'point-interpolate)
 
 ;;; --- End of file graphene.point.lisp ----------------------------------------
+

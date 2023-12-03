@@ -487,8 +487,8 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
-  @argument[x]{a single float with the x field of the vector}
-  @argument[y]{a single float with the y field of the vector}
+  @argument[x]{a float with the x field of the vector}
+  @argument[y]{a float with the y field of the vector}
   @return{The initialized @symbol{graphene:vec2-t} instance.}
   @begin{short}
     Initializes a @symbol{graphene:vec2-t} instance using the given values.
@@ -533,7 +533,7 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
-  @argument[arg]{a list with two single float values}
+  @argument[arg]{a list with two float values}
   @return{The initialized @symbol{graphene:vec2-t} instance.}
   @short{Initializes @arg{v} with the contents of the given list.}
   @begin[Note]{dictionary}
@@ -560,17 +560,23 @@
 
 (defun vec2-to-float (v)
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2023-12-3}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
-  @return{A list with the single float values of the components of @arg{v}.}
+  @return{The list with the float values of the components of @arg{v}.}
   @begin{short}
     Stores the components of @arg{v} into a list.
   @end{short}
+  @begin[Example]{dictionary}
+    @begin{pre}
+(graphene:with-vec2 (v 1/2 3/2) (graphene:vec2-to-float v))
+=> (0.5 1.5)
+    @end{pre}
+  @end{dictionary}
   @see-symbol{graphene:vec2-t}"
   (cffi:with-foreign-object (v-ar :float +vec2-len+)
     (%vec2-to-float v v-ar)
-    (loop for i from 0 below +vec2-len+
-          collect (cffi:mem-aref v-ar :float i))))
+    (iter (for i from 0 below +vec2-len+)
+          (collect (cffi:mem-aref v-ar :float i)))))
 
 (export 'vec2-to-float)
 
@@ -584,7 +590,7 @@
   @argument[a]{a @symbol{graphene:vec2-t} instance}
   @argument[b]{a @symbol{graphene:vec2-t} instance}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance with the result.}
+  @return{The @symbol{graphene:vec2-t} instance with the result.}
   @begin{short}
     Adds each component of the two passed vectors and places each result into
     the components of @arg{result}.
@@ -635,7 +641,7 @@
   @argument[a]{a @symbol{graphene:vec2-t} instance}
   @argument[b]{a @symbol{graphene:vec2-t} instance}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance with the result.}
+  @return{The @symbol{graphene:vec2-t} instance with the result.}
   @begin{short}
     Multiplies each component of the two passed vectors and places each result
     into the components of @arg{result}.
@@ -676,7 +682,7 @@
   @argument[a]{a @symbol{graphene:vec2-t} instance}
   @argument[b]{a @symbol{graphene:vec2-t} instance}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance with the result.}
+  @return{The @symbol{graphene:vec2-t} instance with the result.}
   @begin{short}
     Divides each component of the first operand @arg{a} by the corresponding
     component of the second operand @arg{b}, and places the results into the
@@ -698,7 +704,7 @@
  "@version{#2022-9-22}
   @argument[a]{a @symbol{graphene:vec2-t} instance}
   @argument[b]{a @symbol{graphene:vec2-t} instance}
-  @return{A single float with the dot product of the vectors.}
+  @return{The float with the dot product of the vectors.}
   @begin{short}
     Computes the dot product of the two given vectors.
   @end{short}
@@ -716,9 +722,9 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
-  @argument[factor]{a single float with the scale factor}
+  @argument[factor]{a float with the scale factor}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance withe result vector.}
+  @return{The @symbol{graphene:vec2-t} instance withe result vector.}
   @begin{short}
     Multiplies all components of the given vector with the given scalar factor.
   @end{short}
@@ -740,7 +746,7 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
-  @return{A single float with the length of the vector.}
+  @return{The float with the length of the vector.}
   @begin{short}
     Computes the length of the given vector.
   @end{short}
@@ -758,7 +764,7 @@
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance with the normalized vector.}
+  @return{The @symbol{graphene:vec2-t} instance with the normalized vector.}
   @begin{short}
     Computes the normalized vector for the given vector.
   @end{short}
@@ -780,7 +786,7 @@
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance with the negated vector.}
+  @return{The @symbol{graphene:vec2-t} instance with the negated vector.}
   @begin{short}
     Negates the given vector.
   @end{short}
@@ -821,7 +827,7 @@
  "@version{#2022-9-22}
   @argument[v1]{a @symbol{graphene:vec2-t} instance}
   @argument[v2]{a @symbol{graphene:vec2-t} instance}
-  @argument[epsilon]{a single float with the treshold between the two vectors}
+  @argument[epsilon]{a float with the treshold between the two vectors}
   @return{@em{True} if the two vectors are near each other, and @em{false}
     otherwise.}
   @begin{short}
@@ -847,7 +853,7 @@
   @argument[a]{a @symbol{graphene:vec2-t} instance}
   @argument[b]{a @symbol{graphene:vec2-t} instance}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance with the result.}
+  @return{The @symbol{graphene:vec2-t} instance with the result.}
   @begin{short}
     Compares the two given vectors and places the minimum values of each
     component into @arg{result}.
@@ -872,7 +878,7 @@
   @argument[a]{a @symbol{graphene:vec2-t} instance}
   @argument[b]{a @symbol{graphene:vec2-t} instance}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance with the result.}
+  @return{The @symbol{graphene:vec2-t} instance with the result.}
   @begin{short}
     Compares the two given vectors and places the maximum values of each
     component into @arg{result}.
@@ -892,16 +898,17 @@
 ;;; ----------------------------------------------------------------------------
 
 ;; TODO: Is factor a double float? Yes, the C library defines a double float
-;; value. But the value is coerced to a single float value for the calculation.
+;; value. But the value is coerced to a float value for the calculation.
 
 (defun vec2-interpolate (v1 v2 factor result)
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v1]{a @symbol{graphene:vec2-t} instance}
   @argument[v2]{a @symbol{graphene:vec2-t} instance}
-  @argument[factor]{a single float with the interpolation factor}
+  @argument[factor]{a number coerced to a double float with the interpolation
+    factor}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance with the interpolated vector.}
+  @return{The @symbol{graphene:vec2-t} instance with the interpolated vector.}
   @begin{short}
     Linearly interpolates @arg{v1} and @arg{v2} using the given factor.
   @end{short}
@@ -924,7 +931,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
-  @return{A single float with the value of the x component.}
+  @return{The float with the value of the x component.}
   @short{Retrieves the x component of the vector.}
   @see-symbol{graphene:vec2-t}"
   (v (:pointer (:struct vec2-t))))
@@ -939,7 +946,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
-  @return{A single float with the value of the y component.}
+  @return{The float with the value of the y component.}
   @short{Retrieves the y component of the vector.}
   @see-symbol{graphene:vec2-t}"
   (v (:pointer (:struct vec2-t))))
@@ -953,7 +960,7 @@
 (cffi:defcfun ("graphene_vec2_zero" vec2-zero) (:pointer (:struct vec2-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:vec2-t} instance with (0.0, 0.0) components.}
+  @return{The @symbol{graphene:vec2-t} instance with (0.0, 0.0) components.}
   @short{Retrieves a constant zero vector.}
   @see-symbol{graphene:vec2-t}")
 
@@ -966,7 +973,7 @@
 (cffi:defcfun ("graphene_vec2_one" vec2-one) (:pointer (:struct vec2-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:vec2-t} instance with (1.0, 1.0) components.}
+  @return{The @symbol{graphene:vec2-t} instance with (1.0, 1.0) components.}
   @short{Retrieves a constant one vector.}
   @see-symbol{graphene:vec2-t}")
 
@@ -979,7 +986,7 @@
 (cffi:defcfun ("graphene_vec2_x_axis" vec2-x-axis) (:pointer (:struct vec2-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:vec2-t} instance with the x axis vector.}
+  @return{The @symbol{graphene:vec2-t} instance with the x axis vector.}
   @short{Retrieves a constant vector with (1.0, 0.0) components.}
   @see-symbol{graphene:vec2-t}")
 
@@ -992,7 +999,7 @@
 (cffi:defcfun ("graphene_vec2_y_axis" vec2-y-axis) (:pointer (:struct vec2-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:vec2-t} instance with the y axis vector.}
+  @return{The @symbol{graphene:vec2-t} instance with the y axis vector.}
   @short{Retrieves a constant vector with (0.0, 1.0) components.}
   @see-symbol{graphene:vec2-t}")
 
@@ -1039,9 +1046,9 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @argument[x]{a single float with the x field of the vector}
-  @argument[y]{a single float with the y field of the vector}
-  @argument[z]{a single float with the z field of the vector}
+  @argument[x]{a number coerced to a float with the x field of the vector}
+  @argument[y]{a number coerced to a float with the y field of the vector}
+  @argument[z]{a number coerced to a float with the z field of the vector}
   @return{The initialized @symbol{graphene:vec3-t} instance.}
   @begin{short}
     Initializes a @symbol{graphene:vec3-t} instance using the given values.
@@ -1087,7 +1094,7 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @argument[arg]{a list with three single float values}
+  @argument[arg]{a list with three float values}
   @return{The initialized @symbol{graphene:vec3-t} instance.}
   @short{Initializes @arg{v} with the contents of the given list.}
   @begin[Note]{dictionary}
@@ -1114,17 +1121,17 @@
 
 (defun vec3-to-float (v)
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2023-12-3}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{A list with the single float values of the components of @arg{v}.}
+  @return{The list with the float values of the components of @arg{v}.}
   @begin{short}
     Stores the components of @arg{v} into a list.
   @end{short}
   @see-symbol{graphene:vec3-t}"
   (cffi:with-foreign-object (v-ar :float +vec3-len+)
     (%vec3-to-float v v-ar)
-    (loop for i from 0 below +vec3-len+
-          collect (cffi:mem-aref v-ar :float i))))
+    (iter (for i from 0 below +vec3-len+)
+          (collect (cffi:mem-aref v-ar :float i)))))
 
 (export 'vec3-to-float)
 
@@ -1138,7 +1145,7 @@
   @argument[a]{a @symbol{graphene:vec3-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance with the result.}
+  @return{The @symbol{graphene:vec3-t} instance with the result.}
   @begin{short}
     Adds each component of the two passed vectors and places each result into
     the components of @arg{result}.
@@ -1163,7 +1170,7 @@
   @argument[a]{a @symbol{graphene:vec3-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance with the result.}
+  @return{The @symbol{graphene:vec3-t} instance with the result.}
   @begin{short}
     Subtracts from each component of the first operand @arg{a} the corresponding
     component of the second operand @arg{b} and places each result into the
@@ -1189,7 +1196,7 @@
   @argument[a]{a @symbol{graphene:vec3-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance with the result.}
+  @return{The @symbol{graphene:vec3-t} instance with the result.}
   @begin{short}
     Multiplies each component of the two passed vectors and places each result
     into the components of @arg{result}.
@@ -1230,7 +1237,7 @@
   @argument[a]{a @symbol{graphene:vec3-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance with the result.}
+  @return{The @symbol{graphene:vec3-t} instance with the result.}
   @begin{short}
     Divides each component of the first operand @arg{a} by the corresponding
     component of the second operand @arg{b}, and places the results into the
@@ -1252,7 +1259,7 @@
  "@version{#2022-9-23}
   @argument[a]{a @symbol{graphene:vec3-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
-  @return{A @symbol{graphene:vec3-t} instance with the result.}
+  @return{The @symbol{graphene:vec3-t} instance with the result.}
   @begin{short}
     Computes the cross product of the two given vectors.
   @end{short}
@@ -1275,7 +1282,7 @@
  "@version{#2022-9-22}
   @argument[a]{a @symbol{graphene:vec3-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
-  @return{A single float with the dot product of the vectors.}
+  @return{The float with the dot product of the vectors.}
   @begin{short}
     Computes the dot product of the two given vectors.
   @end{short}
@@ -1293,9 +1300,9 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @argument[factor]{a single float with the scale factor}
+  @argument[factor]{a float with the scale factor}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance withe result vector.}
+  @return{The @symbol{graphene:vec3-t} instance withe result vector.}
   @begin{short}
     Multiplies all components of the given vector with the given scalar factor.
   @end{short}
@@ -1317,7 +1324,7 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{A single float with the length of the vector.}
+  @return{The float with the length of the vector.}
   @begin{short}
     Computes the length of the given vector.
   @end{short}
@@ -1335,7 +1342,7 @@
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance with the normalized vector.}
+  @return{The @symbol{graphene:vec3-t} instance with the normalized vector.}
   @begin{short}
     Computes the normalized vector for the given vector.
   @end{short}
@@ -1357,7 +1364,7 @@
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance with the negated vector.}
+  @return{The @symbol{graphene:vec3-t} instance with the negated vector.}
   @begin{short}
     Negates the given vector.
   @end{short}
@@ -1398,7 +1405,7 @@
  "@version{#2022-9-22}
   @argument[v1]{a @symbol{graphene:vec3-t} instance}
   @argument[v2]{a @symbol{graphene:vec3-t} instance}
-  @argument[epsilon]{a single float with the treshold between the two vectors}
+  @argument[epsilon]{a float with the treshold between the two vectors}
   @return{@em{True} if the two vectors are near each other, and @em{false}
     otherwise.}
   @begin{short}
@@ -1424,7 +1431,7 @@
   @argument[a]{a @symbol{graphene:vec3-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance with the result.}
+  @return{The @symbol{graphene:vec3-t} instance with the result.}
   @begin{short}
     Compares the two given vectors and places the minimum values of each
     component into @arg{result}.
@@ -1449,7 +1456,7 @@
   @argument[a]{a @symbol{graphene:vec3-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance with the result.}
+  @return{The @symbol{graphene:vec3-t} instance with the result.}
   @begin{short}
     Compares the two given vectors and places the maximum values of each
     component into @arg{result}.
@@ -1473,9 +1480,10 @@
  "@version{#2022-9-22}
   @argument[v1]{a @symbol{graphene:vec3-t} instance}
   @argument[v2]{a @symbol{graphene:vec3-t} instance}
-  @argument[factor]{a single float with the interpolation factor}
+  @argument[factor]{a number coerced to a double float with the interpolation
+    factor}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the result}
-  @return{A @symbol{graphene:vec3-t} instance with the interpolated vector.}
+  @return{The @symbol{graphene:vec3-t} instance with the interpolated vector.}
   @begin{short}
     Linearly interpolates @arg{v1} and @arg{v2} using the given factor.
   @end{short}
@@ -1498,7 +1506,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{A single float with the value of the x component.}
+  @return{The float with the value of the x component.}
   @short{Retrieves the x component of the vector.}
   @see-symbol{graphene:vec3-t}"
   (v (:pointer (:struct vec3-t))))
@@ -1513,7 +1521,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{A single float with the value of the y component.}
+  @return{The float with the value of the y component.}
   @short{Retrieves the y component of the vector.}
   @see-symbol{graphene:vec3-t}"
   (v (:pointer (:struct vec3-t))))
@@ -1528,7 +1536,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{A single float with the value of the z component.}
+  @return{The float with the value of the z component.}
   @short{Retrieves the z component of the vector.}
   @see-symbol{graphene:vec3-t}"
   (v (:pointer (:struct vec3-t))))
@@ -1543,7 +1551,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{A @symbol{graphene:vec2-t} instance.}
+  @return{The @symbol{graphene:vec2-t} instance.}
   @begin{short}
     Returns a @symbol{graphene:vec2-t} instance that contains the first two
     components of the given vector.
@@ -1566,7 +1574,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{A @symbol{graphene:vec3-t} instance.}
+  @return{The @symbol{graphene:vec3-t} instance.}
   @begin{short}
     Returns a @symbol{graphene:vec3-t} instance that contains the first two
     components of the given vector, and the third component set to 0.0.
@@ -1588,7 +1596,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{A @symbol{graphene:vec4-t} instance.}
+  @return{The @symbol{graphene:vec4-t} instance.}
   @begin{short}
     Returns a @symbol{graphene:vec4-t} instance that contains the first three
     components of the given vector, and the fourth component set to 0.0.
@@ -1611,7 +1619,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{A @symbol{graphene:vec4-t} instance.}
+  @return{The @symbol{graphene:vec4-t} instance.}
   @begin{short}
     Returns a @symbol{graphene:vec4-t} instance that contains the first three
     components of the given vector, and the fourth component set to 1.0.
@@ -1634,8 +1642,9 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @argument[w]{a single float with the value of the fourth component}
-  @return{A @symbol{graphene:vec4-t} instance.}
+  @argument[w]{a number coerced to a float with the value of the fourth
+    component}
+  @return{The @symbol{graphene:vec4-t} instance.}
   @begin{short}
     Returns a @symbol{graphene:vec4-t} instance that contains the first three
     components of the given vector, and the fourth component set to @arg{w}.
@@ -1658,7 +1667,7 @@
 (cffi:defcfun ("graphene_vec3_zero" vec3-zero) (:pointer (:struct vec3-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:vec3-t} instance with three components, all sets
+  @return{The @symbol{graphene:vec3-t} instance with three components, all sets
     to 0.0.}
   @short{Retrieves a constant zero vector.}
   @see-symbol{graphene:vec3-t}")
@@ -1672,7 +1681,7 @@
 (cffi:defcfun ("graphene_vec3_one" vec3-one) (:pointer (:struct vec3-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:vec3-t} instance with three components, all sets
+  @return{The @symbol{graphene:vec3-t} instance with three components, all sets
     to 1.0.}
   @short{Retrieves a constant one vector.}
   @see-symbol{graphene:vec3-t}")
@@ -1686,7 +1695,7 @@
 (cffi:defcfun ("graphene_vec3_x_axis" vec3-x-axis) (:pointer (:struct vec3-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:vec3-t} instance with the x axis vector.}
+  @return{The @symbol{graphene:vec3-t} instance with the x axis vector.}
   @short{Retrieves a constant vector with (1.0, 0.0, 0.0) components.}
   @see-symbol{graphene:vec3-t}")
 
@@ -1699,7 +1708,7 @@
 (cffi:defcfun ("graphene_vec3_y_axis" vec3-y-axis) (:pointer (:struct vec3-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:vec3-t} instance with the y axis vector.}
+  @return{The @symbol{graphene:vec3-t} instance with the y axis vector.}
   @short{Retrieves a constant vector with (0.0, 1.0, 0.0) components.}
   @see-symbol{graphene:vec3-t}")
 
@@ -1712,7 +1721,7 @@
 (cffi:defcfun ("graphene_vec3_z_axis" vec3-z-axis) (:pointer (:struct vec3-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{graphene:vec3-t} instance with the z axis vector.}
+  @return{The @symbol{graphene:vec3-t} instance with the z axis vector.}
   @short{Retrieves a constant vector with (0.0, 0.0, 1.0) components.}
   @see-symbol{graphene:vec3-t}")
 
@@ -1759,10 +1768,10 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @argument[x]{a single float with the x field of the vector}
-  @argument[y]{a single float with the y field of the vector}
-  @argument[z]{a single float with the z field of the vector}
-  @argument[w]{a single float with the w field of the vector}
+  @argument[x]{a number coerced to a float with the x field of the vector}
+  @argument[y]{a number coerced to a float with the y field of the vector}
+  @argument[z]{a number coerced to a float with the z field of the vector}
+  @argument[w]{a number coerced to a float with the w field of the vector}
   @return{The initialized @symbol{graphene:vec4-t} instance.}
   @begin{short}
     Initializes a @symbol{graphene:vec4-t} instance using the given values.
@@ -1810,7 +1819,8 @@
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
   @argument[source]{a @symbol{graphene:vec4-t} instance}
-  @argument[w]{a single float with the value of the fourth component of @arg{v}}
+  @argument[w]{a number coerced to a float with the value of the fourth
+    component of @arg{v}}
   @return{The initialized @symbol{graphene:vec4-t} instance.}
   @begin{short}
     Initializes a @symbol{graphene:vec4-t} instance using another
@@ -1836,8 +1846,10 @@
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
   @argument[source]{a @symbol{graphene:vec2-t} instance}
-  @argument[z]{a single float with the value of the third component of @arg{v}}
-  @argument[w]{a single float with the value of the fourth component of @arg{v}}
+  @argument[z]{a number coerced to a float with the value of the third
+    component of @arg{v}}
+  @argument[w]{a number coerced to a float with the value of the fourth
+    component of @arg{v}}
   @return{The initialized @symbol{graphene:vec4-t} instance.}
   @begin{short}
     Initializes a @symbol{graphene:vec4-t} instance using another
@@ -1863,7 +1875,7 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @argument[arg]{a list with four single float values}
+  @argument[arg]{a list with four float values}
   @return{The initialized @symbol{graphene:vec4-t} instance.}
   @short{Initializes @arg{v} with the contents of the given list.}
   @begin[Note]{dictionary}
@@ -1890,17 +1902,17 @@
 
 (defun vec4-to-float (v)
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2023-12-3}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @return{A list with the single float values of the components of @arg{v}.}
+  @return{The list with the float values of the components of @arg{v}.}
   @begin{short}
     Stores the components of @arg{v} into a list.
   @end{short}
   @see-symbol{graphene:vec4-t}"
   (cffi:with-foreign-object (v-ar :float +vec4-len+)
     (%vec4-to-float v v-ar)
-    (loop for i from 0 below +vec4-len+
-          collect (cffi:mem-aref v-ar :float i))))
+    (iter (for i from 0 below +vec4-len+)
+          (collect (cffi:mem-aref v-ar :float i)))))
 
 (export 'vec4-to-float)
 
@@ -1914,7 +1926,7 @@
   @argument[a]{a @symbol{graphene:vec4-t} instance}
   @argument[b]{a @symbol{graphene:vec4-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance with the result.}
+  @return{The @symbol{graphene:vec4-t} instance with the result.}
   @begin{short}
     Adds each component of the two passed vectors and places each result into
     the components of @arg{result}.
@@ -1939,7 +1951,7 @@
   @argument[a]{a @symbol{graphene:vec4-t} instance}
   @argument[b]{a @symbol{graphene:vec4-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance with the result.}
+  @return{The @symbol{graphene:vec4-t} instance with the result.}
   @begin{short}
     Subtracts from each component of the first operand @arg{a} the corresponding
     component of the second operand @arg{b} and places each result into the
@@ -1965,7 +1977,7 @@
   @argument[a]{a @symbol{graphene:vec4-t} instance}
   @argument[b]{a @symbol{graphene:vec4-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance with the result.}
+  @return{The @symbol{graphene:vec4-t} instance with the result.}
   @begin{short}
     Multiplies each component of the two passed vectors and places each result
     into the components of @arg{result}.
@@ -1990,7 +2002,7 @@
   @argument[a]{a @symbol{graphene:vec4-t} instance}
   @argument[b]{a @symbol{graphene:vec4-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance with the result.}
+  @return{The @symbol{graphene:vec4-t} instance with the result.}
   @begin{short}
     Divides each component of the first operand @arg{a} by the corresponding
     component of the second operand @arg{b}, and places the results into the
@@ -2015,7 +2027,7 @@
  "@version{#2022-9-22}
   @argument[a]{a @symbol{graphene:vec4-t} instance}
   @argument[b]{a @symbol{graphene:vec4-t} instance}
-  @return{A single float with the dot product of the vectors.}
+  @return{The float with the dot product of the vectors.}
   @begin{short}
     Computes the dot product of the two given vectors.
   @end{short}
@@ -2033,9 +2045,9 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @argument[factor]{a single float with the scale factor}
+  @argument[factor]{a number coerced to a float with the scale factor}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance withe result vector.}
+  @return{The @symbol{graphene:vec4-t} instance withe result vector.}
   @begin{short}
     Multiplies all components of the given vector with the given scalar factor.
   @end{short}
@@ -2057,7 +2069,7 @@
  #+liber-documentation
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @return{A single float with the length of the vector.}
+  @return{The float with the length of the vector.}
   @begin{short}
     Computes the length of the given vector.
   @end{short}
@@ -2075,7 +2087,7 @@
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance with the normalized vector.}
+  @return{The @symbol{graphene:vec4-t} instance with the normalized vector.}
   @begin{short}
     Computes the normalized vector for the given vector.
   @end{short}
@@ -2097,7 +2109,7 @@
  "@version{#2022-9-22}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance with the negated vector.}
+  @return{The @symbol{graphene:vec4-t} instance with the negated vector.}
   @begin{short}
     Negates the given vector.
   @end{short}
@@ -2138,7 +2150,8 @@
  "@version{#2022-9-22}
   @argument[v1]{a @symbol{graphene:vec4-t} instance}
   @argument[v2]{a @symbol{graphene:vec4-t} instance}
-  @argument[epsilon]{a single float with the treshold between the two vectors}
+  @argument[epsilon]{a number coerced to a float with the treshold between the
+    two vectors}
   @return{@em{True} if the two vectors are near each other, and @em{false}
     otherwise.}
   @begin{short}
@@ -2164,7 +2177,7 @@
   @argument[a]{a @symbol{graphene:vec4-t} instance}
   @argument[b]{a @symbol{graphene:vec4-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance with the result.}
+  @return{The @symbol{graphene:vec4-t} instance with the result.}
   @begin{short}
     Compares the two given vectors and places the minimum values of each
     component into @arg{result}.
@@ -2189,7 +2202,7 @@
   @argument[a]{a @symbol{graphene:vec4-t} instance}
   @argument[b]{a @symbol{graphene:vec4-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance with the result.}
+  @return{The @symbol{graphene:vec4-t} instance with the result.}
   @begin{short}
     Compares the two given vectors and places the maximum values of each
     component into @arg{result}.
@@ -2213,9 +2226,10 @@
  "@version{#2022-9-22}
   @argument[v1]{a @symbol{graphene:vec4-t} instance}
   @argument[v2]{a @symbol{graphene:vec4-t} instance}
-  @argument[factor]{a single float with the interpolation factor}
+  @argument[factor]{a number coerced to a double float with the interpolation
+    factor}
   @argument[result]{a @symbol{graphene:vec4-t} instance for the result}
-  @return{A @symbol{graphene:vec4-t} instance with the interpolated vector.}
+  @return{The @symbol{graphene:vec4-t} instance with the interpolated vector.}
   @begin{short}
     Linearly interpolates @arg{v1} and @arg{v2} using the given factor.
   @end{short}
@@ -2238,7 +2252,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @return{A single float with the value of the x component.}
+  @return{The float with the value of the x component.}
   @short{Retrieves the x component of the vector.}
   @see-symbol{graphene:vec4-t}"
   (v (:pointer (:struct vec4-t))))
@@ -2253,7 +2267,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @return{A single float with the value of the y component.}
+  @return{The float with the value of the y component.}
   @short{Retrieves the y component of the vector.}
   @see-symbol{graphene:vec4-t}"
   (v (:pointer (:struct vec4-t))))
@@ -2268,7 +2282,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @return{A single float with the value of the z component.}
+  @return{The float with the value of the z component.}
   @short{Retrieves the z component of the vector.}
   @see-symbol{graphene:vec4-t}"
   (v (:pointer (:struct vec4-t))))
@@ -2283,7 +2297,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @return{A single float with the value of the fourth component.}
+  @return{The float with the value of the fourth component.}
   @short{Retrieves the fourth component of the vector.}
   @see-symbol{graphene:vec4-t}"
   (v (:pointer (:struct vec4-t))))
@@ -2298,7 +2312,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @return{A @symbol{graphene:vec2-t} instance.}
+  @return{The @symbol{graphene:vec2-t} instance.}
   @begin{short}
     Returns a @symbol{graphene:vec2-t} instance that contains the first two
     components of the given vector.
@@ -2321,7 +2335,7 @@
  #+liber-documentation
  "@version{#2022-9-23}
   @argument[v]{a @symbol{vec4-t} instance}
-  @return{A @symbol{vec3-t} instance.}
+  @return{The @symbol{vec3-t} instance.}
   @begin{short}
     Returns a @symbol{vec3-t} instance that contains the first three components
     of the given vector.
@@ -2343,7 +2357,7 @@
 (cffi:defcfun ("graphene_vec4_zero" vec4-zero) (:pointer (:struct vec4-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{vec4-t} instance with three components, all sets to 0.0.}
+  @return{The @symbol{vec4-t} instance with three components, all sets to 0.0.}
   @short{Retrieves a constant zero vector.}
   @see-symbol{vec4-t}")
 
@@ -2356,7 +2370,7 @@
 (cffi:defcfun ("graphene_vec4_one" vec4-one) (:pointer (:struct vec4-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{vec4-t} instance with three components, all sets to 1.0.}
+  @return{The @symbol{vec4-t} instance with three components, all sets to 1.0.}
   @short{Retrieves a constant one vector.}
   @see-symbol{vec4-t}")
 
@@ -2369,7 +2383,7 @@
 (cffi:defcfun ("graphene_vec4_x_axis" vec4-x-axis) (:pointer (:struct vec4-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{vec4-t} instance with the x axis vector.}
+  @return{The @symbol{vec4-t} instance with the x axis vector.}
   @short{Retrieves a constant vector with (1.0, 0.0, 0.0, 0.0) components.}
   @see-symbol{vec4-t}")
 
@@ -2382,7 +2396,7 @@
 (cffi:defcfun ("graphene_vec4_y_axis" vec4-y-axis) (:pointer (:struct vec4-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{vec4-t} instance with the y axis vector.}
+  @return{The @symbol{vec4-t} instance with the y axis vector.}
   @short{Retrieves a constant vector with (0.0, 1.0, 0.0, 0.0) components.}
   @see-symbol{vec4-t}")
 
@@ -2395,7 +2409,7 @@
 (cffi:defcfun ("graphene_vec4_z_axis" vec4-z-axis) (:pointer (:struct vec4-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{vec4-t} instance with the z axis vector.}
+  @return{The @symbol{vec4-t} instance with the z axis vector.}
   @short{Retrieves a constant vector with (0.0, 0.0, 1.0, 0.0) components.}
   @see-symbol{vec4-t}")
 
@@ -2408,10 +2422,11 @@
 (cffi:defcfun ("graphene_vec4_w_axis" vec4-w-axis) (:pointer (:struct vec4-t))
  #+liber-documentation
  "@version{#2022-9-23}
-  @return{A @symbol{vec4-t} instance with the w axis vector.}
+  @return{The @symbol{vec4-t} instance with the w axis vector.}
   @short{Retrieves a constant vector with (0.0, 0.0, 0.0, 1.0) components.}
   @see-symbol{vec4-t}")
 
 (export 'vec4-w-axis)
 
 ;;; --- End of file graphene.vector.lisp ---------------------------------------
+
