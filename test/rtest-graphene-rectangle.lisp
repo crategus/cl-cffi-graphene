@@ -22,31 +22,31 @@
 
 ;;; --- Macros -----------------------------------------------------------------
 
-;;;     with-graphene-rect
+;;;     with-rect
 
-(test with-graphene-rect.1
-  (graphene:with-graphene-rect (r)
+(test with-rect.1
+  (graphene:with-rect (r)
     (is (= 0.0 (graphene:rect-x r)))
     (is (= 0.0 (graphene:rect-y r)))
     (is (= 0.0 (graphene:rect-width r)))
     (is (= 0.0 (graphene:rect-height r)))))
 
-(test with-graphene-rect.2
-  (graphene:with-graphene-rect (r 1 2 3 4)
+(test with-rect.2
+  (graphene:with-rect (r 1 2 3 4)
     (is (= 1.0 (graphene:rect-x r)))
     (is (= 2.0 (graphene:rect-y r)))
     (is (= 3.0 (graphene:rect-width r)))
     (is (= 4.0 (graphene:rect-height r)))))
 
-(test with-graphene-rect.3
-  (graphene:with-graphene-rects ((r1 1 2 3 4) (r r1))
+(test with-rect.3
+  (graphene:with-rects ((r1 1 2 3 4) (r r1))
     (is (= 1.0 (graphene:rect-x r)))
     (is (= 2.0 (graphene:rect-y r)))
     (is (= 3.0 (graphene:rect-width r)))
     (is (= 4.0 (graphene:rect-height r)))))
 
-(test with-graphene-rect.4
-  (graphene:with-graphene-rects ((r1 1 2 3 4) (r (r1 graphene:rect-t)))
+(test with-rect.4
+  (graphene:with-rects ((r1 1 2 3 4) (r (r1 graphene:rect-t)))
     (is (= 1.0 (graphene:rect-x r)))
     (is (= 2.0 (graphene:rect-y r)))
     (is (= 3.0 (graphene:rect-width r)))
@@ -54,9 +54,8 @@
 
 ;;;     with-graphene-rects
 
-(test with-graphene-rects
-  (graphene:with-graphene-rects (r1 (r2 1 2 3 4)
-                                    (r3 r2) (r4 (r2 graphene:rect-t)))
+(test with-rects
+  (graphene:with-rects (r1 (r2 1 2 3 4) (r3 r2) (r4 (r2 graphene:rect-t)))
       (is (= 0.0 (graphene:rect-x r1)))
       (is (= 0.0 (graphene:rect-y r1)))
       (is (= 0.0 (graphene:rect-width r1)))
@@ -77,7 +76,7 @@
 ;;; --- Functions --------------------------------------------------------------
 
 (test graphene-rect-x/y/with/height
-  (graphene:with-graphene-rect (r 1 2 3 4)
+  (graphene:with-rect (r 1 2 3 4)
     (is (= 1.0 (graphene:rect-x r)))
     (is (= 1.0 (graphene:point-x (graphene:rect-origin r))))
     (is (= 2.0 (graphene:rect-y r)))
@@ -127,7 +126,7 @@
 ;;;     graphene_rect_init
 
 (test graphene-rect-init.1
-  (graphene:with-graphene-rect (rect)
+  (graphene:with-rect (rect)
     (is (cffi:pointerp (setf rect (graphene:rect-init rect 1.0 2.0 3.0 4.0))))
     (is (= 1.0 (graphene:rect-x rect)))
     (is (= 1.0 (graphene:point-x (graphene:rect-origin rect))))
@@ -147,7 +146,7 @@
     (is (= 3.5 (graphene:point-y (graphene:rect-origin rect))))))
 
 (test graphene-rect-init.2
-  (graphene:with-graphene-rect (rect 1.0 2.0 3.0 4.0)
+  (graphene:with-rect (rect 1.0 2.0 3.0 4.0)
     (is (= 1.0 (graphene:rect-x rect)))
     (is (= 2.0 (graphene:rect-y rect)))
     (is (= 3.0 (graphene:rect-width rect)))
@@ -159,7 +158,7 @@
     (is (= 4.0 (graphene:size-height (graphene:rect-size rect))))))
 
 (test graphene-rect-init.3
-  (graphene:with-graphene-rects ((rect1 1.0 2.0 3.0 4.0) rect2)
+  (graphene:with-rects ((rect1 1.0 2.0 3.0 4.0) rect2)
     (is (= 3.0 (graphene:rect-width rect1)))
     (is (= 4.0 (graphene:rect-height rect1)))
     (is (= 0.0 (graphene:rect-width rect2)))
@@ -168,7 +167,7 @@
 ;;;     graphene_rect_init_from_rect
 
 (test graphene-rect-init-from-rect
-  (graphene:with-graphene-rects ((rect1 1.0 2.0 3.0 4.0) rect2)
+  (graphene:with-rects ((rect1 1.0 2.0 3.0 4.0) rect2)
     (is (cffi:pointerp (setf rect2 (graphene:rect-init-from-rect rect2 rect1))))
     (is (= 1.0 (graphene:rect-x rect2)))
     (is (= 2.0 (graphene:rect-y rect2)))
@@ -178,9 +177,9 @@
 ;;;     graphene_rect_equal
 
 (test graphene-rect-equal
-  (graphene:with-graphene-rects ((rect1 1.0 2.0 3.0 4.0)
-                                 (rect2 1 2 3 4)
-                                 (rect3 0 0 0 0))
+  (graphene:with-rects ((rect1 1.0 2.0 3.0 4.0)
+                        (rect2 1 2 3 4)
+                        (rect3 0 0 0 0))
     (is-true (graphene:rect-equal rect1 rect2))
     (is-false (graphene:rect-equal rect1 rect3))
     (is-false (graphene:rect-equal rect2 rect3))))
@@ -188,7 +187,7 @@
 ;;;     graphene_rect_normalize
 
 (test graphene-rect-normalize
-  (graphene:with-graphene-rect (rect -4 -3 -2 -1)
+  (graphene:with-rect (rect -4 -3 -2 -1)
     (is (cffi:pointerp (setf rect (graphene:rect-normalize rect))))
     (is (= -6.0 (graphene:rect-x rect)))
     (is (= -4.0 (graphene:rect-y rect)))
@@ -200,8 +199,8 @@
 ;;;     graphene_rect_get_center
 
 (test graphene-rect-center
-  (graphene:with-graphene-rect (rect 1.0 2.0 3.0 4.0)
-    (graphene:with-graphene-point (p)
+  (graphene:with-rect (rect 1.0 2.0 3.0 4.0)
+    (graphene:with-point (p)
       (is (cffi:pointerp (setf p (graphene:rect-center rect p))))
       (is (= 2.5 (graphene:point-x p)))
       (is (= 4.0 (graphene:point-y p))))))
@@ -209,8 +208,8 @@
 ;;;     graphene_rect_get_top_left
 
 (test graphene-rect-top-left
-  (graphene:with-graphene-rect (rect 1.0 2.0 3.0 4.0)
-    (graphene:with-graphene-point (p)
+  (graphene:with-rect (rect 1.0 2.0 3.0 4.0)
+    (graphene:with-point (p)
       (is (cffi:pointerp (setf p (graphene:rect-top-left rect p))))
       (is (= 1.0 (graphene:point-x p)))
       (is (= 2.0 (graphene:point-y p))))))
@@ -218,8 +217,8 @@
 ;;;     graphene_rect_get_top_right
 
 (test graphene-rect-top-right
-  (graphene:with-graphene-rect (rect 1.0 2.0 3.0 4.0)
-    (graphene:with-graphene-point (p)
+  (graphene:with-rect (rect 1.0 2.0 3.0 4.0)
+    (graphene:with-point (p)
       (is (cffi:pointerp (setf p (graphene:rect-top-right rect p))))
       (is (= 4.0 (graphene:point-x p)))
       (is (= 2.0 (graphene:point-y p))))))
@@ -227,8 +226,8 @@
 ;;;     graphene_rect_get_bottom_right
 
 (test graphene-rect-bottom-right
-  (graphene:with-graphene-rect (rect 1.0 2.0 3.0 4.0)
-    (graphene:with-graphene-point (p)
+  (graphene:with-rect (rect 1.0 2.0 3.0 4.0)
+    (graphene:with-point (p)
       (is (cffi:pointerp (setf p (graphene:rect-bottom-right rect p))))
       (is (= 4.0 (graphene:point-x p)))
       (is (= 6.0 (graphene:point-y p))))))
@@ -236,8 +235,8 @@
 ;;;     graphene_rect_get_bottom_left
 
 (test graphene-rect-bottom-left
-  (graphene:with-graphene-rect (rect 1.0 2.0 3.0 4.0)
-    (graphene:with-graphene-point (p)
+  (graphene:with-rect (rect 1.0 2.0 3.0 4.0)
+    (graphene:with-point (p)
       (is (cffi:pointerp (setf p (graphene:rect-bottom-left rect p))))
       (is (= 1.0 (graphene:point-x p)))
       (is (= 6.0 (graphene:point-y p))))))
@@ -248,7 +247,7 @@
 ;;;     graphene_rect_get_height
 
 (test graphene-rect-x/y/width/height
-  (graphene:with-graphene-rect (rect 1.0 2.0 3.0 4.0)
+  (graphene:with-rect (rect 1.0 2.0 3.0 4.0)
     (is (= 1.0 (graphene:rect-x rect)))
     (is (= 2.0 (graphene:rect-y rect)))
     (is (= 3.0 (graphene:rect-width rect)))
@@ -257,7 +256,7 @@
 ;;;     graphene_rect_get_area
 
 (test graphene-rect-area
-  (graphene:with-graphene-rect (rect 1.0 2.0 3.0 4.0)
+  (graphene:with-rect (rect 1.0 2.0 3.0 4.0)
     (is (= 12.0 (graphene:rect-area rect)))))
 
 ;;;     graphene_rect_get_vertices
@@ -265,7 +264,7 @@
 ;;;     graphene_rect_union
 
 (test graphene-rect-union
-  (graphene:with-graphene-rects ((rect1 0 0 4 2) (rect2 2 1 4 2) result)
+  (graphene:with-rects ((rect1 0 0 4 2) (rect2 2 1 4 2) result)
     (is (cffi:pointerp (setf result (graphene:rect-union rect1 rect2 result))))
     (is (= 0.0 (graphene:rect-x result)))
     (is (= 0.0 (graphene:rect-y result)))
@@ -275,8 +274,7 @@
 ;;;     graphene_rect_intersection
 
 (test graphene-rect-intersection
-  (graphene:with-graphene-rects ((rect1 0 0 4 2)
-                                 (rect2 2 1 4 2) result)
+  (graphene:with-rects ((rect1 0 0 4 2) (rect2 2 1 4 2) result)
     (is (cffi:pointerp (setf result
                              (graphene:rect-intersection rect1 rect2 result))))
     (is (= 2.0 (graphene:rect-x result)))
@@ -287,8 +285,8 @@
 ;;;     graphene_rect_contains_point
 
 (test graphene-rect-contains-point
-  (graphene:with-graphene-rect (rect 0 0 4 2)
-    (graphene:with-graphene-points ((p1 1 1) (p2 5 1) (p3 1 3))
+  (graphene:with-rect (rect 0 0 4 2)
+    (graphene:with-points ((p1 1 1) (p2 5 1) (p3 1 3))
       (is-true (graphene:rect-contains-point rect p1))
       (is-false (graphene:rect-contains-point rect p2))
       (is-false (graphene:rect-contains-point rect p3)))))
@@ -296,7 +294,7 @@
 ;;;     graphene_rect_contains_rect
 
 (test graphene-rect-contains-rect
-  (graphene:with-graphene-rects ((rect1 0 0 4 2) (rect2 1 1 1 1) (rect3 1 1 4 2))
+  (graphene:with-rects ((rect1 0 0 4 2) (rect2 1 1 1 1) (rect3 1 1 4 2))
     (is-true (graphene:rect-contains-rect rect1 rect2))
     (is-false (graphene:rect-contains-rect rect1 rect3))))
 
@@ -312,4 +310,4 @@
 ;;;     graphene_rect_zero
 ;;;     graphene_rect_scale
 
-;;; --- 2023-9-22 --------------------------------------------------------------
+;;; --- 2023-12-2 --------------------------------------------------------------

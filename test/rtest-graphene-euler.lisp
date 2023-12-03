@@ -10,42 +10,42 @@
 
 ;;; --- Macros -----------------------------------------------------------------
 
-(test with-graphene-euler.1
-  (graphene:with-graphene-euler (euler)
+(test with-euler.1
+  (graphene:with-euler (euler)
     (is (cffi:pointerp euler))
 ))
 
-(test with-graphene-euler.2
-  (graphene:with-graphene-euler (euler 1 2 3)
+(test with-euler.2
+  (graphene:with-euler (euler 1 2 3)
     (is (cffi:pointerp euler))
 ))
 
-(test with-graphene-euler.3
-  (graphene:with-graphene-euler (euler 1 2 3 :SXYZ)
+(test with-euler.3
+  (graphene:with-euler (euler 1 2 3 :SXYZ)
     (is (cffi:pointerp euler))
 ))
 
-(test with-graphene-euler.4
-  (graphene:with-graphene-matrix (matrix)
-    (graphene:with-graphene-euler (euler matrix :SXYZ)
+(test with-euler.4
+  (graphene:with-matrix (matrix)
+    (graphene:with-euler (euler matrix :SXYZ)
       (is (cffi:pointerp euler))
 )))
 
-(test with-graphene-euler.5
-  (graphene:with-graphene-quaternion (quaternion)
+(test with-euler.5
+  (graphene:with-quaternion (quaternion)
     (is (cffi:pointer-eq quaternion (graphene:quaternion-init-identity quaternion)))
-    (graphene:with-graphene-euler (euler quaternion :SXYZ)
+    (graphene:with-euler (euler quaternion :SXYZ)
       (is (cffi:pointerp euler))
 )))
 
-(test with-graphene-euler.6
-  (graphene:with-graphene-vec3 (vector 1 2 3)
-    (graphene:with-graphene-euler (euler vector :SXYZ)
+(test with-euler.6
+  (graphene:with-vec3 (vector 1 2 3)
+    (graphene:with-euler (euler vector :SXYZ)
       (is (cffi:pointerp euler))
 )))
 
-(test with-graphene-euler.7
-  (graphene:with-graphene-eulers (euler (euler1 euler))
+(test with-euler.7
+  (graphene:with-eulers (euler (euler1 euler))
     (is (cffi:pointerp euler))
     (is (cffi:pointerp euler1))))
 

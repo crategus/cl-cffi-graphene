@@ -9,14 +9,13 @@
 
 ;;; --- Macros -----------------------------------------------------------------
 
-(test with-graphene-plane.1
-  (graphene:with-graphene-vec3 (normal)
-    (graphene:with-graphene-plane (plane)
+(test with-plane.1
+  (graphene:with-vec3 (normal)
+    (graphene:with-plane (plane)
       (is (cffi:pointerp plane))
-      (is (equal '(0.0 0.0 0.0) 
+      (is (equal '(0.0 0.0 0.0)
                  (graphene:vec3-to-float (graphene:plane-normal plane normal))))
       (is (= 0.0 (graphene:plane-constant plane))))))
-
 
 ;;; --- Functions --------------------------------------------------------------
 
@@ -35,4 +34,4 @@
 ;;;     graphene_plane_get_normal
 ;;;     graphene_plane_get_constant
 
-;;; 2022-9-25
+;;; 2023-12-2

@@ -10,20 +10,20 @@
 ;;; --- Macros -----------------------------------------------------------------
 
 ;; no argument
-(test with-graphene-quad.1
-  (graphene:with-graphene-quad (q)
+(test with-quad.1
+  (graphene:with-quad (q)
     (is (cffi:pointerp q))))
 
 ;; four points
-(test with-graphene-quad.2
-  (graphene:with-graphene-points (p1 p2 p3 p4)
-    (graphene:with-graphene-quad (q p1 p2 p3 p4)
+(test with-quad.2
+  (graphene:with-points (p1 p2 p3 p4)
+    (graphene:with-quad (q p1 p2 p3 p4)
       (is (cffi:pointerp q)))))
 
 ;; a rectangle
-(test with-graphene-quad.3
-  (graphene:with-graphene-rect (r 1 2 3 4)
-    (graphene:with-graphene-quad (q r)
+(test with-quad.3
+  (graphene:with-rect (r 1 2 3 4)
+    (graphene:with-quad (q r)
       (is (cffi:pointerp q)))))
 
 ;;; --- Functions --------------------------------------------------------------
@@ -42,28 +42,28 @@
 ;;;     graphene_quad_init_from_points
 
 (test graphene-quad-init-from-points
-  (graphene:with-graphene-points (p0 p1 p2 p3)
-    (graphene:with-graphene-quad (q)
-      (is (cffi:pointer-eq 
-              q 
-              (graphene:quad-init-from-points q 
+  (graphene:with-points (p0 p1 p2 p3)
+    (graphene:with-quad (q)
+      (is (cffi:pointer-eq
+              q
+              (graphene:quad-init-from-points q
                                               (list p0 p1 p2 p3)))))))
 
 ;;;     graphene_quad_contains
 
 (test graphene-quad-contains
-  (graphene:with-graphene-points ((p0 1 2) (p1 4 2) (p2 4 6) (p3 1 6) 
-                                  (pt1 3 4) (pt2 3 10))
-    (graphene:with-graphene-quad (q p0 p1 p2 p3)
+  (graphene:with-points ((p0 1 2) (p1 4 2) (p2 4 6) (p3 1 6)
+                         (pt1 3 4) (pt2 3 10))
+    (graphene:with-quad (q p0 p1 p2 p3)
       (is-true (graphene:quad-contains q pt1))
       (is-false (graphene:quad-contains q pt2)))))
 
 ;;;     graphene_quad_bounds
 
 (test graphene-quad-bounds
-  (graphene:with-graphene-points ((p0 1 2) (p1 4 2) (p2 4 6) (p3 1 6))
-    (graphene:with-graphene-rect (result)
-      (graphene:with-graphene-quad (q p0 p1 p2 p3)
+  (graphene:with-points ((p0 1 2) (p1 4 2) (p2 4 6) (p3 1 6))
+    (graphene:with-rect (result)
+      (graphene:with-quad (q p0 p1 p2 p3)
         (is (cffi:pointer-eq result (graphene:quad-bounds q result)))
         (is (= 1.0 (graphene:rect-x result)))
         (is (= 2.0 (graphene:rect-y result)))
@@ -73,9 +73,9 @@
 ;;;     graphene_quad_get_point
 
 (test graphene-quad-point
-  (graphene:with-graphene-point (result)
-    (graphene:with-graphene-rect (r 1 2 3 4)
-      (graphene:with-graphene-quad (q r)
+  (graphene:with-point (result)
+    (graphene:with-rect (r 1 2 3 4)
+      (graphene:with-quad (q r)
         (is (cffi:pointer-eq result (graphene:quad-point q 0 result)))
         (is (= 1.0 (graphene:point-x result)))
         (is (= 2.0 (graphene:point-y result)))

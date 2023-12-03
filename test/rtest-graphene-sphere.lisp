@@ -9,9 +9,9 @@
 
 ;;; --- Macros -----------------------------------------------------------------
 
-(test with-graphene-sphere
-  (graphene:with-graphene-point3d (center 0.0 0.0 0.0)
-    (graphene:with-graphene-sphere (sphere center 1.0)
+(test with-sphere
+  (graphene:with-point3d (center 0.0 0.0 0.0)
+    (graphene:with-sphere (sphere center 1.0)
 
 )))
 
@@ -29,7 +29,7 @@
 
 (test sphere-init
   (let ((sphere (graphene:sphere-alloc)))
-    (graphene:with-graphene-point3d (center 0 0 0)
+    (graphene:with-point3d (center 0 0 0)
       (is (cffi:pointer-eq sphere (graphene:sphere-init sphere center 1))))
     (graphene:sphere-free sphere)))
 
@@ -40,9 +40,9 @@
 ;;;     graphene_sphere_get_radius
 
 (test sphere-center/radius
-  (graphene:with-graphene-vec3 (vector)
-    (graphene:with-graphene-point3ds ((center 1.0 2.0 3.0) point)
-      (graphene:with-graphene-sphere (sphere center 1.0)
+  (graphene:with-vec3 (vector)
+    (graphene:with-point3ds ((center 1.0 2.0 3.0) point)
+      (graphene:with-sphere (sphere center 1.0)
 
         (is (cffi:pointer-eq point (graphene:sphere-center sphere point)))
         (is (= 1.0 (graphene:sphere-radius sphere)))
