@@ -156,7 +156,6 @@
 
 ;;;     graphene_matrix_to_float
 
-#+nil
 (test matrix-to-float
   (graphene:with-matrix (matrix)
     (is (cffi:pointerp (setf matrix (graphene:matrix-init-identity matrix))))
@@ -212,3 +211,4 @@
 ;;;     graphene_matrix_print
 
 ;;; 2023-12-2
+

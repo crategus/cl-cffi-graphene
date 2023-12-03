@@ -52,7 +52,7 @@
     (is (= 3.0 (graphene:rect-width r)))
     (is (= 4.0 (graphene:rect-height r)))))
 
-;;;     with-graphene-rects
+;;;     with-rects
 
 (test with-rects
   (graphene:with-rects (r1 (r2 1 2 3 4) (r3 r2) (r4 (r2 graphene:rect-t)))

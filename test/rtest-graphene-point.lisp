@@ -3,8 +3,6 @@
 (def-suite graphene-point :in graphene-suite)
 (in-suite graphene-point)
 
-(export 'graphene-point)
-
 ;;; --- Types and Values -------------------------------------------------------
 
 ;;;     graphene_point_t

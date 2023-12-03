@@ -155,7 +155,10 @@
 (test vec2-to-float
   (graphene:with-vec2s ((v 1 2) v1)
     (is (equal '(1.0 2.0) (graphene:vec2-to-float v)))
-    (is (cffi:pointerp (setf v1 (graphene:vec2-init-from-float v1 (graphene:vec2-to-float v)))))
+    (is (cffi:pointerp
+            (setf v1
+                  (graphene:vec2-init-from-float v1
+                                                 (graphene:vec2-to-float v)))))
       (is (= 1.0 (graphene:vec2-x v1)))
       (is (= 2.0 (graphene:vec2-y v1)))))
 
@@ -561,4 +564,5 @@
 ;;;     graphene_vec4_z_axis
 ;;;     graphene_vec4_w_axis
 
-;;; 2022-9-23
+;;; 2022-12-3
+
