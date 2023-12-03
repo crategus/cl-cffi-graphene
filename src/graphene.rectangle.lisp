@@ -86,32 +86,31 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-rect ((var &rest args) &body body)
+(defmacro with-rect ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-11-19}
-  @syntax[]{(with-graphene-rect (r) body) => result}
-  @syntax[]{(with-graphene-rect (r src) body) => result}
-  @syntax[]{(with-graphene-rect (r x y width height) body) => result}
+ "@version{2023-12-2}
+  @syntax[]{(graphene:with-rect (r) body) => result}
+  @syntax[]{(graphene:with-rect (r src) body) => result}
+  @syntax[]{(graphene:with-rect (r x y width height) body) => result}
   @argument[r]{a @symbol{graphene:rect-t} instance to create and initialize}
-  @argument[x]{a number coerced to a single float for the x coordinate of the
+  @argument[x]{a number coerced to a float for the x coordinate of the
     rectangle}
-  @argument[y]{a number coerced to a single float for the y coerced of the
+  @argument[y]{a number coerced to a float for the y coordinate of the
     rectangle}
-  @argument[width]{a number coerced to a single float with the width of the
-    rectangle}
-  @argument[height]{a number coerced to a single float with the height of the
+  @argument[width]{a number coerced to a float with the width of the rectangle}
+  @argument[height]{a number coerced to a float with the height of the
     rectangle}
   @argument[src]{a @symbol{graphene:rect-t} instance to use for initialization}
   @begin{short}
-    The @fun{graphene:with-graphene-rect} macro allocates a new
-    @symbol{graphene:rect-t} instance, initializes the rectangle with the given
-    values and executes the body that uses the rectangle.
+    The @fun{graphene:with-rect} macro allocates a new @symbol{graphene:rect-t}
+    instance, initializes the rectangle with the given values and executes the
+    body that uses the rectangle.
   @end{short}
   After execution of the body the allocated memory for the rectangle is
   released.
 
   When no argument is given the components of the rectangle are initialized to
-  zero. The initialization with four single float values uses the
+  zero. The initialization with four float values uses the
   @fun{graphene:rect-init} function. The initialization from another rectangle
   is done with the @fun{graphene:rect-init-from-rect} function.
   @begin[Note]{dictionary}
@@ -119,7 +118,7 @@
     released with the @fun{graphene:rect-free} function.
   @end{dictionary}
   @see-symbol{graphene:rect-t}
-  @see-macro{graphene:with-graphene-rects}
+  @see-macro{graphene:with-rects}
   @see-function{graphene:rect-alloc}
   @see-function{graphene:rect-free}"
   (cond ((not args)
@@ -142,7 +141,7 @@
                        (progn ,@body)
                        (rect-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-RECT")))))
+                  (error "Type error in GRAPHENE:WITH-RECT")))))
         ((not (fifth args))
          ;; We have a list of four arguments with (x,y,width,height) values
          `(let ((,var (rect-alloc)))
@@ -151,35 +150,35 @@
               (progn ,@body)
               (rect-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-RECT"))))
+         (error "Syntax error in GRAPHENE:WITH-RECT"))))
 
-(export 'with-graphene-rect)
+(export 'with-rect)
 
-(defmacro with-graphene-rects (vars &body body)
+(defmacro with-rects (vars &body body)
  #+liber-documentation
- "@version{2023-11-19}
-  @syntax[]{(with-graphene-rects (r1 r2 r3 ... rn) body) => result}
+ "@version{2023-12-2}
+  @syntax[]{(graphene:with-rects (r1 r2 r3 ... rn) body) => result}
   @argument[r1 ... rn]{the newly created @symbol{graphene:rect-t} instances}
   @argument[body]{a body that uses the bindings @arg{r1 ... rn}}
   @begin{short}
-    The @fun{graphene:with-graphene-rects} macro creates new variable bindings
-    and executes the body that use these bindings.
+    The @fun{graphene:with-rects} macro creates new variable bindings and
+    executes the body that use these bindings.
   @end{short}
   The macro performs the bindings sequentially, like the @sym{let*} macro.
 
   Each rectangle can be initialized with values using the syntax for the
-  @fun{graphene:with-graphene-rectangle} macro. See also the
-  @fun{graphene:with-graphene-rectangle} documentation.
-  @see-symbol{graphene:rectangle-t}
-  @see-macro{graphene:with-graphene-rectangle}"
+  @fun{graphene:with-rect} macro. See also the @fun{graphene:with-rect}
+  documentation.
+  @see-symbol{graphene:rect-t}
+  @see-macro{graphene:with-rect}"
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-rect ,var
-           (with-graphene-rects ,(rest vars)
+        `(with-rect ,var
+           (with-rects ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-rects)
+(export 'with-rects)
 
 ;;; ----------------------------------------------------------------------------
 ;;; GRAPHENE_RECT_INIT_ZERO

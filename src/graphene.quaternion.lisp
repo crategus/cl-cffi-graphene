@@ -2,8 +2,8 @@
 ;;; graphene.quaternion.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -74,7 +74,7 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-quaternion ((var &rest args) &body body)
+(defmacro with-quaternion ((var &rest args) &body body)
   (cond ((not args)
          ;; No arguments, the default is initialization with zeros.
          `(let ((,var (quaternion-alloc)))
@@ -117,7 +117,7 @@
                        (progn ,@body)
                        (quaternion-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-QUATERNION")))))
+                  (error "Type error in GRAPHENE:WITH-QUATERNION")))))
         ((not (third args))
          ;; Two arguments. These must be a float and a vec3-t.
          `(let ((,var (quaternion-alloc)))
@@ -156,21 +156,21 @@
                          (quaternion-free ,var))))
 
                    (t
-                    (error "Type error in WITH-GRAPHENE-QUATERNION")))))
+                    (error "Type error in GRAPHENE:WITH-QUATERNION")))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-QUATERNION"))))
+         (error "Syntax error in GRAPHENE:WITH-QUATERNION"))))
 
-(export 'with-graphene-quaternion)
+(export 'with-quaternion)
 
-(defmacro with-graphene-quaternions (vars &body body)
+(defmacro with-quaternions (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-quaternion ,var
-           (with-graphene-quaternions ,(rest vars)
+        `(with-quaternion ,var
+           (with-quaternions ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-quaternions)
+(export 'with-quaternions)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_quaternion_t
@@ -370,7 +370,7 @@
 ;;;the initialized quaternion.
 ;;; ----------------------------------------------------------------------------
 
-(cffi:defcfun ("graphene_quaternion_init_from_matrix" 
+(cffi:defcfun ("graphene_quaternion_init_from_matrix"
                quaternion-init-from-matrix) (:pointer (:struct quaternion-t))
   (quaternion (:pointer (:struct quaternion-t)))
   (source (:pointer (:struct matrix-t))))

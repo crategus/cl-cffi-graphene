@@ -52,33 +52,31 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-point ((var &rest args) &body body)
+(defmacro with-point ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-9-22}
-  @syntax[]{(with-graphene-point (p) body) => result}
-  @syntax[]{(with-graphene-point (p x y) body) => result}
-  @syntax[]{(with-graphene-point (p p1) body) => result}
-  @syntax[]{(with-graphene-point (p (v vec2-t)) body) => result}
+ "@version{2023-12-2}
+  @syntax[]{(grahene:with-point (p) body) => result}
+  @syntax[]{(graphene:with-point (p x y) body) => result}
+  @syntax[]{(graphene:with-point (p p1) body) => result}
+  @syntax[]{(graphene:with-point (p (v graphene:vec2-t)) body) => result}
   @argument[p]{a @symbol{graphene:point-t} instance to create and initialize}
-  @argument[x]{a number coerced to a single float for the x component of the
-    point}
-  @argument[y]{a number coerced to a single float for the y component of the
-    point}
+  @argument[x]{a number coerced to a float for the x component of the point}
+  @argument[y]{a number coerced to a float for the y component of the point}
   @argument[p1]{a @symbol{graphene:point-t} instance to use for initialization}
   @argument[v]{a @symbol{graphene:vec2-t} instance to use for initialization}
   @begin{short}
-    The @fun{graphene:with-graphene-point} macro allocates a new
+    The @fun{graphene:with-point} macro allocates a new
     @symbol{graphene:point-t} instance, initializes the point with the given
     values and executes the body that uses the point.
   @end{short}
   After execution of the body the allocated memory for the point is released.
 
   When no argument is given the components of the point are initialized to zero.
-  The initialization with two single float values uses the
-  @fun{graphene:point-init} function. The initialization from another point is
-  done with the @fun{graphene:point-init-from-point} function. That is the
-  default when no type specifier for the value is given. If the value has the
-  type specifier @code{vec2-t} the point is initialized with the
+  The initialization with two float values uses the @fun{graphene:point-init}
+  function. The initialization from another point is done with the
+  @fun{graphene:point-init-from-point} function. That is the default when no
+  type specifier for the value is given. If the value has the type specifier
+  @code{graphene:vec2-t} the point is initialized with the
   @fun{graphene:point-init-from-vec2} function.
   @begin[Note]{dictionary}
     The memory is allocated with the @fun{graphene:point-alloc} function and
@@ -87,32 +85,31 @@
   @begin[Examples]{dictionary}
     Initialize a point with no value and two single float values.
     @begin{pre}
-(graphene:with-graphene-point (p)
+(graphene:with-point (p)
   (list (graphene:point-x p) (graphene:point-y p)))
 => (0.0 0.0)
-(graphene:with-graphene-point (p 1.5 1.7)
+(graphene:with-point (p 1.5 1.7)
   (list (graphene:point-x p) (graphene:point-y p)))
 => (1.5 1.7)
     @end{pre}
     Use a vector for initialization of the point.
     @begin{pre}
-(graphene:with-graphene-vec2 (v 3.5 4.5)
-  (graphene:with-graphene-point (p (v vec2-t))
+(graphene:with-vec2 (v 3.5 4.5)
+  (graphene:with-point (p (v graphene:vec2-t))
     (list (graphene:point-x p) (graphene:point-y p))))
 => (3.5 4.5)
     @end{pre}
-    This examples uses the @fun{graphene:with-graphene-points} macro to
-    initialize two points. The second point is intialized with the values from
-    the first point.
+    This examples uses the @fun{graphene:with-points} macro to initialize two
+    points. The second point is intialized with the values from the first point.
     @begin{pre}
-(grapene:with-graphene-points ((p1 0.3 0.5) (p2 p1))
+(grapene:with-points ((p1 0.3 0.5) (p2 p1))
   (list (graphene:point-x p2) (graphene:point-y p2)))
 => (0.3 0.5)
     @end{pre}
   @end{dictionary}
   @see-symbol{graphene:point-t}
   @see-symbol{graphene:vec2-t}
-  @see-macro{graphene:with-graphene-points}
+  @see-macro{graphene:with-points}
   @see-function{graphene:point-alloc}
   @see-function{graphene:point-free}"
   (cond ((not args)
@@ -142,7 +139,7 @@
                        (progn ,@body)
                        (point-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-POINT")))))
+                  (error "Type error in GRAPHENE:WITH-POINT")))))
         ((not (third args))
          ;; We have a list of two arguments with (x,y) values
          `(let ((,var (point-alloc)))
@@ -151,28 +148,28 @@
               (progn ,@body)
               (point-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-POINT"))))
+         (error "Syntax error in GRAPHENE:WITH-POINT"))))
 
-(export 'with-graphene-point)
+(export 'with-point)
 
-(defmacro with-graphene-points (vars &body body)
+(defmacro with-points (vars &body body)
  #+liber-documentation
- "@version{2023-9-22}
-  @syntax[]{(with-graphene-points (p1 p2 p3 ... pn) body) => result}
+ "@version{2023-12-2}
+  @syntax[]{(graphene:with-points (p1 p2 p3 ... pn) body) => result}
   @argument[p1 ... pn]{the newly created @symbol{graphene:point-t} instances}
   @argument[body]{a body that uses the bindings @arg{p1 ... pn}}
   @begin{short}
-    The @fun{graphene:with-graphene-points} macro creates new variable bindings
-    and executes the body that use these bindings.
+    The @fun{graphene:with-points} macro creates new variable bindings and
+    executes the body that use these bindings.
   @end{short}
   The macro performs the bindings sequentially, like the @sym{let*} macro.
 
   Each point can be initialized with values using the syntax for the
-  @fun{graphene:with-graphene-point} macro. See also the
-  @fun{graphene:with-graphene-point} documentation.
+  @fun{graphene:with-point} macro. See also the @fun{graphene:with-point}
+  documentation.
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-points (p1 (p2 1.2 1.3) (p3 p2))
+(graphene:with-points (p1 (p2 1.2 1.3) (p3 p2))
   (list (list (graphene:point-x p1) (graphene:point-y p1))
         (list (graphene:point-x p2) (graphene:point-y p2))
         (list (graphene:point-x p3) (graphene:point-y p3))))
@@ -180,15 +177,15 @@
     @end{pre}
   @end{dictionary}
   @see-symbol{graphene:point-t}
-  @see-macro{graphene:with-graphene-point}"
+  @see-macro{graphene:with-point}"
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-point ,var
-           (with-graphene-points ,(rest vars)
+        `(with-point ,var
+           (with-points ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-points)
+(export 'with-points)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_point_t
@@ -245,9 +242,9 @@
   @end{short}
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-point (p 0.5 1.0) (graphene:point-x p))
+(graphene:with-point (p 0.5 1.0) (graphene:point-x p))
 => 0.5
-(graphene:with-graphene-point (p) (setf (graphene:point-x p) 2.0))
+(graphene:with-point (p) (setf (graphene:point-x p) 2.0))
 => 2.0
   @end{pre}
   @end{dictionary}
@@ -278,9 +275,9 @@
   @end{short}
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-point (p 0.5 1.0) (graphene:point-y p))
+(graphene:with-point (p 0.5 1.0) (graphene:point-y p))
 => 1.0
-(graphene:with-graphene-point (p) (setf (graphene:point-y p) 2.0))
+(graphene:with-point (p) (setf (graphene:point-y p) 2.0))
 => 2.0
   @end{pre}
   @end{dictionary}
@@ -434,8 +431,8 @@
   @short{Stores the coordinates of the given point into a vector.}
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-point (p 1.0 2.0)
-  (graphene:with-graphene-vec2 (v)
+(graphene:with-point (p 1.0 2.0)
+  (graphene:with-vec2 (v)
     (graphene:vec2-to-float (graphene:point-to-vec2 p v))))
 => (1.0 2.0)
     @end{pre}
@@ -549,7 +546,7 @@
   @end{short}
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-points ((a 0 0) (b 1 2) result)
+(graphene:with-points ((a 0 0) (b 1 2) result)
   (graphene:point-interpolate a b 0.5 result)
   (values (graphene:point-x result) (graphene:point-y result)))
 => 0.5

@@ -2,8 +2,8 @@
 ;;; graphene.euler.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -63,7 +63,7 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-euler ((var &rest args) &body body)
+(defmacro with-euler ((var &rest args) &body body)
   (cond ((not args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (euler-alloc)))
@@ -83,7 +83,7 @@
                        (progn ,@body)
                        (euler-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-EULER")))))
+                  (error "Type error in GRAPHENE:WITH-EULER")))))
         ((not (third args))
          ;; We have two arguments. The first can be of type matrix-t,
          ;; quaternion-t, or vec3-t. The secon argument is the order.
@@ -120,7 +120,7 @@
                          (progn ,@body)
                          (euler-free ,var))))
                    (t
-                    (error "Type error in WITH-GRAPHENE-EULER"))))))
+                    (error "Type error in GRAPHENE:WITH-EULER"))))))
         ((not (fourth args))
          ;; We have three numbers
          `(let ((,var (euler-alloc)))
@@ -136,19 +136,19 @@
               (progn ,@body)
               (euler-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-EULER"))))
+         (error "Syntax error in GRAPHENE:WITH-EULER"))))
 
-(export 'with-graphene-euler)
+(export 'with-euler)
 
-(defmacro with-graphene-eulers (vars &body body)
+(defmacro with-eulers (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-euler ,var
-           (with-graphene-eulers ,(rest vars)
+        `(with-euler ,var
+           (with-eulers ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-eulers)
+(export 'with-eulers)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_euler_order_t

@@ -2,8 +2,8 @@
 ;;; graphene.ray.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -60,7 +60,7 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-ray-old ((var &rest args) &body body)
+(defmacro with-ray-old ((var &rest args) &body body)
   (if args
       (if (second args)
           ;; We have a list with more than one argument, use point-init
@@ -95,7 +95,7 @@
              (progn ,@body)
              (point-free ,var))))))
 
-(defmacro with-graphene-ray ((var &rest args) &body body)
+(defmacro with-ray ((var &rest args) &body body)
   (cond ((not args)
          ;; We have no arguments, the default is no initilization
          `(let ((,var (ray-alloc)))
@@ -115,7 +115,7 @@
                        (progn ,@body)
                        (ray-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-RAY")))))
+                  (error "Type error in GRAPHENE:WITH-RAY")))))
         ((not (third args))
          ;; We have two arguments. The first can be of type point3d-t or
          ;; vec3-t. The second argument must be of type vec3-t
@@ -146,21 +146,21 @@
                          (progn ,@body)
                          (ray-free ,var))))
                    (t
-                    (error "Type error in WITH-GRAPHENE-RAY"))))))
+                    (error "Type error in GRAPHENE:WITH-RAY"))))))
         (t
-         (error "Error in WITH-GRAPHENE-RAY"))))
+         (error "Error in GRAPHENE:WITH-RAY"))))
 
-(export 'with-graphene-ray)
+(export 'with-ray)
 
-(defmacro with-graphene-rays (vars &body body)
+(defmacro with-rays (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-ray ,var
-           (with-graphene-rays ,(rest vars)
+        `(with-ray ,var
+           (with-rays ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-rays)
+(export 'with-rays)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_ray_intersection_kind_t

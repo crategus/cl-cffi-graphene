@@ -71,7 +71,7 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-box ((var &rest args) &body body)
+(defmacro with-box ((var &rest args) &body body)
   (cond ((not args)
          ;; No arguments, the default is initialization with zeros.
          `(let ((,var (box-alloc)))
@@ -92,7 +92,7 @@
                        (progn ,@body)
                        (box-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-BOX")))))
+                  (error "Type error in GRAPHENE:WITH-BOX")))))
         ((not (third args))
          ;; Two arguments, the first can be of type point3d-t or vec3-t.
          ;; TODO: Combine the two destructuring-bind calls to onw call.
@@ -122,21 +122,21 @@
                          (progn ,@body)
                          (box-free ,var))))
                    (t
-                    (error "Type error in WITH-GRAPHENE-BOX"))))))
+                    (error "Type error in GRAPHENE:WITH-BOX"))))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-BOX"))))
+         (error "Syntax error in GRAPHENE:WITH-BOX"))))
 
-(export 'with-graphene-box)
+(export 'with-box)
 
-(defmacro with-graphene-boxes (vars &body body)
+(defmacro with-boxes (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-box ,var
-           (with-graphene-boxes ,(rest vars)
+        `(with-box ,var
+           (with-boxes ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-boxes)
+(export 'with-boxes)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_box_t
@@ -587,9 +587,9 @@
   @end{short}
   @begin[Example]{dictionary}
     @begin{pre}
-(with-graphene-vec3s (v0 v1 v2 v3 v4 v5 v6 v7)
-  (with-graphene-point3ds ((min 0 0 0) (max 1 1 1))
-    (with-graphene-box (box min max)
+(graphene:with-vec3s (v0 v1 v2 v3 v4 v5 v6 v7)
+  (graphene:with-point3ds ((min 0 0 0) (max 1 1 1))
+    (graphene:with-box (box min max)
       (mapcar #'vec3-to-float
               (box-vertices box (list v0 v1 v2 v3 v4 v5 v6 v7))))))
 => ((0.0 0.0 0.0) (0.0 0.0 1.0) (0.0 1.0 0.0) (0.0 1.0 1.0)
@@ -598,7 +598,7 @@
   @end{dictionary}
   @see-symbol{graphene:box-t}
   @see-symbol{graphene:vec3-t}"
-  (with-graphene-point3ds (min max)
+  (with-point3ds (min max)
     (box-min box min)
     (box-max box max)
     (let ((v0 (elt vertices 0))

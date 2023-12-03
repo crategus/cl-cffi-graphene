@@ -58,34 +58,32 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-point3d ((var &rest args) &body body)
+(defmacro with-point3d ((var &rest args) &body body)
  #+liber-documentation
  "@version{2023-9-22}
-  @syntax[]{(with-graphene-point3d (p) body) => result}
-  @syntax[]{(with-graphene-point3d (p x y z) body) => result}
-  @syntax[]{(with-graphene-point3d (p p1) body) => result}
-  @syntax[]{(with-graphene-point3d (p (v vec3-t)) body) => result}
+  @syntax[]{(graphene:with-point3d (p) body) => result}
+  @syntax[]{(graphene:with-point3d (p x y z) body) => result}
+  @syntax[]{(graphene:with-point3d (p p1) body) => result}
+  @syntax[]{(graphene:with-point3d (p (v vec3-t)) body) => result}
   @argument[p]{a @symbol{graphene:point3d-t} instance to create and initialize}
-  @argument[a]{a number coerced to a single float for the x component of the
-    point}
-  @argument[b]{a number coerced to a single float for the y component of the
-    point}
+  @argument[a]{a number coerced to a float for the x component of the point}
+  @argument[b]{a number coerced to a float for the y component of the point}
   @argument[p1]{a @symbol{graphene:point3d-t} instance to use for
     initialization}
   @argument[v]{a @symbol{graphene:vec3-t} instance to use for initialization}
   @begin{short}
-    The @fun{graphene:with-graphene-point3d} macro allocates a new
+    The @fun{graphene:with-point3d} macro allocates a new
     @symbol{graphene:point3d-t} instance, initializes the point with the given
     values and executes the body that uses the point.
   @end{short}
   After execution of the body the allocated memory for the point is released.
 
   When no argument is given the components of the point are initialized to zero.
-  The initialization with three single float values uses the
+  The initialization with three float values uses the
   @fun{graphene:point3d-init} function. The initialization from another point is
   done with the @fun{graphene:point3d-init-from-point} function. That is the
   default when no type specifier for the value is given. If the value has the
-  type specifier @code{vec3-t} the point is initialized with the
+  type specifier @code{graphene:vec3-t} the point is initialized with the
   @fun{graphene:point3d-init-from-vec3} function.
   @begin[Note]{dictionary}
     The memory is allocated with the @fun{graphene:point3d-alloc} function and
@@ -94,26 +92,26 @@
   @begin[Examples]{dictionary}
     Initialize a point with no value and two single float values.
     @begin{pre}
-(graphene:with-graphene-point3d (p)
+(graphene:with-point3d (p)
   (list (graphene:point3d-x p) (graphene:point3d-y p) (graphene:point3d-z p)))
 => (0.0 0.0 0.0)
-(graphene:with-graphene-point3d (p 1.5 1.7 1.9)
+(graphene:with-point3d (p 1.5 1.7 1.9)
   (list (graphene:point3d-x p) (graphene:point3d-y p) (graphene:point3d-z p)))
 => (1.5 1.7 1.9)
     @end{pre}
     Use a vector for initialization of the point.
     @begin{pre}
-(graphene:with-graphene-vec3 (v 3.5 4.5 5.5)
-  (graphene:with-graphene-point3d (p (v vec3-t))
+(graphene:with-vec3 (v 3.5 4.5 5.5)
+  (graphene:with-point3d (p (v vec3-t))
     (list (graphene:point3d-x p)
           (graphene:point3d-y p) (graphene:point3d-z p))))
 => (3.5 4.5 5.5)
     @end{pre}
-    This examples uses the @fun{graphene:with-graphene-point3ds} macro to
+    This examples uses the @fun{graphene:with-point3ds} macro to
     initialize two points. The second point is intialized with the values from
     the first point.
     @begin{pre}
-(graphene:with-graphene-point3ds ((p1 0.3 0.5 0.7) (p2 p1))
+(graphene:with-point3ds ((p1 0.3 0.5 0.7) (p2 p1))
   (list (graphene:point3d-x p2)
         (graphene:point3d-y p2) (graphene:point3d-z p2)))
 => (0.3 0.5 0.7)
@@ -121,7 +119,7 @@
   @end{dictionary}
   @see-symbol{graphene:point3d-t}
   @see-symbol{graphene:vec3-t}
-  @see-macro{graphene:with-graphene-point3ds}
+  @see-macro{graphene:with-point3ds}
   @see-function{graphene:point3d-alloc}
   @see-function{graphene:point3d-free}"
   (cond ((not args)
@@ -151,7 +149,7 @@
                        (progn ,@body)
                        (point3d-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-POINT3D")))))
+                  (error "Type error in GRAPHENE:WITH-POINT3D")))))
         ((not (fourth args))
          ;; We have a list of three arguments with (x,y,z) values
          `(let ((,var (point3d-alloc)))
@@ -160,28 +158,28 @@
               (progn ,@body)
               (point3d-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-POINT3D"))))
+         (error "Syntax error in GRAPHENE:WITH-POINT3D"))))
 
-(export 'with-graphene-point3d)
+(export 'with-point3d)
 
-(defmacro with-graphene-point3ds (vars &body body)
+(defmacro with-point3ds (vars &body body)
  #+liber-documentation
- "@version{2023-9-22}
-  @syntax[]{(with-graphene-point3ds (p1 p2 p3 ... pn) body) => result}
+ "@version{2023-12-2}
+  @syntax[]{(graphene:with-point3ds (p1 p2 p3 ... pn) body) => result}
   @argument[p1 ... pn]{the newly created @symbol{graphene:point3d-t} instances}
   @argument[body]{a body that uses the bindings @arg{p1 ... pn}}
   @begin{short}
-    The @fun{graphene:with-graphene-point3ds} macro creates new variable
-    bindings and executes the body that use these bindings.
+    The @fun{graphene:with-point3ds} macro creates new variable bindings and
+    executes the body that use these bindings.
   @end{short}
   The macro performs the bindings sequentially, like the @sym{let*} macro.
 
   Each point can be initialized with values using the syntax for the
-  @fun{graphene:with-graphene-point3d} macro. See also the
-  @fun{graphene:with-graphene-point3d} documentation.
+  @fun{graphene:with-point3d} macro. See also the @fun{graphene:with-point3d}
+  documentation.
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-point3ds (p1 (p2 1.2 1.3 1.4) (p3 p2))
+(graphene:with-point3ds (p1 (p2 1.2 1.3 1.4) (p3 p2))
   (list (list (graphene:point3d-x p1)
               (graphene:point3d-y p1) (graphene:point3d-z p1))
         (list (graphene:point3d-x p2)
@@ -192,15 +190,15 @@
     @end{pre}
   @end{dictionary}
   @see-symbol{graphene:point3d-t}
-  @see-macro{graphene:with-graphene-point3d}"
+  @see-macro{graphene:with-point3d}"
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-point3d ,var
-           (with-graphene-point3ds ,(rest vars)
+        `(with-point3d ,var
+           (with-point3ds ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-point3ds)
+(export 'with-point3ds)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_point3d_t
@@ -260,10 +258,10 @@
   @end{short}
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-point3d (p 0.5 1.0 1.5)
+(graphene:with-point3d (p 0.5 1.0 1.5)
   (list (graphene:point3d-x p) (graphene:point3d-y p) (graphene:point3d-z p)))
 => (0.5 1.0 1.5)
-(graphene:with-graphene-point3d (p)
+(graphene:with-point3d (p)
   (setf (graphene:point3d-x p) 2.0
         (graphene:point3d-y p) 2.5
         (graphene:point3d-z p) 3.0)
@@ -482,8 +480,8 @@
   @short{Stores the coordinates of the given point into a vector.}
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-point3d (p 1.0 2.0 3.0)
-  (graphene:with-graphene-vec3 (v)
+(graphene:with-point3d (p 1.0 2.0 3.0)
+  (graphene:with-vec3 (v)
     (graphene:vec3-to-float (graphene:point3d-to-vec3 p v))))
 => (1.0 2.0 3.0)
     @end{pre}
@@ -594,7 +592,7 @@
   @end{short}
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-point3ds ((a 0 0 0) (b 1 2 3) result)
+(graphene:with-point3ds ((a 0 0 0) (b 1 2 3) result)
   (graphene:point3d-interpolate a b 0.5 result)
   (values (graphene:point3d-x result)
           (graphene:point3d-y result)

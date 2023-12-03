@@ -2,8 +2,8 @@
 ;;; graphene.plane.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -55,7 +55,7 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-plane ((var &rest args) &body body)
+(defmacro with-plane ((var &rest args) &body body)
   (cond ((not args)
          ;; No arguments, the default is initialization with zeros.
          `(let ((,var (plane-alloc)))
@@ -83,7 +83,7 @@
                        (progn ,@body)
                        (plane-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-PLANE")))))
+                  (error "Type error in GRAPHENE:WITH-PLANE")))))
         ((not (third args))
          ;; Two arguments
          (destructuring-bind (arg1 &optional type1)
@@ -113,7 +113,7 @@
                          (progn ,@body)
                          (plane-free ,var))))
                    (t
-                    (error "Type error in WITH-GRAPHENE-PLANE"))))))
+                    (error "Type error in GRAPHENE:WITH-PLANE"))))))
         ((not (fourth args))
          ;; Three arguments
          `(let ((,var (plane-alloc)))
@@ -122,19 +122,19 @@
             (progn ,@body)
             (plane-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-PLANE"))))
+         (error "Syntax error in GRAPHENE:WITH-PLANE"))))
 
-(export 'with-graphene-plane)
+(export 'with-plane)
 
-(defmacro with-graphene-planes (vars &body body)
+(defmacro with-planes (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-plane ,var
-           (with-graphene-planes ,(rest vars)
+        `(with-plane ,var
+           (with-planes ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-planes)
+(export 'with-planes)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_plane_t

@@ -108,7 +108,7 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-matrix ((var &rest args) &body body)
+(defmacro with-matrix ((var &rest args) &body body)
   (cond ((not args)
          ;; No arguments, the default is initialization with identity
          `(let ((,var (matrix-alloc)))
@@ -137,7 +137,7 @@
                        (progn ,@body)
                        (matrix-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-MATRIX")))))
+                  (error "Type error in GRAPHENE:WITH-MATRIX")))))
 
         ((not (third args))
          ;; Two arguments, the first can be of type point3d-t or vec3-t.
@@ -169,7 +169,7 @@
                          (matrix-free ,var))))
 
                    (t
-                    (error "Type error in WITH-GRAPHENE-MATRIX"))))))
+                    (error "Type error in GRAPHENE:WITH-MATRIX"))))))
 
         ((not (fourth args))
          ;; Three arguments, the first can be of type :float or vec3-t.
@@ -193,7 +193,7 @@
                        (matrix-free ,var))))
 
                  (t
-                  (error "Type error in WITH-GRAPHENE-MATRIX")))))
+                  (error "Type error in GRAPHENE:WITH-MATRIX")))))
 
         ((not (fifth args))
          ;; Four arguments, the first can be of type :float or vec4-t.
@@ -217,7 +217,7 @@
                        (matrix-free ,var))))
 
                    (t
-                    (error "Type error in WITH-GRAPHENE-MATRIX")))))
+                    (error "Type error in GRAPHENE:WITH-MATRIX")))))
 
         ((not (seventh args))
          ;; Six arguments, the first can be of type :float or :double
@@ -241,7 +241,7 @@
                        (matrix-free ,var))))
 
                    (t
-                    (error "Type error in WITH-GRAPHENE-MATRIX")))))
+                    (error "Type error in GRAPHENE:WITH-MATRIX")))))
 
         ((not (nth 16 args))
          ;; Sixteen arguments.
@@ -252,19 +252,19 @@
               (matrix-free ,var))))
 
         (t
-         (error "Syntax error in WITH-GRAPHENE-MATRIX"))))
+         (error "Syntax error in GRAPHENE:WITH-MATRIX"))))
 
-(export 'with-graphene-matrix)
+(export 'with-matrix)
 
-(defmacro with-graphene-matrices (vars &body body)
+(defmacro with-matrices (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-matrix ,var
-           (with-graphene-matrices ,(rest vars)
+        `(with-matrix ,var
+           (with-matrices ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-matrices)
+(export 'with-matrices)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_matrix_t

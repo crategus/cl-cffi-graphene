@@ -49,18 +49,18 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-size ((var &rest args) &body body)
+(defmacro with-size ((var &rest args) &body body)
  #+liber-documentation
  "@version{2023-9-22}
-  @syntax[]{(with-graphene-size (s) body) => result}
-  @syntax[]{(with-graphene-size (s width height) body) => result}
-  @syntax[]{(with-graphene-size (s s1) body) => result}
+  @syntax[]{(graphene:with-size (s) body) => result}
+  @syntax[]{(graphene:with-size (s width height) body) => result}
+  @syntax[]{(graphene:with-size (s s1) body) => result}
   @argument[s]{a @symbol{graphene:size-t} instance to create and initialize}
   @argument[width]{a number coerced to a single float for the width component}
   @argument[height]{a number coerced to a single float for the height component}
   @argument[s1]{a @symbol{graphene:size-t} instance to use for initialization}
   @begin{short}
-    The @fun{graphene:with-graphene-size} macro allocates a new
+    The @fun{graphene:with-size} macro allocates a new
     @symbol{graphene:size-t} instance, initializes the @symbol{graphene:size-t}
     instance with the given values and executes the body that uses the size.
   @end{short}
@@ -78,24 +78,24 @@
     Initialize a @symbol{graphene:size-t} instance with no value and two single
     float values.
     @begin{pre}
-(with-graphene-size (s)
+(graphene:with-size (s)
   (list (size-width s) (size-height s)))
 => (0.0 0.0)
-(graphene:with-graphene-size (s 1.5 1.7)
+(graphene:with-size (s 1.5 1.7)
   (list (graphene:size-width s) (graphene:size-height s)))
 => (1.5 1.7)
     @end{pre}
-    This examples uses the @fun{graphene:with-graphene-sizes} macro to
+    This examples uses the @fun{graphene:with-sizes} macro to
     initialize two @symbol{graphene:size-t} instances. The second instance is
     intialized with the values from the first instance.
     @begin{pre}
-(graphene:with-graphene-sizes ((s1 0.3 0.5) (s2 s1))
+(graphene:with-sizes ((s1 0.3 0.5) (s2 s1))
   (list (graphene:size-width s2) (graphene:size-height s2)))
 => (0.3 0.5)
     @end{pre}
   @end{dictionary}
   @see-symbol{graphene:size-t}
-  @see-macro{graphene:with-graphene-sizes}
+  @see-macro{graphene:with-sizes}
   @see-function{graphene:size-alloc}
   @see-function{graphene:size-free}"
   (cond ((not args)
@@ -118,7 +118,7 @@
                        (progn ,@body)
                        (size-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-SIZE")))))
+                  (error "Type error in GRAPHENE:WITH-SIZE")))))
         ((not (third args))
          ;; We have a list of two arguments with (width,height) values
          `(let ((,var (size-alloc)))
@@ -127,28 +127,28 @@
               (progn ,@body)
               (size-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-SIZE"))))
+         (error "Syntax error in GRAPHENE:WITH-SIZE"))))
 
-(export 'with-graphene-size)
+(export 'with-size)
 
-(defmacro with-graphene-sizes (vars &body body)
+(defmacro with-sizes (vars &body body)
  #+liber-documentation
  "@version{2023-9-22}
-  @syntax[]{(with-graphene-sizes (s1 s2 s3 ... sn) body) => result}
+  @syntax[]{(graphene:with-sizes (s1 s2 s3 ... sn) body) => result}
   @argument[s1 ... sn]{the newly created @symbol{graphene:size-t} instances}
   @argument[body]{a body that uses the bindings @arg{s1 ... sn}}
   @begin{short}
-    The @fun{graphene:with-graphene-sizes} macro creates new variable bindings
+    The @fun{graphene:with-sizes} macro creates new variable bindings
     and executes the body that use these bindings.
   @end{short}
   The macro performs the bindings sequentially, like the @sym{let*} macro.
 
   Each point can be initialized with values using the syntax for the
-  @fun{graphene:with-graphene-size} macro. See also the
-  @fun{graphene:with-graphene-size} documentation.
+  @fun{graphene:with-size} macro. See also the
+  @fun{graphene:with-size} documentation.
   @begin[Examples]{dictionary}
     @begin{pre}
-(graphene:with-graphene-sizes (s1 (s2 1.2 1.3) (s3 s2))
+(graphene:with-sizes (s1 (s2 1.2 1.3) (s3 s2))
   (list (list (graphene:size-width s1) (graphene:size-height s1))
         (list (graphene:size-width s2) (graphene:size-height s2))
         (list (graphene:size-width s3) (graphene:size-height s3))))
@@ -156,15 +156,15 @@
     @end{pre}
   @end{dictionary}
   @see-symbol{graphene:size-t}
-  @see-macro{graphene:with-graphene-size}"
+  @see-macro{graphene:with-size}"
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-size ,var
-           (with-graphene-sizes ,(rest vars)
+        `(with-size ,var
+           (with-sizes ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-sizes)
+(export 'with-sizes)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_size_t

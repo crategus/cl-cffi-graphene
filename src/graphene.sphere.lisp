@@ -59,7 +59,7 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-sphere ((var &rest args) &body body)
+(defmacro with-sphere ((var &rest args) &body body)
   (cond ((not args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (sphere-alloc)))
@@ -69,7 +69,7 @@
               (sphere-free ,var))))
         ((not (second args))
          ;; We have one argument. We have no method for this case.
-         (error "Type error in WITH-GRAPHENE-SPHERE"))
+         (error "Type error in GRAPHENE:WITH-SPHERE"))
         ((not (third args))
          ;; We have two arguments. The first must be of type point3d-t and
          ;; the second a single float.
@@ -89,21 +89,21 @@
                          (progn ,@body)
                          (sphere-free ,var))))
                    (t
-                    (error "Type error in WITH-GRAPHENE-SPHERE"))))))
+                    (error "Type error in GRAPHENE:WITH-SPHERE"))))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-SPHERE"))))
+         (error "Syntax error in GRAPHENE:WITH-SPHERE"))))
 
-(export 'with-graphene-sphere)
+(export 'with-sphere)
 
-(defmacro with-graphene-spheres (vars &body body)
+(defmacro with-spheres (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-sphere ,var
-           (with-graphene-spheres ,(rest vars)
+        `(with-sphere ,var
+           (with-spheres ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-spheres)
+(export 'with-spheres)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_sphere_t

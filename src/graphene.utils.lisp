@@ -29,30 +29,30 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-object ((var type &rest args) &body body)
+(defmacro with-object ((var type &rest args) &body body)
   (cond ((eq 'box-t type)
-         `(with-graphene-box (,var ,@args) ,@body))
+         `(with-box (,var ,@args) ,@body))
         ((eq 'point-t type)
-         `(with-graphene-point (,var ,@args) ,@body))
+         `(with-point (,var ,@args) ,@body))
         ((eq 'rect-t type)
-         `(with-graphene-rect (,var ,@args) ,@body))
+         `(with-rect (,var ,@args) ,@body))
         ((eq 'size-t type)
-         `(with-graphene-size (,var ,@args) ,@body))
+         `(with-size (,var ,@args) ,@body))
         ((eq 'quad-t type)
-         `(with-graphene-quad (,var ,@args) ,@body))
+         `(with-quad (,var ,@args) ,@body))
         (t
-         (error "WITH-GRAPHENE-OBJECT: Unknown type"))))
+         (error "GRAPHENE:WITH-OBJECT: Unknown type"))))
 
-(export 'with-graphene-object)
+(export 'with-object)
 
-(defmacro with-graphene-objects (vars &body body)
+(defmacro with-objects (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-object ,var
-           (with-graphene-objects ,(rest vars)
+        `(with-object ,var
+           (with-objects ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-objects)
+(export 'with-objects)
 
 ;;; --- graphene.utils.lisp ----------------------------------------------------

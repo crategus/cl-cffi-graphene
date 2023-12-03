@@ -56,12 +56,12 @@
 
 ;; TODO: The initialization from a list of points is not implemented.
 
-(defmacro with-graphene-quad ((var &rest args) &body body)
+(defmacro with-quad ((var &rest args) &body body)
  #+liber-documentation
  "@version{2023-11-20}
-  @syntax[]{(with-graphene-quad (q) body) => result}
-  @syntax[]{(with-graphene-quad (q r) body) => result}
-  @syntax[]{(with-graphene-quad (q p1 p2 p3 p4) body) => result}
+  @syntax[]{(graphene:with-quad (q) body) => result}
+  @syntax[]{(graphene:with-quad (q r) body) => result}
+  @syntax[]{(graphene:with-quad (q p1 p2 p3 p4) body) => result}
   @argument[q]{a @symbol{graphene:quad-t} instance to create and initialize}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[p1]{a @symbol{graphene:point-t} instance with the first point}
@@ -69,9 +69,9 @@
   @argument[p3]{a @symbol{graphene:point-t} instance with the third point}
   @argument[p4]{a @symbol{graphene:point-t} instance with the fourth point}
   @begin{short}
-    The @fun{graphene:with-graphene-quad} macro allocates a new
-    @symbol{graphene:quad-t} instance, initializes the quadrilateral with the
-    given values and executes the body that uses the quadrilateral.
+    The @fun{graphene:with-quad} macro allocates a new @symbol{graphene:quad-t}
+    instance, initializes the quadrilateral with the given values and executes
+    the body that uses the quadrilateral.
   @end{short}
   After execution of the body the allocated memory for the quadrilateral is
   released.
@@ -86,7 +86,7 @@
   @end{dictionary}
   @see-symbol{graphene:quad-t}
   @see-symbol{graphene:point-t}
-  @see-macro{graphene:with-graphene-quads}
+  @see-macro{graphene:with-quads}
   @see-function{graphene:quad-alloc}
   @see-function{graphene:quad-free}"
   (cond ((not args)
@@ -115,35 +115,35 @@
                (progn ,@body)
                (quad-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-QUAD"))))
+         (error "Syntax error in GRAPHENE:WITH-QUAD"))))
 
-(export 'with-graphene-quad)
+(export 'with-quad)
 
-(defmacro with-graphene-quads (vars &body body)
+(defmacro with-quads (vars &body body)
  #+liber-documentation
  "@version{2023-11-20}
-  @syntax[]{(with-graphene-quads (q1 q2 q3 ... qn) body) => result}
+  @syntax[]{(graphene:with-quads (q1 q2 q3 ... qn) body) => result}
   @argument[q1 ... qn]{the newly created @symbol{graphene:quad-t} instances}
   @argument[body]{a body that uses the bindings @arg{q1 ... qn}}
   @begin{short}
-    The @fun{graphene:with-graphene-quads} macro creates new variable bindings
-    and executes the body that use these bindings.
+    The @fun{graphene:with-quads} macro creates new variable bindings and
+    executes the body that use these bindings.
   @end{short}
   The macro performs the bindings sequentially, like the @sym{let*} macro.
 
   Each quadrilateral can be initialized with values using the syntax for the
-  @fun{graphene:with-graphene-quad} macro. See also the
-  @fun{graphene:with-graphene-quad} documentation.
+  @fun{graphene:with-quad} macro. See also the
+  @fun{graphene:with-quad} documentation.
   @see-symbol{graphene:quad-t}
-  @see-macro{graphene:with-graphene-quad}"
+  @see-macro{graphene:with-quad}"
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-quad ,var
-           (with-graphene-quads ,(rest vars)
+        `(with-quad ,var
+           (with-quads ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-quads)
+(export 'with-quads)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_quad_t

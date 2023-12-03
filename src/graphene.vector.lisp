@@ -154,7 +154,7 @@
 
 ;;; ----------------------------------------------------------------------------
 
-(defmacro with-graphene-vec2 ((var &rest args) &body body)
+(defmacro with-vec2 ((var &rest args) &body body)
   (cond ((not args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (vec2-alloc)))
@@ -175,7 +175,7 @@
                        (progn ,@body)
                        (vec2-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-VEC2")))))
+                  (error "Type error in GRAPHENE:WITH-VEC2")))))
         ((not (third args))
          ;; We have a list of two arguments with (x,y) values
          `(let ((,var (vec2-alloc)))
@@ -184,23 +184,23 @@
               (progn ,@body)
               (vec2-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-VEC2"))))
+         (error "Syntax error in GRAPHENE:WITH-VEC2"))))
 
-(export 'with-graphene-vec2)
+(export 'with-vec2)
 
-(defmacro with-graphene-vec2s (vars &body body)
+(defmacro with-vec2s (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-vec2 ,var
-           (with-graphene-vec2s ,(rest vars)
+        `(with-vec2 ,var
+           (with-vec2s ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-vec2s)
+(export 'with-vec2s)
 
 ;;; ----------------------------------------------------------------------------
 
-(defmacro with-graphene-vec3 ((var &rest args) &body body)
+(defmacro with-vec3 ((var &rest args) &body body)
   (cond ((not args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (vec3-alloc)))
@@ -221,7 +221,7 @@
                        (progn ,@body)
                        (vec3-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-VEC3")))))
+                  (error "Type error in GRPAPHENE:WITH-VEC3")))))
         ((not (fourth args))
          ;; We have a list of two arguments with (x,y,z) values
          `(let ((,var (vec3-alloc)))
@@ -230,23 +230,23 @@
               (progn ,@body)
               (vec3-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-VEC3"))))
+         (error "Syntax error in GRAPHENE:WITH-VEC3"))))
 
-(export 'with-graphene-vec3)
+(export 'with-vec3)
 
-(defmacro with-graphene-vec3s (vars &body body)
+(defmacro with-vec3s (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-vec3 ,var
-           (with-graphene-vec3s ,(rest vars)
+        `(with-vec3 ,var
+           (with-vec3s ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-vec3s)
+(export 'with-vec3s)
 
 ;;; ----------------------------------------------------------------------------
 
-(defmacro with-graphene-vec4 ((var &rest args) &body body)
+(defmacro with-vec4 ((var &rest args) &body body)
   (cond ((not args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (vec4-alloc)))
@@ -267,7 +267,7 @@
                        (progn ,@body)
                        (vec4-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-VEC4")))))
+                  (error "Type error in GRAPHENE:WITH-VEC4")))))
         ((not (third args))
          ;; We have two argument. The first argument must be of type vec4-t.
          (destructuring-bind (arg &optional type)
@@ -281,7 +281,7 @@
                        (progn ,@body)
                        (vec4-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-VEC4")))))
+                  (error "Type error in GRAPHENE:WITH-VEC4")))))
         ((not (fourth args))
          ;; We have three arguments. The first argument must be of type vec2-t.
          (destructuring-bind (arg &optional type)
@@ -295,7 +295,7 @@
                        (progn ,@body)
                        (vec4-free ,var))))
                  (t
-                  (error "Type error in WITH-GRAPHENE-VEC4")))))
+                  (error "Type error in GRAPHENE:WITH-VEC4")))))
         ((not (fifth args))
          ;; We have a list of four arguments with (x,y,z,w) values
          `(let ((,var (vec4-alloc)))
@@ -304,19 +304,19 @@
               (progn ,@body)
               (vec4-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-VEC4"))))
+         (error "Syntax error in GRAPHENE:WITH-VEC4"))))
 
-(export 'with-graphene-vec4)
+(export 'with-vec4)
 
-(defmacro with-graphene-vec4s (vars &body body)
+(defmacro with-vec4s (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-vec4 ,var
-           (with-graphene-vec4s ,(rest vars)
+        `(with-vec4 ,var
+           (with-vec4s ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-vec4s)
+(export 'with-vec4s)
 
 ;;; ----------------------------------------------------------------------------
 ;;; GRAPHENE_VEC2_LEN
@@ -683,7 +683,7 @@
     vector @arg{result}.
   @end{short}
   @see-symbol{graphene:vec2-t}"
-  (with-graphene-vec4s ((v1 a 1.0 1.0) (v2 b 1.0 1.0) res)
+  (with-vec4s ((v1 a 1.0 1.0) (v2 b 1.0 1.0) res)
     (vec4-divide v1 v2 res)
     (vec4-xy res result)))
 
@@ -1237,7 +1237,7 @@
     vector @arg{result}.
   @end{short}
   @see-symbol{graphene:vec3-t}"
-  (with-graphene-vec4s ((v1 a 1.0) (v2 b 1.0) res)
+  (with-vec4s ((v1 a 1.0) (v2 b 1.0) res)
     (vec4-divide v1 v2 res)
     (vec4-xyz res result)))
 

@@ -2,8 +2,8 @@
 ;;; graphene.package.lisp
 ;;;
 ;;; The documentation of this file is taken from the GRAPHENE Reference Manual
-;;; and modified to document the Lisp binding to the Graphene library. See 
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp 
+;;; and modified to document the Lisp binding to the Graphene library. See
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2023 Dieter Kaiser
@@ -49,8 +49,8 @@
     @about-symbol{point-t}
     @about-function{point-x}
     @about-function{point-y}
-    @about-macro{with-graphene-point}
-    @about-macro{with-graphene-points}
+    @about-macro{with-point}
+    @about-macro{with-points}
     @about-function{point-alloc}
     @about-function{point-free}
     @about-function{point-zero}
@@ -69,8 +69,8 @@
     @about-function{point3d-x}
     @about-function{point3d-y}
     @about-function{point3d-z}
-    @about-macro{with-graphene-point3d}
-    @about-macro{with-graphene-point3ds}
+    @about-macro{with-point3d}
+    @about-macro{with-point3ds}
     @about-function{point3d-alloc}
     @about-function{point3d-free}
     @about-function{point3d-zero}
@@ -94,8 +94,8 @@
     @about-symbol{size-t}
     @about-function{size-width}
     @about-function{size-height}
-    @about-macro{with-graphene-size}
-    @about-macro{with-graphene-sizes}
+    @about-macro{with-size}
+    @about-macro{with-sizes}
     @about-function{size-alloc}
     @about-function{size-free}
     @about-function{size-zero}
@@ -108,8 +108,8 @@
   @begin[Rectangle]{section}
     Rectangular shape type.
     @about-symbol{rect-t}
-    @about-macro{with-graphene-rect}
-    @about-macro{with-graphene-rects}
+    @about-macro{with-rect}
+    @about-macro{with-rects}
     @about-function{rect-origin}
     @about-function{rect-size}
     @about-function{rect-alloc}
@@ -149,8 +149,8 @@
   @begin[Quad]{section}
     Four-vertex quadrilateral.
     @about-symbol{quad-t}
-    @about-macro{with-graphene-quad}
-    @about-macro{with-graphene-quads}
+    @about-macro{with-quad}
+    @about-macro{with-quads}
     @about-function{quad-alloc}
     @about-function{quad-free}
     @about-function{quad-init}
@@ -163,8 +163,8 @@
   @begin[Triangle]{section}
     A triangle described by 3D points.
     @about-symbol{triangle-t}
-    @about-macro{with-graphene-triangle}
-    @about-macro{with-graphene-triangles}
+    @about-macro{with-triangle}
+    @about-macro{with-triangles}
     @about-function{triangle-alloc}
     @about-function{triangle-free}
     @about-function{triangle-init-from-point3d}
@@ -185,8 +185,8 @@
   @begin[Box]{section}
     Axis-aligned bounding box.
     @about-symbol{box-t}
-    @about-macro{with-graphene-box}
-    @about-macro{with-graphene-boxes}
+    @about-macro{with-box}
+    @about-macro{with-boxes}
     @about-function{box-alloc}
     @about-function{box-free}
     @about-function{box-init}
@@ -221,8 +221,8 @@
   @begin[Sphere]{section}
     A sphere.
     @about-symbol{sphere-t}
-    @about-macro{with-graphene-sphere}
-    @about-macro{with-graphene-spheres}
+    @about-macro{with-sphere}
+    @about-macro{with-spheres}
     @about-function{sphere-alloc}
     @about-function{sphere-free}
     @about-function{sphere-init}
@@ -240,8 +240,8 @@
   @begin[Frustum]{section}
     A 3D field of view.
     @about-symbol{frustum-t}
-    @about-macro{with-graphene-frustum}
-    @about-macro{with-graphene-frustums}
+    @about-macro{with-frustum}
+    @about-macro{with-frustums}
     @about-function{frustum-alloc}
     @about-function{frustum-free}
     @about-function{frustum-init}
@@ -259,8 +259,8 @@
     @about-variable{+vec3-len+}
     @about-variable{+vec4-len+}
     @about-symbol{vec2-t}
-    @about-macro{with-graphene-vec2}
-    @about-macro{with-graphene-vec2s}
+    @about-macro{with-vec2}
+    @about-macro{with-vec2s}
     @about-function{vec2-alloc}
     @about-function{vec2-free}
     @about-function{vec2-init}
@@ -288,8 +288,8 @@
     @about-function{vec2-x-axis}
     @about-function{vec2-y-axis}
     @about-symbol{vec3-t}
-    @about-macro{with-graphene-vec3}
-    @about-macro{with-graphene-vec3s}
+    @about-macro{with-vec3}
+    @about-macro{with-vec3s}
     @about-function{vec3-alloc}
     @about-function{vec3-free}
     @about-function{vec3-init}
@@ -325,8 +325,8 @@
     @about-function{vec3-y-axis}
     @about-function{vec3-z-axis}
     @about-symbol{vec4-t}
-    @about-macro{with-graphene-vec4}
-    @about-macro{with-graphene-vec4s}
+    @about-macro{with-vec4}
+    @about-macro{with-vec4s}
     @about-function{vec4-alloc}
     @about-function{vec4-free}
     @about-function{vec4-init}
@@ -365,8 +365,8 @@
   @begin[Matrix]{section}
     4x4 matrices.
     @about-symbol{matrix-t}
-    @about-macro{with-graphene-matrix}
-    @about-macro{with-graphene-matrices}
+    @about-macro{with-matrix}
+    @about-macro{with-matrices}
     @about-function{matrix-alloc}
     @about-function{matrix-free}
     @about-function{matrix-init-identity}
@@ -439,8 +439,8 @@
     Euler angles.
     @about-symbol{euler-order-t}
     @about-symbol{euler-t}
-    @about-macro{with-graphene-euler}
-    @about-macro{with-graphene-eulers}
+    @about-macro{with-euler}
+    @about-macro{with-eulers}
     @about-function{euler-alloc}
     @about-function{euler-free}
     @about-function{euler-init}
@@ -466,8 +466,8 @@
   @begin[Quaternion]{section}
     Quaternion operations.
     @about-symbol{quaternion-t}
-    @about-macro{with-graphene-quaternion}
-    @about-macro{with-graphene-quaternions}
+    @about-macro{with-quaternion}
+    @about-macro{with-quaternions}
     @about-function{quaternion-alloc}
     @about-function{quaternion-free}
     @about-function{quaternion-init}
@@ -496,8 +496,8 @@
   @begin[Plane]{section}
     A plane in 3D space.
     @about-symbol{plane-t}
-    @about-macro{with-graphene-plane}
-    @about-macro{with-graphene-planes}
+    @about-macro{with-plane}
+    @about-macro{with-planes}
     @about-function{plane-alloc}
     @about-function{plane-free}
     @about-function{plane-init}
@@ -517,8 +517,8 @@
     A ray emitted from an origin in a given direction.
     @about-symbol{ray-intersection-kind-t}
     @about-symbol{ray-t}
-    @about-macro{with-graphene-ray}
-    @about-macro{with-graphene-rays}
+    @about-macro{with-ray}
+    @about-macro{with-rays}
     @about-function{ray-alloc}
     @about-function{ray-free}
     @about-function{ray-init}

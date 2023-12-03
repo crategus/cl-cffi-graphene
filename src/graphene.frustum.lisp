@@ -51,7 +51,7 @@
 
 (in-package :graphene)
 
-(defmacro with-graphene-frustum ((var &rest args) &body body)
+(defmacro with-frustum ((var &rest args) &body body)
   (cond
 ;        ((not args)
 ;         ;; We have no arguments, the default is initialization with zeros.
@@ -84,7 +84,7 @@
                        (frustum-free ,var))))
 
                  (t
-                  (error "Type error in WITH-GRAPHENE-FRUSTUM")))))
+                  (error "Type error in GRAPHENE:WITH-FRUSTUM")))))
 
         ((not (seventh args))
          ;; Six arguments of type plane-t
@@ -95,19 +95,19 @@
               (progn ,@body)
               (frustum-free ,var))))
         (t
-         (error "Syntax error in WITH-GRAPHENE-FRUSTUM"))))
+         (error "Syntax error in GRAPHENE:WITH-FRUSTUM"))))
 
-(export 'with-graphene-frustum)
+(export 'with-frustum)
 
-(defmacro with-graphene-frustums (vars &body body)
+(defmacro with-frustums (vars &body body)
   (if vars
       (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
-        `(with-graphene-frustum ,var
-           (with-graphene-frustums ,(rest vars)
+        `(with-frustum ,var
+           (with-frustums ,(rest vars)
              ,@body)))
       `(progn ,@body)))
 
-(export 'with-graphene-frustums)
+(export 'with-frustums)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_frustum_t
@@ -265,7 +265,7 @@
   @see-symbol{graphene:frustum-t}
   @see-symbol{graphene:plane-t}"
   (format t "~& in FRUSTUM-PLANES with ~a~%" planes)
-  (with-graphene-vec3 (result)
+  (with-vec3 (result)
   (cffi:with-foreign-object (planes-ar :pointer 6)
     (loop for i from 0 below 6
           for plane in planes
