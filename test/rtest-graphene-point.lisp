@@ -21,33 +21,33 @@
 
 ;;;     with-point
 
-(test with-point.1
+(test graphene-with-point.1
   (graphene:with-point (p)
     (is (= 0.0 (graphene:point-x p)))
     (is (= 0.0 (graphene:point-y p)))))
 
-(test with-point.2
+(test graphene-with-point.2
   (graphene:with-point (p 1 2)
     (is (= 1.0 (graphene:point-x p)))
     (is (= 2.0 (graphene:point-y p)))))
 
-(test with-point.3
+(test graphene-with-point.3
   (graphene:with-points ((p1 3 4) (p p1))
     (is (= 3.0 (graphene:point-x p)))
     (is (= 4.0 (graphene:point-y p)))))
 
-(test with-point.4
+(test graphene-with-point.4
   (graphene:with-points ((p1 5 6) (p (p1 graphene:point-t)))
     (is (= 5.0 (graphene:point-x p)))
     (is (= 6.0 (graphene:point-y p)))))
 
-(test with-point.5
+(test graphene-with-point.5
   (graphene:with-vec2 (v 1.5 2.5)
     (graphene:with-point (p (v graphene:vec2-t))
       (is (= 1.5 (graphene:point-x p)))
       (is (= 2.5 (graphene:point-y p))))))
 
-(test with-point.6
+(test graphene-with-point.6
   (let ((a 3.5) (b 4.5))
     (graphene:with-point (p a b)
       (is (= 3.5 (graphene:point-x p)))
@@ -55,19 +55,19 @@
 
 ;;;     with-points
 
-(test with-points.1
+(test graphene-with-points.1
   (graphene:with-points ((p1) (p2) (p3))
     (is (graphene:point-equal p1 (graphene:point-zero)))
     (is (graphene:point-equal p2 (graphene:point-zero)))
     (is (graphene:point-equal p3 (graphene:point-zero)))))
 
-(test with-points.2
+(test graphene-with-points.2
   (graphene:with-points (p1 p2 p3)
     (is (graphene:point-equal p1 (graphene:point-zero)))
     (is (graphene:point-equal p2 (graphene:point-zero)))
     (is (graphene:point-equal p3 (graphene:point-zero)))))
 
-(test with-points.3
+(test graphene-with-points.3
   (graphene:with-points (p1 (p2 1 2) (p3 p2) (p4 (p3 graphene:point-t)))
     (is (graphene:point-equal p1 (graphene:point-zero)))
     (is (= 1.0 (graphene:point-x p2)))
@@ -75,7 +75,7 @@
     (is (graphene:point-equal p3 p2))
     (is (graphene:point-equal p4 p3))))
 
-(test with-points.4
+(test graphene-with-points.4
   (graphene:with-vec2 (v 1.5 2.5)
     (graphene:with-points ((p1 (v graphene:vec2-t)) p2 (p3 p1))
       (is (= 1.5 (graphene:point-x p1)))
@@ -202,4 +202,4 @@
     (is (= 0.0 (graphene:point-x result)))
     (is (= 0.1 (graphene:point-y result)))))
 
-;;; --- 2023-12-2 --------------------------------------------------------------
+;;; 2023-12-10

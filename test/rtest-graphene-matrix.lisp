@@ -9,59 +9,59 @@
 
 ;;; --- Macros -----------------------------------------------------------------
 
-(test with-matrix.1
+(test graphene-with-matrix.1
   (graphene:with-matrix (matrix)
     (is (graphene:matrix-is-identity matrix))))
 
-(test with-matrix.2
+(test graphene-with-matrix.2
   (graphene:with-matrices (matrix1 (matrix matrix1))
     (is (graphene:matrix-is-identity matrix))
     (is (graphene:matrix-is-identity matrix1))))
 
-(test with-matrix.3
+(test graphene-with-matrix.3
   (graphene:with-point3d (point 1 1 1)
     (graphene:with-matrix (matrix point)
       (is (cffi:pointerp matrix))
 )))
 
-(test with-matrix.4
+(test graphene-with-matrix.4
   (graphene:with-vec3 (vector 1 1 1)
     (graphene:with-matrix (matrix 1.0 (vector graphene:vec3-t))
       (is (cffi:pointerp matrix))
 )))
 
-(test with-matrix.5
+(test graphene-with-matrix.5
   (graphene:with-matrix (matrix 1.0 2.0)
     (is (cffi:pointerp matrix))
 ))
 
-(test with-matrix.6
+(test graphene-with-matrix.6
   (graphene:with-matrix (matrix 1.0 2.0 3.0)
     (is (cffi:pointerp matrix))
 ))
 
-(test with-matrix.7
+(test graphene-with-matrix.7
   (graphene:with-vec3s ((v1 1 0 0) (v2 0 1 0) (v3 0 0 1))
     (graphene:with-matrix (matrix (v1 graphene:vec3-t) v2 v3)
       (is (cffi:pointerp matrix))
 )))
 
-(test with-matrix.8
+(test graphene-with-matrix.8
   (graphene:with-matrix (matrix  1 2 3 4)
     (is (cffi:pointerp matrix))
 ))
 
-(test with-matrix.9
+(test graphene-with-matrix.9
   (graphene:with-matrix (matrix 1 2 3 4 5 6)
     (is (cffi:pointerp matrix))
 ))
 
-(test with-matrix.10
+(test graphene-with-matrix.10
   (graphene:with-matrix (matrix (1 :double) 2 3 4 5 6)
     (is (cffi:pointerp matrix))
 ))
 
-(test with-matrix.11
+(test graphene-with-matrix.11
   (graphene:with-matrix (matrix 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)
     (is (cffi:pointerp matrix))
 ))
@@ -71,7 +71,7 @@
 ;;;     graphene_matrix_alloc
 ;;;     graphene_matrix_free
 
-(test matrix-alloc
+(test graphene-matrix-alloc
   (let (matrix)
     (is (cffi:pointerp (setf matrix (graphene:matrix-alloc))))
     (is-false (graphene:matrix-free matrix))))
@@ -79,7 +79,7 @@
 ;;;     graphene_matrix_init_identity
 
 #+nil
-(test matrix-init-identity
+(test graphene-matrix-init-identity
   (graphene:with-matrix (matrix)
     (is (cffi:pointer-eq matrix
                     (graphene:matrix-init-identity matrix)))
@@ -88,7 +88,7 @@
 ;;;     graphene_matrix_init_from_float
 
 #+nil
-(test matrix-init-from-float.1
+(test graphene-matrix-init-from-float.1
   (graphene:with-matrix (matrix  1.0  2.0  3.0  4.0
                                  5.0  6.0  7.0  8.0
                                  9.0 10.0 11.0 12.0
@@ -98,7 +98,7 @@
                (graphene:matrix-to-float matrix)))))
 
 #+nil
-(test matrix-init-from-float.2
+(test graphene-matrix-init-from-float.2
   (graphene:with-matrix (matrix)
     ;; More than 16 values are ignored.
     (let ((values '(1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0
@@ -110,7 +110,7 @@
                  (graphene:matrix-to-float matrix))))))
 
 #+nil
-(test matrix-init-from-float.3
+(test graphene-matrix-init-from-float.3
   (graphene:with-matrix (matrix)
     ;; The list of values does not contain 16 values.
     (let ((values '(1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0)))
@@ -122,7 +122,7 @@
 ;;;     graphene_matrix_init_from_matrix
 
 #+nil
-(test matrix-init-from-matrix
+(test graphene-matrix-init-from-matrix
   (graphene:with-matrix (matrix1)
     (graphene:with-matrix (matrix2)
       (is (graphene:matrix-is-identity
@@ -144,7 +144,7 @@
 ;;;     graphene_matrix_is_identity
 
 #+nil
-(test matrix-is-identity
+(test graphene-matrix-is-identity
   (let ((matrix (graphene:matrix-alloc)))
     (is (cffi:pointerp (setf matrix (graphene:matrix-init-identity matrix))))
     (is (graphene:matrix-is-identity matrix))
@@ -156,7 +156,7 @@
 
 ;;;     graphene_matrix_to_float
 
-(test matrix-to-float
+(test graphene-matrix-to-float
   (graphene:with-matrix (matrix)
     (is (cffi:pointerp (setf matrix (graphene:matrix-init-identity matrix))))
     (is (equal '(1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0)
@@ -210,5 +210,4 @@
 ;;;     graphene_matrix_near
 ;;;     graphene_matrix_print
 
-;;; 2023-12-2
-
+;;; 2023-12-10

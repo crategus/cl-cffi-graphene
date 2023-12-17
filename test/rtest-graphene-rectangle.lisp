@@ -24,28 +24,28 @@
 
 ;;;     with-rect
 
-(test with-rect.1
+(test graphene-with-rect.1
   (graphene:with-rect (r)
     (is (= 0.0 (graphene:rect-x r)))
     (is (= 0.0 (graphene:rect-y r)))
     (is (= 0.0 (graphene:rect-width r)))
     (is (= 0.0 (graphene:rect-height r)))))
 
-(test with-rect.2
+(test graphene-with-rect.2
   (graphene:with-rect (r 1 2 3 4)
     (is (= 1.0 (graphene:rect-x r)))
     (is (= 2.0 (graphene:rect-y r)))
     (is (= 3.0 (graphene:rect-width r)))
     (is (= 4.0 (graphene:rect-height r)))))
 
-(test with-rect.3
+(test graphene-with-rect.3
   (graphene:with-rects ((r1 1 2 3 4) (r r1))
     (is (= 1.0 (graphene:rect-x r)))
     (is (= 2.0 (graphene:rect-y r)))
     (is (= 3.0 (graphene:rect-width r)))
     (is (= 4.0 (graphene:rect-height r)))))
 
-(test with-rect.4
+(test graphene-with-rect.4
   (graphene:with-rects ((r1 1 2 3 4) (r (r1 graphene:rect-t)))
     (is (= 1.0 (graphene:rect-x r)))
     (is (= 2.0 (graphene:rect-y r)))
@@ -54,7 +54,7 @@
 
 ;;;     with-rects
 
-(test with-rects
+(test graphene-with-rects
   (graphene:with-rects (r1 (r2 1 2 3 4) (r3 r2) (r4 (r2 graphene:rect-t)))
       (is (= 0.0 (graphene:rect-x r1)))
       (is (= 0.0 (graphene:rect-y r1)))
@@ -261,6 +261,22 @@
 
 ;;;     graphene_rect_get_vertices
 
+(test graphene-rect-vertices
+  (let (result)
+    (graphene:with-vec2s (v1 v2 v3 v4)
+      (graphene:with-rect (rect 1.0 2.0 3.0 4.0)
+        (is (every #'cffi:pointerp
+                   (setf result
+                         (graphene:rect-vertices rect (list v1 v2 v3 v4)))))
+        (is (cffi:pointer-eq v1 (first result)))
+        (is (equal '(1.0 2.0) (graphene:vec2-to-float (first result))))
+        (is (cffi:pointer-eq v2 (second result)))
+        (is (equal '(4.0 2.0) (graphene:vec2-to-float (second result))))
+        (is (cffi:pointer-eq v3 (third result)))
+        (is (equal '(4.0 6.0) (graphene:vec2-to-float (third result))))
+        (is (cffi:pointer-eq v4 (fourth result)))
+        (is (equal '(1.0 6.0) (graphene:vec2-to-float (fourth result))))))))
+
 ;;;     graphene_rect_union
 
 (test graphene-rect-union
@@ -310,4 +326,4 @@
 ;;;     graphene_rect_zero
 ;;;     graphene_rect_scale
 
-;;; --- 2023-12-2 --------------------------------------------------------------
+;;; 2023-12-9

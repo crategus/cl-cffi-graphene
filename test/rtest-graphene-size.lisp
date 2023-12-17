@@ -21,29 +21,29 @@
 
 ;;;     with-size
 
-(test with-size.1
+(test graphene-with-size.1
   (graphene:with-size (s)
     (is (= 0.0 (graphene:size-width s)))
     (is (= 0.0 (graphene:size-height s)))))
 
-(test with-size.2
+(test graphene-with-size.2
   (graphene:with-size (s 1 2)
     (is (= 1.0 (graphene:size-width s)))
     (is (= 2.0 (graphene:size-height s)))))
 
-(test with-size.3
+(test graphene-with-size.3
   (graphene:with-sizes ((s1 3 4) (s s1))
     (is (= 3.0 (graphene:size-width s)))
     (is (= 4.0 (graphene:size-height s)))))
 
-(test with-size.4
+(test graphene-with-size.4
   (graphene:with-sizes ((s1 5 6) (s (s1 graphene:size-t)))
       (is (= 5.0 (graphene:size-width s)))
       (is (= 6.0 (graphene:size-height s)))))
 
 ;;     with-sizes
 
-(test with-sizes
+(test graphene-with-sizes
   (graphene:with-sizes (s1 (s2 1.5 2.5)
                            (s3 s2)
                            (s4 (s2 graphene:size-t)))
@@ -156,4 +156,4 @@
     (is (= 1.0 (graphene:size-width size)))
     (is (= 2.0 (graphene:size-height size)))))
 
-;;; --- 2023-12-4 --------------------------------------------------------------
+;;; 2023-12-10

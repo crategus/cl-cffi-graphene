@@ -9,36 +9,36 @@
 
 ;;; --- Macros -----------------------------------------------------------------
 
-(test with-box.1
+(test graphene-with-box.1
   (graphene:with-box (box)
     (is (cffi:pointerp box))))
 
-(test with-box.2
+(test graphene-with-box.2
   (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
     (graphene:with-box (box p1 p2)
       (is (cffi:pointerp box)))))
 
-(test with-box.3
+(test graphene-with-box.3
   (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
     (graphene:with-box (box (p1 graphene:point3d-t) p2)
       (is (cffi:pointerp box)))))
 
-(test with-box.4
+(test graphene-with-box.4
   (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
     (graphene:with-box (box (p1 graphene:point3d-t) (p2 graphene:point3d-t))
       (is (cffi:pointerp box)))))
 
-(test with-box.5
+(test graphene-with-box.5
   (graphene:with-vec3s ((v1 0 0 0) (v2 1 1 1))
     (graphene:with-box (box (v1 graphene:vec3-t) v2)
       (is (cffi:pointerp box)))))
 
-(test with-box.6
+(test graphene-with-box.6
   (graphene:with-vec3s ((v1 0 0 0) (v2 1 1 1))
     (graphene:with-box (box (v1 graphene:vec3-t) (v2 graphene:vec3-t))
       (is (cffi:pointerp box)))))
 
-(test with-boxes.1
+(test graphene-with-boxes.1
   (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
     (graphene:with-boxes (box (box1 p1 p2) (box2 box1))
       (is (cffi:pointerp box))
@@ -46,7 +46,7 @@
       (is (cffi:pointerp box2))
       (is (graphene:box-equal box1 box2)))))
 
-(test with-boxes.2
+(test graphene-with-boxes.2
   (graphene:with-vec3s ((v1 0 0 0) (v2 1 1 1))
     (graphene:with-boxes (box (box1 v1 v2) (box2 box1))
       (is (cffi:pointerp box))
@@ -59,14 +59,14 @@
 ;;;     graphene_box_alloc
 ;;;     graphene_box_free
 
-(test box-alloc/free
+(test graphene-box-alloc/free
   (let ((box nil))
     (is (cffi:pointerp (setf box (graphene:box-alloc))))
     (is-false (graphene:box-free box))))
 
 ;;;     graphene_box_init
 
-(test box-init
+(test graphene-box-init
   (let ((box (graphene:box-alloc)))
     (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
       (is (cffi:pointer-eq box (graphene:box-init box p1 p2))))
@@ -74,7 +74,7 @@
 
 ;;;     graphene_box_init_from_box
 
-(test box-init-from-box
+(test graphene-box-init-from-box
   (let ((box1 (graphene:box-alloc))
         (box2 (graphene:box-alloc)))
     (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
@@ -85,7 +85,7 @@
 
 ;;;     graphene_box_init_from_points
 
-(test box-init-from-points
+(test graphene-box-init-from-points
   (let ((box (graphene:box-alloc)))
     (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
       (is (cffi:pointer-eq box
@@ -94,7 +94,7 @@
 
 ;;;     graphene_box_init_from_vec3
 
-(test box-init-from-vec3
+(test graphene-box-init-from-vec3
   (let ((box (graphene:box-alloc)))
     (graphene:with-vec3s ((v1 0 0 0) (v2 1 1 1))
       (is (cffi:pointer-eq box (graphene:box-init-from-vec3 box v1 v2))))
@@ -102,7 +102,7 @@
 
 ;;;     graphene_box_init_from_vectors
 
-(test box-init-from-vectors
+(test graphene-box-init-from-vectors
   (let ((box (graphene:box-alloc)))
     (graphene:with-vec3s ((v1 0 0 0) (v2 1 1 1))
       (is (cffi:pointer-eq box (graphene:box-init-from-vectors box (list v1 v2)))))
@@ -110,7 +110,7 @@
 
 ;;;     graphene_box_equal
 
-(test box-equal
+(test graphene-box-equal
   (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
     (graphene:with-boxes (box (box1 p1 p2) (box2 box1))
       (is (graphene:box-equal box1 box2))
@@ -119,7 +119,7 @@
 
 ;;;     graphene_box_expand
 
-(test box-expand
+(test graphene-box-expand
   (graphene:with-point3ds ((min 0 0 0) (max 1 1 1) (point 2 2 2))
     (graphene:with-boxes ((box min max) result)
 
@@ -141,7 +141,7 @@
 
 ;;;     graphene_box_expand_scalar
 
-(test box-expand-scalar
+(test graphene-box-expand-scalar
   (graphene:with-point3ds ((min 0 0 0) (max 1 1 1) point)
     (graphene:with-boxes ((box min max) result)
 
@@ -163,7 +163,7 @@
 
 ;;;     graphene_box_expand_vec3
 
-(test box-expand-vec3
+(test graphene-box-expand-vec3
   (graphene:with-point3ds ((min 0 0 0) (max 1 1 1))
     (graphene:with-vec3 (vector 2 2 2)
       (graphene:with-boxes ((box min max) result)
@@ -187,7 +187,7 @@
 ;;;     graphene_box_get_min
 ;;;     graphene_box_get_max
 
-(test box-min/max.1
+(test graphene-box-min/max.1
   (graphene:with-point3ds ((min 0 1 2) (max 3 4 5) result)
     (graphene:with-box (box min max)
 
@@ -207,7 +207,7 @@
       (is (= 4.0 (graphene:point3d-y (graphene:box-max box result))))
       (is (= 5.0 (graphene:point3d-z (graphene:box-max box result)))))))
 
-(test box-min/max.2
+(test graphene-box-min/max.2
   (graphene:with-point3ds ((min 0 1 2) (max 3 4 5))
     (graphene:with-box (box min max)
 
@@ -226,7 +226,7 @@
 
 ;;;     graphene_box_get_center
 
-(test box-center
+(test graphene-box-center
   (graphene:with-point3ds ((min 0 0 0) (max 1 1 1) point)
     (graphene:with-box (box min max)
       (is (cffi:pointer-eq point (graphene:box-center box point)))
@@ -238,7 +238,7 @@
 ;;;     graphene_box_get_height
 ;;;     graphene_box_get_width
 
-(test box-depth/height/width
+(test graphene-box-depth/height/width
   (graphene:with-point3ds ((min 0 0 0) (max 1 1 1))
     (graphene:with-box (box min max)
 
@@ -248,7 +248,7 @@
 
 ;;;     graphene_box_get_size
 
-(test box-size
+(test graphene-box-size
   (graphene:with-point3ds ((min 1 2 3) (max 4 4 4))
     (graphene:with-vec3 (vector)
       (graphene:with-box (box min max)
@@ -262,7 +262,7 @@
 
 ;;;     graphene_box_get_bounding_sphere
 
-(test box-bounding-sphere
+(test graphene-box-bounding-sphere
   (graphene:with-sphere (sphere)
     (graphene:with-point3ds ((min 0 0 0) (max 1 1 1) center)
       (graphene:with-box (box min max)
@@ -278,7 +278,7 @@
 
 ;;;     graphene_box_get_vertices
 
-(test box-vertices
+(test graphene-box-vertices
   (graphene:with-vec3s (v0 v1 v2 v3 v4 v5 v6 v7)
     (graphene:with-point3ds ((min 0 0 0) (max 1 1 1))
       (graphene:with-box (box min max)
@@ -301,7 +301,7 @@
 
 ;;;     graphene_box_zero
 
-(test box-zero
+(test graphene-box-zero
   (graphene:with-point3ds (min max)
     (graphene:with-box (box)
 
@@ -323,7 +323,7 @@
 
 ;;;     graphene_box_one
 
-(test box-one
+(test graphene-box-one
   (graphene:with-point3ds (min max)
     (graphene:with-box (box)
 
@@ -345,7 +345,7 @@
 
 ;;;     graphene_box_minus_one
 
-(test box-minus-one
+(test graphene-box-minus-one
   (graphene:with-point3ds (min max)
     (graphene:with-box (box)
 
@@ -367,7 +367,7 @@
 
 ;;;     graphene_box_one_minus_one
 
-(test box-one-minus-one
+(test graphene-box-one-minus-one
   (graphene:with-point3ds (min max)
     (graphene:with-box (box)
 
@@ -390,4 +390,4 @@
 ;;;     graphene_box_empty
 ;;;     graphene_box_infinite
 
-;;; 2023-12-2
+;;; 2023-12-10

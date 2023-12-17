@@ -10,18 +10,21 @@
 ;;; --- Macros -----------------------------------------------------------------
 
 ;; no argument
-(test with-quad.1
-  (graphene:with-quad (q)
-    (is (cffi:pointerp q))))
+(test graphene-with-quad.1
+  (graphene:with-rect (result)
+    (graphene:with-quad (q)
+      (is (cffi:pointerp q))
+      (is (graphene:rect-equal (graphene:rect-zero)
+                               (graphene:quad-bounds q result))))))
 
 ;; four points
-(test with-quad.2
+(test graphene-with-quad.2
   (graphene:with-points (p1 p2 p3 p4)
     (graphene:with-quad (q p1 p2 p3 p4)
       (is (cffi:pointerp q)))))
 
 ;; a rectangle
-(test with-quad.3
+(test graphene-with-quad.3
   (graphene:with-rect (r 1 2 3 4)
     (graphene:with-quad (q r)
       (is (cffi:pointerp q)))))
@@ -89,4 +92,4 @@
         (is (= 1.0 (graphene:point-x result)))
         (is (= 6.0 (graphene:point-y result)))))))
 
-;;; --- 2023-11-20 -------------------------------------------------------------
+;;; 2023-12-10

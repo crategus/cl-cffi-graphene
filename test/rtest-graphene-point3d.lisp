@@ -23,38 +23,38 @@
 
 ;;;     with-point3d
 
-(test with-point3d.1
+(test graphene-with-point3d.1
   (graphene:with-point3d (p)
     (is (= 0.0 (graphene:point3d-x p)))
     (is (= 0.0 (graphene:point3d-y p)))
     (is (= 0.0 (graphene:point3d-y p)))))
 
-(test with-point3d.2
+(test graphene-with-point3d.2
   (graphene:with-point3d (p 1 2 3)
     (is (= 1.0 (graphene:point3d-x p)))
     (is (= 2.0 (graphene:point3d-y p)))
     (is (= 3.0 (graphene:point3d-z p)))))
 
-(test with-point3d.3
+(test graphene-with-point3d.3
   (graphene:with-point3ds ((p1 3/2 4/2 5/2) (p p1))
     (is (= 1.5 (graphene:point3d-x p)))
     (is (= 2.0 (graphene:point3d-y p)))
     (is (= 2.5 (graphene:point3d-z p)))))
 
-(test with-point3d.4
+(test graphene-with-point3d.4
   (graphene:with-point3ds ((p1 5 6 7) (p (p1 graphene:point3d-t)))
     (is (= 5.0 (graphene:point3d-x p)))
     (is (= 6.0 (graphene:point3d-y p)))
     (is (= 7.0 (graphene:point3d-z p)))))
 
-(test with-point3d.5
+(test graphene-with-point3d.5
   (graphene:with-vec3 (v 1.5 2.5 3.5)
     (graphene:with-point3d (p (v graphene:vec3-t))
       (is (= 1.5 (graphene:point3d-x p)))
       (is (= 2.5 (graphene:point3d-y p)))
       (is (= 3.5 (graphene:point3d-z p))))))
 
-(test with-point3d.6
+(test graphene-with-point3d.6
   (let ((a 3.5) (b 4.5) (c 5.5))
     (graphene:with-point3d (p a b c)
       (is (= 3.5 (graphene:point3d-x p)))
@@ -63,19 +63,19 @@
 
 ;;;     with-point3ds
 
-(test with-point3ds.1
+(test graphene-with-point3ds.1
   (graphene:with-point3ds ((p1) (p2) (p3))
     (is (graphene:point3d-equal p1 (graphene:point3d-zero)))
     (is (graphene:point3d-equal p2 (graphene:point3d-zero)))
     (is (graphene:point3d-equal p3 (graphene:point3d-zero)))))
 
-(test with-point3ds.2
+(test graphene-with-point3ds.2
   (graphene:with-point3ds (p1 p2 p3)
     (is (graphene:point3d-equal p1 (graphene:point3d-zero)))
     (is (graphene:point3d-equal p2 (graphene:point3d-zero)))
     (is (graphene:point3d-equal p3 (graphene:point3d-zero)))))
 
-(test with-point3ds.3
+(test graphene-with-point3ds.3
   (graphene:with-point3ds (p1 (p2 1 2 3) (p3 p2) (p4 (p3 graphene:point3d-t)))
     (is (graphene:point3d-equal p1 (graphene:point3d-zero)))
     (is (= 1.0 (graphene:point3d-x p2)))
@@ -84,7 +84,7 @@
     (is (graphene:point3d-equal p3 p2))
     (is (graphene:point3d-equal p4 p3))))
 
-(test with-point3ds.4
+(test graphene-with-point3ds.4
   (graphene:with-vec3 (v 1.5 2.5 3.5)
     (graphene:with-point3ds ((p1 (v graphene:vec3-t)) p2 (p3 p1))
       (is (= 1.5 (graphene:point3d-x p1)))
@@ -307,5 +307,4 @@
         (is (= -0.5 (graphene:point3d-y result)))
         (is (= -1.0 (graphene:point3d-z result))))))
 
-;;; --- 2023-9-22 --------------------------------------------------------------
-
+;;; 2023-12-10

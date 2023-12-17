@@ -10,41 +10,41 @@
 
 ;;; --- Macros -----------------------------------------------------------------
 
-(test with-euler.1
+(test graphene-with-euler.1
   (graphene:with-euler (euler)
     (is (cffi:pointerp euler))
 ))
 
-(test with-euler.2
+(test graphene-with-euler.2
   (graphene:with-euler (euler 1 2 3)
     (is (cffi:pointerp euler))
 ))
 
-(test with-euler.3
+(test graphene-with-euler.3
   (graphene:with-euler (euler 1 2 3 :SXYZ)
     (is (cffi:pointerp euler))
 ))
 
-(test with-euler.4
+(test graphene-with-euler.4
   (graphene:with-matrix (matrix)
     (graphene:with-euler (euler matrix :SXYZ)
       (is (cffi:pointerp euler))
 )))
 
-(test with-euler.5
+(test graphene-with-euler.5
   (graphene:with-quaternion (quaternion)
     (is (cffi:pointer-eq quaternion (graphene:quaternion-init-identity quaternion)))
     (graphene:with-euler (euler quaternion :SXYZ)
       (is (cffi:pointerp euler))
 )))
 
-(test with-euler.6
+(test graphene-with-euler.6
   (graphene:with-vec3 (vector 1 2 3)
     (graphene:with-euler (euler vector :SXYZ)
       (is (cffi:pointerp euler))
 )))
 
-(test with-euler.7
+(test graphene-with-euler.7
   (graphene:with-eulers (euler (euler1 euler))
     (is (cffi:pointerp euler))
     (is (cffi:pointerp euler1))))
@@ -73,4 +73,4 @@
 ;;;     graphene_euler_to_quaternion
 ;;;     graphene_euler_reorder
 
-;;; 2022-9-24
+;;; 2023-12-10
