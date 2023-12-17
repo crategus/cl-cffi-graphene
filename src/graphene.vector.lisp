@@ -138,16 +138,6 @@
 ;;;     graphene_vec4_y_axis
 ;;;     graphene_vec4_z_axis
 ;;;     graphene_vec4_w_axis
-;;;
-;;; Description
-;;;
-;;; Graphene has three vector types, distinguished by their length:
-;;;
-;;; graphene_vec2_t, which holds 2 components x and y
-;;; graphene_vec3_t, which holds 3 components x, y, and z
-;;; graphene_vec4_t, which holds 4 components x, y, z, and w
-;;;
-;;; Each vector type should be treated as an opaque data type.
 ;;; ----------------------------------------------------------------------------
 
 (in-package :graphene)
@@ -155,19 +145,46 @@
 ;;; ----------------------------------------------------------------------------
 
 (defmacro with-vec2 ((var &rest args) &body body)
-  (cond ((not args)
+ #+liber-documentation
+ "@version{2023-12-10}
+  @syntax[]{(graphene:with-vec2 (v) body) => result}
+  @syntax[]{(graphene:with-vec2 (v v1) body) => result}
+  @syntax[]{(graphene:with-vec2 (v x y) body) => result}
+  @argument[v]{a @symbol{graphene:vec2-t} instance to create and initialize}
+  @argument[v1]{a @symbol{graphene:vec2-t} instance to use for initialization}
+  @argument[x]{a float with the x component of the vector}
+  @argument[y]{a float with the y component of the vector}
+  @begin{short}
+    The @fun{graphene:with-vec2} macro allocates a new @symbol{graphene:vec2-t}
+    instance, initializes the vector with the given values and executes the body
+    that uses the vector.
+  @end{short}
+  After execution of the body the allocated memory for the vector is released.
+
+  When no argument is given the components of the vector are initialized to
+  zero. The initialization from another vector is done with the
+  @fun{graphene:vec2-init-from-vec2} function. The initialization with two
+  values @arg{x} and @arg{y} uses the @fun{graphene:vec2-init} function.
+  @begin[Note]{dictionary}
+    The memory is allocated with the @fun{graphene:vec2-alloc} function and
+    released with the @fun{graphene:vec2-free} function.
+  @end{dictionary}
+  @see-symbol{graphene:vec2-t}
+  @see-macro{graphene:with-vec2s}
+  @see-function{graphene:vec2-alloc}
+  @see-function{graphene:vec2-free}"
+  (cond ((null args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (vec2-alloc)))
             (vec2-init ,var 0.0 0.0)
             (unwind-protect
               (progn ,@body)
               (vec2-free ,var))))
-        ((not (second args))
+        ((null (second args))
          ;; We have one argument. The argument is of type vec2-t
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'vec2-t))
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'vec2-t))
                   ;; One argument with no type or of type vec2-t
                   `(let ((,var (vec2-alloc)))
                      (vec2-init-from-vec2 ,var ,arg)
@@ -175,9 +192,9 @@
                        (progn ,@body)
                        (vec2-free ,var))))
                  (t
-                  (error "Type error in GRAPHENE:WITH-VEC2")))))
-        ((not (third args))
-         ;; We have a list of two arguments with (x,y) values
+                  (error "Syntax error in GRAPHENE:WITH-VEC2")))))
+        ((null (third args))
+         ;; We have a list of two arguments with the (x,y) values
          `(let ((,var (vec2-alloc)))
             (vec2-init ,var ,@args)
             (unwind-protect
@@ -189,8 +206,24 @@
 (export 'with-vec2)
 
 (defmacro with-vec2s (vars &body body)
+ #+liber-documentation
+ "@version{2023-12-10}
+  @syntax[]{(graphene:with-vec2s (v1 v2 v3 ... vn) body) => result}
+  @argument[v1 ... vn]{the newly created @symbol{graphene:vec2-t} instances}
+  @argument[body]{a body that uses the bindings @arg{v1 ... vn}}
+  @begin{short}
+    The @fun{graphene:with-vec2s} macro creates new variable bindings and
+    executes the body that use these bindings.
+  @end{short}
+  The macro performs the bindings sequentially, like the @sym{let*} macro.
+
+  Each vector can be initialized with values using the syntax for the
+  @fun{graphene:with-vec2} macro. See also the @fun{graphene:with-vec2}
+  documentation.
+  @see-symbol{graphene:vec2-t}
+  @see-macro{graphene:with-vec2}"
   (if vars
-      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+      (let ((var (mklist (first vars))))
         `(with-vec2 ,var
            (with-vec2s ,(rest vars)
              ,@body)))
@@ -201,19 +234,48 @@
 ;;; ----------------------------------------------------------------------------
 
 (defmacro with-vec3 ((var &rest args) &body body)
-  (cond ((not args)
+ #+liber-documentation
+ "@version{2023-12-10}
+  @syntax[]{(graphene:with-vec3 (v) body) => result}
+  @syntax[]{(graphene:with-vec3 (v v1) body) => result}
+  @syntax[]{(graphene:with-vec3 (v x y z) body) => result}
+  @argument[v]{a @symbol{graphene:vec3-t} instance to create and initialize}
+  @argument[v1]{a @symbol{graphene:vec3-t} instance to use for initialization}
+  @argument[x]{a float with the x component of the vector}
+  @argument[y]{a float with the y component of the vector}
+  @argument[z]{a float with the z component of the vector}
+  @begin{short}
+    The @fun{graphene:with-vec3} macro allocates a new @symbol{graphene:vec3-t}
+    instance, initializes the vector with the given values and executes the body
+    that uses the vector.
+  @end{short}
+  After execution of the body the allocated memory for the vector is released.
+
+  When no argument is given the components of the vector are initialized to
+  zero. The initialization from another vector is done with the
+  @fun{graphene:vec3-init-from-vec3} function. The initialization with three
+  values @arg{x}, @arg{y} and @arg{z} uses the @fun{graphene:vec3-init}
+  function.
+  @begin[Note]{dictionary}
+    The memory is allocated with the @fun{graphene:vec3-alloc} function and
+    released with the @fun{graphene:vec3-free} function.
+  @end{dictionary}
+  @see-symbol{graphene:vec3-t}
+  @see-macro{graphene:with-vec3s}
+  @see-function{graphene:vec3-alloc}
+  @see-function{graphene:vec3-free}"
+  (cond ((null args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (vec3-alloc)))
             (vec3-init ,var 0.0 0.0 0.0)
             (unwind-protect
               (progn ,@body)
               (vec3-free ,var))))
-        ((not (second args))
+        ((null (second args))
          ;; We have one argument. The argument is of type vec3-t
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'vec3-t))
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'vec3-t))
                   ;; One argument with no type or of type vec3-t
                   `(let ((,var (vec3-alloc)))
                      (vec3-init-from-vec3 ,var ,arg)
@@ -221,9 +283,9 @@
                        (progn ,@body)
                        (vec3-free ,var))))
                  (t
-                  (error "Type error in GRPAPHENE:WITH-VEC3")))))
-        ((not (fourth args))
-         ;; We have a list of two arguments with (x,y,z) values
+                  (error "Syntax error in GRPAPHENE:WITH-VEC3")))))
+        ((null (fourth args))
+         ;; We have a list of three arguments with (x,y,z) values
          `(let ((,var (vec3-alloc)))
             (vec3-init ,var ,@args)
             (unwind-protect
@@ -235,8 +297,24 @@
 (export 'with-vec3)
 
 (defmacro with-vec3s (vars &body body)
+ #+liber-documentation
+ "@version{2023-12-10}
+  @syntax[]{(graphene:with-vec3s (v1 v2 v3 ... vn) body) => result}
+  @argument[v1 ... vn]{the newly created @symbol{graphene:vec3-t} instances}
+  @argument[body]{a body that uses the bindings @arg{v1 ... vn}}
+  @begin{short}
+    The @fun{graphene:with-vec3s} macro creates new variable bindings and
+    executes the body that use these bindings.
+  @end{short}
+  The macro performs the bindings sequentially, like the @sym{let*} macro.
+
+  Each vector can be initialized with values using the syntax for the
+  @fun{graphene:with-vec3} macro. See also the @fun{graphene:with-vec3}
+  documentation.
+  @see-symbol{graphene:vec3-t}
+  @see-macro{graphene:with-vec3}"
   (if vars
-      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+      (let ((var (mklist (first vars))))
         `(with-vec3 ,var
            (with-vec3s ,(rest vars)
              ,@body)))
@@ -247,19 +325,57 @@
 ;;; ----------------------------------------------------------------------------
 
 (defmacro with-vec4 ((var &rest args) &body body)
-  (cond ((not args)
+ #+liber-documentation
+ "@version{2023-12-10}
+  @syntax[]{(graphene:with-vec4 (v) body) => result}
+  @syntax[]{(graphene:with-vec4 (v v1) body) => result}
+  @syntax[]{(graphene:with-vec4 (v v2 w) body) => result}
+  @syntax[]{(graphene:with-vec4 (v v3 z w) body) => result}
+  @syntax[]{(graphene:with-vec4 (v x y z w) body) => result}
+  @argument[v]{a @symbol{graphene:vec4-t} instance to create and initialize}
+  @argument[v1]{a @symbol{graphene:vec4-t} instance to use for initialization}
+  @argument[v2]{a @symbol{graphene:vec3-t} instance to use for initialization}
+  @argument[v3]{a @symbol{graphene:vec2-t} instance to use for initialization}
+  @argument[x]{a float with the x component of the vector}
+  @argument[y]{a float with the y component of the vector}
+  @argument[z]{a float with the z component of the vector}
+  @argument[w]{a float with the w component of the vector}
+  @begin{short}
+    The @fun{graphene:with-vec4} macro allocates a new @symbol{graphene:vec4-t}
+    instance, initializes the vector with the given values and executes the body
+    that uses the vector.
+  @end{short}
+  After execution of the body the allocated memory for the vector is released.
+
+  When no argument is given the components of the vector are initialized to
+  zero. The initialization from another vector is done with the
+  @fun{graphene:vec4-init-from-vec4} function. The initialization with two
+  values uses the @fun{graphene:vec4-init-from-vec3} function and the
+  initialization with three values values uses the
+  @fun{graphene:vec4-init-from-vec2} function. At last, the
+  @fun{graphene:vect-init} function initializes the vector from four values.
+  @begin[Note]{dictionary}
+    The memory is allocated with the @fun{graphene:vec4-alloc} function and
+    released with the @fun{graphene:vec4-free} function.
+  @end{dictionary}
+  @see-symbol{graphene:vec4-t}
+  @see-symbol{graphene:vec3-t}
+  @see-symbol{graphene:vec2-t}
+  @see-macro{graphene:with-vec4s}
+  @see-function{graphene:vec4-alloc}
+  @see-function{graphene:vec4-free}"
+  (cond ((null args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (vec4-alloc)))
             (vec4-init ,var 0.0 0.0 0.0 0.0)
             (unwind-protect
               (progn ,@body)
               (vec4-free ,var))))
-        ((not (second args))
+        ((null (second args))
          ;; We have one argument. The argument must be of type vec4-t.
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'vec4-t))
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'vec4-t))
                   ;; One argument with no type or of type vec4-t
                   `(let ((,var (vec4-alloc)))
                      (vec4-init-from-vec4 ,var ,arg)
@@ -267,37 +383,35 @@
                        (progn ,@body)
                        (vec4-free ,var))))
                  (t
-                  (error "Type error in GRAPHENE:WITH-VEC4")))))
-        ((not (third args))
-         ;; We have two argument. The first argument must be of type vec4-t.
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'vec3-t))
-                  ;; One argument with no type or of type vec4-t
+                  (error "Syntax error in GRAPHENE:WITH-VEC4")))))
+        ((null (third args))
+         ;; We have two argument. The first argument must be of type vec3-t.
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'vec3-t))
+                  ;; The first argument with no type or of type vec3-t
                   `(let ((,var (vec4-alloc)))
                      (vec4-init-from-vec3 ,var ,arg ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (vec4-free ,var))))
                  (t
-                  (error "Type error in GRAPHENE:WITH-VEC4")))))
-        ((not (fourth args))
+                  (error "Syntax error in GRAPHENE:WITH-VEC4")))))
+        ((null (fourth args))
          ;; We have three arguments. The first argument must be of type vec2-t.
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'vec2-t))
-                  ;; One argument with no type or of type vec2-t
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'vec2-t))
+                  ;; The first argument with no type or of type vec2-t
                   `(let ((,var (vec4-alloc)))
                      (vec4-init-from-vec2 ,var ,arg ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (vec4-free ,var))))
                  (t
-                  (error "Type error in GRAPHENE:WITH-VEC4")))))
-        ((not (fifth args))
-         ;; We have a list of four arguments with (x,y,z,w) values
+                  (error "Syntax error in GRAPHENE:WITH-VEC4")))))
+        ((null (fifth args))
+         ;; We have a list of four arguments with the (x,y,z,w) values
          `(let ((,var (vec4-alloc)))
             (vec4-init ,var ,@args)
             (unwind-protect
@@ -309,8 +423,24 @@
 (export 'with-vec4)
 
 (defmacro with-vec4s (vars &body body)
+ #+liber-documentation
+ "@version{2023-12-10}
+  @syntax[]{(graphene:with-vec4s (v1 v2 v3 ... vn) body) => result}
+  @argument[v1 ... vn]{the newly created @symbol{graphene:vec4-t} instances}
+  @argument[body]{a body that uses the bindings @arg{v1 ... vn}}
+  @begin{short}
+    The @fun{graphene:with-vec4s} macro creates new variable bindings and
+    executes the body that use these bindings.
+  @end{short}
+  The macro performs the bindings sequentially, like the @sym{let*} macro.
+
+  Each vector can be initialized with values using the syntax for the
+  @fun{graphene:with-vec4} macro. See also the @fun{graphene:with-vec4}
+  documentation.
+  @see-symbol{graphene:vec4-t}
+  @see-macro{graphene:with-vec4}"
   (if vars
-      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+      (let ((var (mklist (first vars))))
         `(with-vec4 ,var
            (with-vec4s ,(rest vars)
              ,@body)))
@@ -341,16 +471,17 @@
 ;;; graphene_vec2_t
 ;;; ----------------------------------------------------------------------------
 
-(cffi:defcstruct vec2-t)
+(cffi:defcstruct vec2-t
+  (value :float :count 4)) ; place for 4 float values
 
 #+liber-documentation
 (setf (liber:alias-for-symbol 'vec2-t)
       "CStruct"
       (liber:symbol-documentation 'vec2-t)
- "@version{#2022-9-22}
+ "@version{#2023-12-10}
   @begin{short}
-    The @symbol{grapnene:vec2-t} structure is capable of holding a vector with
-    two dimensions: x and y.
+    The @symbol{graphene:vec2-t} structure is capable of holding a vector with
+    two dimensions x and y.
   @end{short}
   Use the @fun{graphene:vec2-x} and @fun{graphene:vec2-y} functions to get the
   values of the components. There are no functions to set the values directly.
@@ -382,16 +513,17 @@
 ;;; graphene_vec3_t
 ;;; ----------------------------------------------------------------------------
 
-(cffi:defcstruct vec3-t)
+(cffi:defcstruct vec3-t
+  (value :float :count 4)) ; place for 4 float values
 
 #+liber-documentation
 (setf (liber:alias-for-symbol 'vec3-t)
       "CStruct"
       (liber:symbol-documentation 'vec3-t)
- "@version{#2022-9-22}
+ "@version{#2023-12-10}
   @begin{short}
     The @symbol{graphene:vec3-t} structure is capable of holding a vector with
-    three dimensions: x, y, and z.
+    three dimensions x, y, and z.
   @end{short}
   Use the @fun{graphene:vec3-x}, @fun{graphene:vec3-y}, and
   @fun{graphene:vec3-z} functions to get the values of the components. There
@@ -425,16 +557,17 @@
 ;;; graphene_vec4_t
 ;;; ----------------------------------------------------------------------------
 
-(cffi:defcstruct vec4-t)
+(cffi:defcstruct vec4-t
+  (value :float :count 4)) ; place for 4 float values
 
 #+liber-documentation
 (setf (liber:alias-for-symbol 'vec4-t)
       "CStruct"
       (liber:symbol-documentation 'vec4-t)
- "@version{#2022-9-22}
+ "@version{#2023-10-12}
   @begin{short}
     The @symbol{graphene:vec4-t} structure is capable of holding a vector with
-    four dimensions: x, y, z and w.
+    four dimensions x, y, z and w.
   @end{short}
   Use the @fun{graphene:vec4-x}, @fun{graphene:vec4-y}, @fun{graphene:vec4-z},
   and @fun{graphene:vec4-w} functions to get the values of the components.
@@ -452,13 +585,13 @@
 
 (cffi:defcfun ("graphene_vec2_alloc" vec2-alloc) (:pointer (:struct vec2-t))
  #+liber-documentation
- "@version{#2022-9-22}
-  @return{The newly allocated @symbol{graphene:vec2-t} instance. Use the
-  @fun{graphene:vec2-free} function to free the resources allocated by this
-  function.}
+ "@version{2023-10-12}
+  @return{The newly allocated @symbol{graphene:vec2-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:vec2-t} instance.
   @end{short}
+  Use the @fun{graphene:vec2-free} function to free the resources allocated by
+  this function.
   @see-symbol{graphene:vec2-t}
   @see-function{graphene:vec2-free}")
 
@@ -470,7 +603,7 @@
 
 (cffi:defcfun ("graphene_vec2_free" vec2-free) :void
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2023-10-12}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
   @short{Frees the resources allocated by @arg{v}.}
   @see-symbol{graphene:vec2-t}
@@ -611,11 +744,11 @@
 
 (defun vec2-subtract (a b result)
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{#2023-10-12}
   @argument[a]{a @symbol{graphene:vec2-t} instance}
   @argument[b]{a @symbol{graphene:vec2-t} instance}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the result}
-  @return{A @symbol{graphene:vec2-t} instance with the result.}
+  @return{The @symbol{graphene:vec2-t} instance with the result.}
   @begin{short}
     Subtracts from each component of the first operand @arg{a} the corresponding
     component of the second operand @arg{b} and places each result into the
@@ -897,9 +1030,6 @@
 ;;; graphene_vec2_interpolate ()
 ;;; ----------------------------------------------------------------------------
 
-;; TODO: Is factor a double float? Yes, the C library defines a double float
-;; value. But the value is coerced to a float value for the calculation.
-
 (defun vec2-interpolate (v1 v2 factor result)
  #+liber-documentation
  "@version{#2022-9-22}
@@ -1011,13 +1141,13 @@
 
 (cffi:defcfun ("graphene_vec3_alloc" vec3-alloc) (:pointer (:struct vec3-t))
  #+liber-documentation
- "@version{#2022-9-22}
-  @return{The newly allocated @symbol{graphene:vec3-t} instance. Use the
-  @fun{graphene:vec3-free} function to free the resources allocated by this
-  function.}
+ "@version{2023-12-10}
+  @return{The newly allocated @symbol{graphene:vec3-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:vec3-t} instance.
   @end{short}
+  Use the @fun{graphene:vec3-free} function to free the resources allocated by
+  this function.
   @see-symbol{graphene:vec3-t}
   @see-function{graphende:vec3-free}")
 
@@ -1029,7 +1159,7 @@
 
 (cffi:defcfun ("graphene_vec3_free" vec3-free) :void
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2023-12-10}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
   @short{Frees the resources allocated by @arg{v}.}
   @see-symbol{graphene:vec3-t}
@@ -1733,13 +1863,13 @@
 
 (cffi:defcfun ("graphene_vec4_alloc" vec4-alloc) (:pointer (:struct vec4-t))
  #+liber-documentation
- "@version{#2022-9-22}
-  @return{The newly allocated @symbol{graphene:vec4-t} instance. Use the
-    @fun{graphene:vec4-free} function to free the resources allocated by this
-    function.}
+ "@version{2023-12-10}
+  @return{The newly allocated @symbol{graphene:vec4-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:vec4-t} instance.
   @end{short}
+  Use the @fun{graphene:vec4-free} function to free the resources allocated by
+  this function.
   @see-symbol{graphene:vec4-t}
   @see-function{graphene:vec4-free}")
 
@@ -1751,7 +1881,7 @@
 
 (cffi:defcfun ("graphene_vec4_free" vec4-free) :void
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2023-12-10}
   @argument[v]{a @symbol{graphene:vec3-4} instance}
   @short{Frees the resources allocated by @arg{v}.}
   @see-symbol{graphene:vec4-t}
@@ -2333,15 +2463,15 @@
 
 (defun vec4-xyz (v result)
  #+liber-documentation
- "@version{#2022-9-23}
-  @argument[v]{a @symbol{vec4-t} instance}
-  @return{The @symbol{vec3-t} instance.}
+ "@version{#2023-12-10}
+  @argument[v]{a @symbol{graphene:vec4-t} instance}
+  @return{The @symbol{graaphene:vec3-t} instance.}
   @begin{short}
-    Returns a @symbol{vec3-t} instance that contains the first three components
-    of the given vector.
+    Returns a @symbol{graphene:vec3-t} instance that contains the first three
+    components of the given vector.
   @end{short}
-  @see-symbol{vec4-t}
-  @see-symbol{vec3-t}"
+  @see-symbol{graphene:vec4-t}
+  @see-symbol{graphene:vec3-t}"
   (cffi:foreign-funcall "graphene_vec4_get_xyz"
                         (:pointer (:struct vec4-t)) v
                         (:pointer (:struct vec3-t)) result
@@ -2356,10 +2486,11 @@
 
 (cffi:defcfun ("graphene_vec4_zero" vec4-zero) (:pointer (:struct vec4-t))
  #+liber-documentation
- "@version{#2022-9-23}
-  @return{The @symbol{vec4-t} instance with three components, all sets to 0.0.}
+ "@version{#2023-12-10}
+  @return{The @symbol{graphene:vec4-t} instance with three components, all
+    sets to 0.0.}
   @short{Retrieves a constant zero vector.}
-  @see-symbol{vec4-t}")
+  @see-symbol{graphene:vec4-t}")
 
 (export 'vec4-zero)
 
@@ -2369,10 +2500,11 @@
 
 (cffi:defcfun ("graphene_vec4_one" vec4-one) (:pointer (:struct vec4-t))
  #+liber-documentation
- "@version{#2022-9-23}
-  @return{The @symbol{vec4-t} instance with three components, all sets to 1.0.}
+ "@version{#2023-12-10}
+  @return{The @symbol{graphene:vec4-t} instance with three components, all
+    sets to 1.0.}
   @short{Retrieves a constant one vector.}
-  @see-symbol{vec4-t}")
+  @see-symbol{graphene:vec4-t}")
 
 (export 'vec4-one)
 
@@ -2382,10 +2514,10 @@
 
 (cffi:defcfun ("graphene_vec4_x_axis" vec4-x-axis) (:pointer (:struct vec4-t))
  #+liber-documentation
- "@version{#2022-9-23}
-  @return{The @symbol{vec4-t} instance with the x axis vector.}
+ "@version{#2023-12-10}
+  @return{The @symbol{graphene:vec4-t} instance with the x axis vector.}
   @short{Retrieves a constant vector with (1.0, 0.0, 0.0, 0.0) components.}
-  @see-symbol{vec4-t}")
+  @see-symbol{graphene:vec4-t}")
 
 (export 'vec4-x-axis)
 
@@ -2395,10 +2527,10 @@
 
 (cffi:defcfun ("graphene_vec4_y_axis" vec4-y-axis) (:pointer (:struct vec4-t))
  #+liber-documentation
- "@version{#2022-9-23}
-  @return{The @symbol{vec4-t} instance with the y axis vector.}
+ "@version{#2023-12-10}
+  @return{The @symbol{graphene:vec4-t} instance with the y axis vector.}
   @short{Retrieves a constant vector with (0.0, 1.0, 0.0, 0.0) components.}
-  @see-symbol{vec4-t}")
+  @see-symbol{graphene:vec4-t}")
 
 (export 'vec4-y-axis)
 
@@ -2408,10 +2540,10 @@
 
 (cffi:defcfun ("graphene_vec4_z_axis" vec4-z-axis) (:pointer (:struct vec4-t))
  #+liber-documentation
- "@version{#2022-9-23}
-  @return{The @symbol{vec4-t} instance with the z axis vector.}
+ "@version{#2023-12-10}
+  @return{The @symbol{graphene:vec4-t} instance with the z axis vector.}
   @short{Retrieves a constant vector with (0.0, 0.0, 1.0, 0.0) components.}
-  @see-symbol{vec4-t}")
+  @see-symbol{graphene:vec4-t}")
 
 (export 'vec4-z-axis)
 
@@ -2421,12 +2553,11 @@
 
 (cffi:defcfun ("graphene_vec4_w_axis" vec4-w-axis) (:pointer (:struct vec4-t))
  #+liber-documentation
- "@version{#2022-9-23}
-  @return{The @symbol{vec4-t} instance with the w axis vector.}
+ "@version{#2023-12-10}
+  @return{The @symbol{graphene:vec4-t} instance with the w axis vector.}
   @short{Retrieves a constant vector with (0.0, 0.0, 0.0, 1.0) components.}
-  @see-symbol{vec4-t}")
+  @see-symbol{graphene:vec4-t}")
 
 (export 'vec4-w-axis)
 
 ;;; --- End of file graphene.vector.lisp ---------------------------------------
-

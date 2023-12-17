@@ -37,4 +37,78 @@
     (pushnew (intern (string-upcase (machine-instance)) :keyword) *features*)
     (pushnew :graphene *features*))
 
+;;; ----------------------------------------------------------------------------
+
+(declaim (inline mklist))
+
+(defun mklist (obj)
+  (if (listp obj)
+      obj
+      (list obj)))
+
+(defmacro with-object ((var type &rest args) &body body)
+  (cond ((eq 'point-t type)
+         `(with-point (,var ,@args) ,@body))
+        ((eq 'point3d-t type)
+         `(with-point3d (,var ,@args) ,@body))
+        ((eq 'rect-t type)
+         `(with-rect (,var ,@args) ,@body))
+        ((eq 'size-t type)
+         `(with-size (,var ,@args) ,@body))
+        ((eq 'vec2-t type)
+         `(with-vec2 (,var ,@args) ,@body))
+        ((eq 'vec3-t type)
+         `(with-vec3 (,var ,@args) ,@body))
+        ((eq 'vec4-t type)
+         `(with-vec4 (,var ,@args) ,@body))
+        ((eq 'quad-t type)
+         `(with-quad (,var ,@args) ,@body))
+        ((eq 'quaternion-t type)
+         `(with-quaternion (,var ,@args) ,@body))
+        ((eq 'box-t type)
+         `(with-box (,var ,@args) ,@body))
+        ((eq 'ray-t type)
+         `(with-ray (,var ,@args) ,@body))
+        ((eq 'triangle-t type)
+         `(with-triangle (,var ,@args) ,@body))
+        ((eq 'plane-t type)
+         `(with-plane (,var ,@args) ,@body))
+        ((eq 'sphere-t type)
+         `(with-sphere (,var ,@args) ,@body))
+        ((eq 'euler-t type)
+         `(with-euler (,var ,@args) ,@body))
+        ((eq 'frustum-t type)
+         `(with-frustum (,var ,@args) ,@body))
+        ((eq 'matrix-t type)
+         `(with-matrix (,var ,@args) ,@body))
+        (t
+         (error "Syntax error in GRAPHENE:WITH-object"))))
+
+(export 'with-object)
+
+(defmacro with-objects (vars &body body)
+ #+liber-documentation
+ "@version{2023-12-10}
+  @syntax[]{(graphene:with-objects (obj1 ... objn) body) => result}
+  @argument[obj1 ... objn]{the newly created Graphene instances}
+  @argument[body]{a body that uses the bindings @arg{obj1 ... objn}}
+  @begin{short}
+    The @fun{graphene:with-objects} macro creates new variable bindings and
+    executes the body that use these bindings.
+  @end{short}
+  The macro performs the bindings sequentially, like the @sym{let*} macro.
+
+  Each object can be initialized with values using the syntax for the
+  @fun{graphene:with-object} macro. See also the @fun{graphene:with-object}
+  documentation.
+  @see-macro{graphene:with-object}"
+  (if vars
+      (let ((var (mklist (first vars))))
+        `(with-object ,var
+           (with-objects ,(rest vars)
+             ,@body)))
+      `(progn ,@body)))
+
+(export 'with-objects)
+
 ;;; --- End of file graphene.init.lisp -----------------------------------------

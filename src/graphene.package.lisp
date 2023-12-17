@@ -228,6 +228,7 @@
     @about-function{sphere-init}
     @about-function{sphere-init-from-points}
     @about-function{sphere-init-from-vectors}
+    @about-function{sphere-init-from-sphere}
     @about-function{sphere-center}
     @about-function{sphere-radius}
     @about-function{sphere-bounding-box}

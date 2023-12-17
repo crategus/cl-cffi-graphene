@@ -45,11 +45,6 @@
 ;;;     graphene_quad_contains
 ;;;     graphene_quad_bounds
 ;;;     graphene_quad_get_point
-;;;
-;;; Description
-;;;
-;;;     A graphene_quad_t represents a coplanar, four vertex quadrilateral
-;;;     shape.
 ;;; ----------------------------------------------------------------------------
 
 (in-package :graphene)
@@ -61,13 +56,13 @@
  "@version{2023-11-20}
   @syntax[]{(graphene:with-quad (q) body) => result}
   @syntax[]{(graphene:with-quad (q r) body) => result}
-  @syntax[]{(graphene:with-quad (q p1 p2 p3 p4) body) => result}
+  @syntax[]{(graphene:with-quad (q p0 p1 p2 p3) body) => result}
   @argument[q]{a @symbol{graphene:quad-t} instance to create and initialize}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @argument[p1]{a @symbol{graphene:point-t} instance with the first point}
-  @argument[p2]{a @symbol{graphene:point-t} instance with the second point}
-  @argument[p3]{a @symbol{graphene:point-t} instance with the third point}
-  @argument[p4]{a @symbol{graphene:point-t} instance with the fourth point}
+  @argument[p0]{a @symbol{graphene:point-t} instance with the first point}
+  @argument[p1]{a @symbol{graphene:point-t} instance with the second point}
+  @argument[p2]{a @symbol{graphene:point-t} instance with the third point}
+  @argument[p3]{a @symbol{graphene:point-t} instance with the fourth point}
   @begin{short}
     The @fun{graphene:with-quad} macro allocates a new @symbol{graphene:quad-t}
     instance, initializes the quadrilateral with the given values and executes
@@ -76,10 +71,10 @@
   After execution of the body the allocated memory for the quadrilateral is
   released.
 
-  When no argument is given the components of the quadrilateral are not
-  initialized and undefined. The initialization with four points uses the
-  @fun{graphene:quad-init} function. The initialization from a rectangle
-  is done with the @fun{graphene:quad-init-from-rect} function.
+  When no argument is given the components of the quadrilateral are initialized
+  to zeros. The initialization with four points uses the
+  @fun{graphene:quad-init} function. The initialization from a rectangle is done
+  with the @fun{graphene:quad-init-from-rect} function.
   @begin[Note]{dictionary}
     The memory is allocated with the @fun{graphene:quad-alloc} function and
     released with the @fun{graphene:quad-free} function.
@@ -89,25 +84,25 @@
   @see-macro{graphene:with-quads}
   @see-function{graphene:quad-alloc}
   @see-function{graphene:quad-free}"
-  (cond ((not args)
+  (cond ((null args)
         ;; The default is no initialization
         `(let ((,var (quad-alloc)))
            (unwind-protect
+             (quad-init-from-rect ,var (rect-zero))
              (progn ,@body)
              (quad-free ,var))))
-        ((not (second args))
+        ((null (second args))
          ;; We have one argument. The argument must be of type rect-t
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'rect-t))
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'rect-t))
                   ;; One argument with no type or of type rect-t
                   `(let ((,var (quad-alloc)))
                      (setf ,var (quad-init-from-rect ,var ,arg))
                      (unwind-protect
                        (progn ,@body)
                        (quad-free ,var)))))))
-         ((not (fifth args))
+         ((null (fifth args))
           ;; We have a list with four arguments, use quad-init
           `(let ((,var (quad-alloc)))
              (setf ,var (quad-init ,var ,@args))
@@ -160,8 +155,6 @@
     A 4 vertex quadrilateral, as represented by four @symbol{graphene:point-t}
     instances.
   @end{short}
-  The contents of a @symbol{graphene:quad-t} instance are private and should
-  never be accessed directly.
   @see-symbol{graphene:point-t}")
 
 (export 'quad-t)
@@ -209,13 +202,13 @@
  #+liber-documentation
  "@version{2023-11-20}
   @argument[q]{a @symbol{graphene:quad-t} instance}
-  @argument[p1]{a @symbol{graphene:point-t} instance with the first point of
+  @argument[p0]{a @symbol{graphene:point-t} instance with the first point of
     the quadrilateral}
-  @argument[p2]{a @symbol{graphene:point-t} instance with the second point of
+  @argument[p1]{a @symbol{graphene:point-t} instance with the second point of
     the quadrilateral}
-  @argument[p3]{a @symbol{graphene:point-t} instance with the third point of
+  @argument[p2]{a @symbol{graphene:point-t} instance with the third point of
     the quadrilateral}
-  @argument[p4]{a @symbol{graphene:point-t} instance with the fourth point of
+  @argument[p3]{a @symbol{graphene:point-t} instance with the fourth point of
     the quadrilateral}
   @return{The initialized @symbol{graphene:quad-t} instance.}
   @begin{short}
@@ -224,10 +217,10 @@
   @see-symbol{graphene:quad-t}
   @see-symbol{graphene:point-t}"
   (q (:pointer (:struct quad-t)))
+  (p0 (:pointer (:struct point-t)))
   (p1 (:pointer (:struct point-t)))
   (p2 (:pointer (:struct point-t)))
-  (p3 (:pointer (:struct point-t)))
-  (p4 (:pointer (:struct point-t))))
+  (p3 (:pointer (:struct point-t))))
 
 (export 'quad-init)
 

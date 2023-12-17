@@ -52,43 +52,72 @@
 (in-package :graphene)
 
 (defmacro with-frustum ((var &rest args) &body body)
-  (cond
-;        ((not args)
-;         ;; We have no arguments, the default is initialization with zeros.
-;         `(let ((,var (frustum-alloc)))
-;            (frustum-init-from-matrix ,var (matrix-zero))
-;            (unwind-protect
-;              (progn ,@body)
-;              (box-free ,var))))
+ #+liber-documentation
+ "@version{2023-12-10}
+  @syntax[]{(graphene:with-frustum (frustum) body) => result}
+  @syntax[]{(graphene:with-frustum (frustum frustum1) body) => result}
+  @syntax[]{(graphene:with-frustum (frustum (matrix graphene:matrix-t)) body)
+    => result}
+  @syntax[]{(graphene:with-frustum (frustum plane0 ... plane5) body) => result}
+  @argument[frustum]{a @symbol{graphene:frustum-t} instance to create and
+    initialize}
+  @argument[frustum1]{a @symbol{graphene:frustum-t} instance to use for
+    initialization}
+  @argument[matrix]{a @symbol{graphene:matrix-t} instance to use for
+    initialization}
+  @argument[plane0 ... plane5]{the six @symbol{graphene:plane-t} instances to
+    use for initialization}
+  @begin{short}
+    The @fun{graphene:with-frustum} macro allocates a new
+    @symbol{graphene:frustum-t} instance, initializes the frustum with the given
+    values and executes the body that uses the frustum.
+  @end{short}
+  After execution of the body the allocated memory for the frustum is released.
 
-        ((and (first args) (not (second args)))
+  When no argument is given the components of the frustum are undefined. The
+  initialization with another frustum uses the
+  @fun{graphene:frustum-init-from-frustum} function. If the first value has the
+  @code{graphene:matrix-t} type the @fun{graphene:frustum-init-from-matrix}
+  function is used for initialization with the matrix. The initialization from
+  six planes is done with the @fun{graphene:frustum-init} function.
+  @begin[Note]{dictionary}
+    The memory is allocated with the @fun{graphene:box-alloc} function and
+    released with the @fun{graphene:box-free} function.
+  @end{dictionary}
+  @see-symbol{graphene:frustum-t}
+  @see-symbol{graphene:matrix-t}
+  @see-symbol{graphene:plane-t}
+  @see-macro{graphene:with-frustums}
+  @see-function{graphene:frustum-alloc}
+  @see-function{graphene:frustum-free}"
+  (cond ((null args)
+         ;; We have no arguments, we return an uninitialized frustum
+         `(let ((,var (frustum-alloc)))
+            (unwind-protect
+              (progn ,@body)
+              (frustum-free ,var))))
+        ((null (second args))
          ;; One argument
-         (format t "one argument ~a~%" args)
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'frustum-t))
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'frustum-t))
                   ;; One argument with no type or of type frustum-t
                   `(let ((,var (frustum-alloc)))
                      (frustum-init-from-frustum ,var ,arg)
                      (unwind-protect
                        (progn ,@body)
                        (frustum-free ,var))))
-
-                 ((eq type 'marrix-t)
+                 ((eq type1 'matrix-t)
                   ;; One argument with type matrix-t
                   `(let ((,var (frustum-alloc)))
                      (frustum-init-from-matrix ,var ,arg)
                      (unwind-protect
                        (progn ,@body)
                        (frustum-free ,var))))
-
                  (t
-                  (error "Type error in GRAPHENE:WITH-FRUSTUM")))))
-
-        ((not (seventh args))
+                  (error "Syntac error in GRAPHENE:WITH-FRUSTUM")))))
+        ((null (seventh args))
          ;; Six arguments of type plane-t
-         (format t "six argument ~a~%" args)
          `(let ((,var (frustum-alloc)))
             (frustum-init ,var ,@args)
             (unwind-protect
@@ -100,8 +129,25 @@
 (export 'with-frustum)
 
 (defmacro with-frustums (vars &body body)
+ #+liber-documentation
+ "@version{2023-12-10}
+  @syntax[]{(graphene:with-frustums (frustum1 ... frustumn) body) => result}
+  @argument[frustum1 ... frustumn]{the newly created @symbol{graphene:frustum-t}
+    instances}
+  @argument[body]{a body that uses the bindings @arg{frustum1 ... frustumn}}
+  @begin{short}
+    The @fun{graphene:with-frustums} macro creates new variable bindings and
+    executes the body that use these bindings.
+  @end{short}
+  The macro performs the bindings sequentially, like the @sym{let*} macro.
+
+  Each point can be initialized with values using the syntax for the
+  @fun{graphene:with-frustum} macro. See also the @fun{graphene:with-frustum}
+  documentation.
+  @see-symbol{graphene:frustum-t}
+  @see-macro{graphene:with-frustum}"
   (if vars
-      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+      (let ((var (mklist (first vars))))
         `(with-frustum ,var
            (with-frustums ,(rest vars)
              ,@body)))
@@ -119,7 +165,7 @@
 (setf (liber:alias-for-symbol 'frustum-t)
       "CStruct"
       (liber:symbol-documentation 'frustum-t)
- "@version{#2022-9-25}
+ "@version{2023-12-10}
   @begin{short}
     A @symbol{graphene:frustum-t} structure represents a volume of space
     delimited by planes.
@@ -137,7 +183,7 @@
 (cffi:defcfun ("graphene_frustum_alloc" frustum-alloc)
     (:pointer (:struct frustum-t))
  #+liber-documentation
- "@version{#2022-9-25}
+ "@version{2023-12-10}
   @return{The newly allocated @symbol{graphene:frustum-t} instance. Use the
     @fun{graphene:frustum-free} function to free the resources allocated by this
     function.}
@@ -156,7 +202,7 @@
 
 (cffi:defcfun ("graphene_frustum_free" frustum-free) :void
  #+liber-documentation
- "@version{#2022-9-25}
+ "@version{2023-12-10}
   @argument[frustum]{a @symbol{graphene:frustum-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:frustum-alloc} function.
@@ -176,12 +222,8 @@
  #+liber-documentation
  "@version{#2022-9-29}
   @argument[frustum]{a @symbol{graphene:frustum-t} instance}
-  @argument[p0]{a @symbol{graphene:plane-t} instance with a clipping plane}
-  @argument[p1]{a @symbol{graphene:plane-t} instance with a clipping plane}
-  @argument[p2]{a @symbol{graphene:plane-t} instance with a clipping plane}
-  @argument[p3]{a @symbol{graphene:plane-t} instance with a clipping plane}
-  @argument[p4]{a @symbol{graphene:plane-t} instance with a clipping plane}
-  @argument[p5]{a @symbol{graphene:plane-t} instance with a clipping plane}
+  @argument[p0 ... p5]{the six @symbol{graphene:plane-t} instances with a
+    clipping plane}
   @return{The initialized @symbol{graphene:frustum-t} instance.}
   @begin{short}
     Initializes the given @symbol{graphene:frustum-t} instance using the
@@ -246,42 +288,30 @@
 ;;; graphene_frustum_get_planes ()
 ;;; ----------------------------------------------------------------------------
 
-;; FIXME: The implementation does not work.
-
-#+nil
 (cffi:defcfun ("graphene_frustum_get_planes" %frustum-planes) :void
   (frustum (:pointer (:struct frustum-t)))
   (values-ar :pointer))
 
-#+nil
 (defun frustum-planes (frustum planes)
  #+liber-documentation
- "@version{#2022-9-29}
+ "@version{2023-12-10}
   @argument[frustum]{a @symbol{graphene:frustum-t} instance}
-  @argument[planes]{a list with the @symbol{graphene:plane-t} instances}
-  @return{The list of @symbol{graphene:plane-t} instances.}
+  @argument[planes]{a list with six @symbol{graphene:plane-t} instances}
+  @return{The list of six @symbol{graphene:plane-t} instances.}
   @begin{short}
     Retrieves the planes that define the given @symbol{graphene:frustum-t}
     instance.
   @end{short}
   @see-symbol{graphene:frustum-t}
   @see-symbol{graphene:plane-t}"
-  (format t "~& in FRUSTUM-PLANES with ~a~%" planes)
-  (with-vec3 (result)
-  ;; FIXME: This is wrong. We have to allocate memory for 6 planes.
-  (cffi:with-foreign-object (planes-ar :pointer 6)
-    (loop for i from 0 below 6
-          for plane in planes
-          do (format t " plane ~a : ~a ~a~%"
-                       i
-                       (vec3-to-float (plane-normal plane result))
-                       (plane-constant plane))
-             (setf (cffi:mem-aref planes-ar :pointer i) plane)
-    )
+  (cffi:with-foreign-object (planes-ar '(:struct plane-t) 6)
     (%frustum-planes frustum planes-ar)
-    planes)))
+    (iter (for i from 0 below 6)
+          (for plane in planes)
+          (for ptr = (cffi:mem-aptr planes-ar '(:struct plane-t) i))
+          (plane-init-from-plane plane ptr)
+          (collect plane))))
 
-#+nil
 (export 'frustum-planes)
 
 ;;; ----------------------------------------------------------------------------

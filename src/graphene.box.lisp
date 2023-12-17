@@ -72,19 +72,55 @@
 (in-package :graphene)
 
 (defmacro with-box ((var &rest args) &body body)
-  (cond ((not args)
+ #+liber-documentation
+ "@version{2023-12-8}
+  @syntax[]{(graphene:with-box (box) body) => result}
+  @syntax[]{(graphene:with-box (box box1) body) => result}
+  @syntax[]{(graphene:with-box (box pmin pmax) body) => result}
+  @syntax[]{(graphene:with-box (box (vmin graphene:vec3-t) vmax) body) => result}
+  @argument[box]{a @symbol{graphene:box-t} instance to create and initialize}
+  @argument[box1]{a @symbol{graphene:box-t} instance to use for initialization}
+  @argument[pmin]{a @symbol{graphene:point3d-t} instance to use for
+    initialization}
+  @argument[pmax]{a @symbol{graphene:point3d-t} instance to use for
+    initialization}
+  @argument[vmin]{a @symbol{graphene:vec3-t} instance to use for initialization}
+  @argument[vmax]{a @symbol{graphene:vec3-t} instance to use for initialization}
+  @begin{short}
+    The @fun{graphene:with-box} macro allocates a new @symbol{graphene:box-t}
+    instance, initializes the box with the given values and executes the body
+    that uses the box.
+  @end{short}
+  After execution of the body the allocated memory for the box is released.
+
+  When no argument is given the components of the box are initialized to zero.
+  The initialization with two points uses the @fun{graphene:box-init} function.
+  If the first value has the @code{graphene:vec3-t} type the
+  @fun{graphene:box-init-from-vec3} function is used for initialization with
+  two vectors. The initialization from another box is done with the
+  @fun{graphene:box-init-from-box} function.
+  @begin[Note]{dictionary}
+    The memory is allocated with the @fun{graphene:box-alloc} function and
+    released with the @fun{graphene:box-free} function.
+  @end{dictionary}
+  @see-symbol{graphene:box-t}
+  @see-symbol{graphene:point3d-t}
+  @see-symbol{grapene:vec3-t}
+  @see-macro{graphene:with-boxes}
+  @see-function{graphene:box-alloc}
+  @see-function{graphene:box-free}"
+  (cond ((null args)
          ;; No arguments, the default is initialization with zeros.
          `(let ((,var (box-alloc)))
             (box-init-from-box ,var (box-zero))
             (unwind-protect
               (progn ,@body)
               (box-free ,var))))
-        ((not (second args))
+        ((null (second args))
          ;; One argument, the argument must be of type box-t.
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'box-t))
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'box-t))
                   ;; One argument with no type or of type box-t
                   `(let ((,var (box-alloc)))
                      (box-init-from-box ,var ,arg)
@@ -92,45 +128,59 @@
                        (progn ,@body)
                        (box-free ,var))))
                  (t
-                  (error "Type error in GRAPHENE:WITH-BOX")))))
-        ((not (third args))
-         ;; Two arguments, the first can be of type point3d-t or vec3-t.
-         ;; TODO: Combine the two destructuring-bind calls to onw call.
-         (destructuring-bind (arg1 &optional type1)
-             (if (listp (first args)) (first args) (list (first args)))
-           (destructuring-bind (arg2 &optional type2)
-               (if (listp (second args)) (second args) (list (second args)))
-             (cond ((and (or (not type1)
-                             (eq type1 'point3d-t))
-                         (or (not type2)
-                             (eq type2 'point3d-t)))
-                    ;; First argument with no type or of type point3d-t and
-                    ;; second argument with no type or type point3d-t
-                    `(let ((,var (box-alloc)))
-                       (box-init ,var ,arg1 ,arg2)
-                       (unwind-protect
-                         (progn ,@body)
-                         (box-free ,var))))
-                   ((and (eq type1 'vec3-t)
-                         (or (not type2)
-                             (eq type2 'vec3-t)))
-                    ;; First argument of type vec3-t and second argument with
-                    ;; no type or type vec3-t
-                    `(let ((,var (box-alloc)))
-                       (box-init-from-vec3 ,var ,arg1 ,arg2)
-                       (unwind-protect
-                         (progn ,@body)
-                         (box-free ,var))))
-                   (t
-                    (error "Type error in GRAPHENE:WITH-BOX"))))))
+                  (error "Syntax error in GRAPHENE:WITH-BOX")))))
+        ((null (third args))
+         ;; Two arguments, the first can be of type point3d-t or vec3-t
+         (destructuring-bind ((arg1 &optional type1)
+                              (arg2 &optional type2))
+             (list (mklist (first args)) (mklist (second args)))
+           (cond ((and (or (not type1)
+                           (eq type1 'point3d-t))
+                       (or (not type2)
+                           (eq type2 'point3d-t)))
+                  ;; First argument with no type or of type point3d-t and
+                  ;; second argument with no type or type point3d-t
+                  `(let ((,var (box-alloc)))
+                     (box-init ,var ,arg1 ,arg2)
+                     (unwind-protect
+                       (progn ,@body)
+                       (box-free ,var))))
+                 ((and (eq type1 'vec3-t)
+                       (or (not type2)
+                           (eq type2 'vec3-t)))
+                  ;; First argument of type vec3-t and second argument with
+                  ;; no type or type vec3-t
+                  `(let ((,var (box-alloc)))
+                     (box-init-from-vec3 ,var ,arg1 ,arg2)
+                     (unwind-protect
+                       (progn ,@body)
+                       (box-free ,var))))
+                 (t
+                  (error "Syntax error in GRAPHENE:WITH-BOX")))))
         (t
          (error "Syntax error in GRAPHENE:WITH-BOX"))))
 
 (export 'with-box)
 
 (defmacro with-boxes (vars &body body)
+ #+liber-documentation
+ "@version{2023-12-8}
+  @syntax[]{(graphene:with-boxes (box1 box2 box3 ... boxn) body) => result}
+  @argument[box1 ... boxn]{the newly created @symbol{graphene:box-t} instances}
+  @argument[body]{a body that uses the bindings @arg{box1 ... boxn}}
+  @begin{short}
+    The @fun{graphene:with-boxes} macro creates new variable bindings and
+    executes the body that use these bindings.
+  @end{short}
+  The macro performs the bindings sequentially, like the @sym{let*} macro.
+
+  Each box can be initialized with values using the syntax for the
+  @fun{graphene:with-box} macro. See also the @fun{graphene:with-box}
+  documentation.
+  @see-symbol{graphene:box-t}
+  @see-macro{graphene:with-box}"
   (if vars
-      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+      (let ((var (mklist (first vars))))
         `(with-box ,var
            (with-boxes ,(rest vars)
              ,@body)))
@@ -148,9 +198,9 @@
 (setf (liber:alias-for-symbol 'box-t)
       "CStruct"
       (liber:symbol-documentation 'box-t)
- "@version{#2022-9-22}
+ "@version{2023-12-8}
   @begin{short}
-    The @sym{graphene:box-t} structure provides a representation of an axis
+    The @symbol{graphene:box-t} structure provides a representation of an axis
     aligned minimum bounding box using the coordinates of its minimum and
     maximum vertices.
   @end{short}")
@@ -163,7 +213,7 @@
 
 (cffi:defcfun ("graphene_box_alloc" box-alloc) (:pointer (:struct box-t))
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2023-12-10}
   @return{The newly allocated @symbol{graphene:box-t} instance. Use the
     @fun{graphene:box-free} function to free the resources allocated by this
     function.}
@@ -182,7 +232,7 @@
 
 (cffi:defcfun ("graphene_box_free" box-free) :void
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2023-12-10}
   @argument[box]{a @symbol{graphene:box-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:box-alloc} function.

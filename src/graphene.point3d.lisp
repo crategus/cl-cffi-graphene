@@ -60,18 +60,18 @@
 
 (defmacro with-point3d ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2023-12-10}
   @syntax[]{(graphene:with-point3d (p) body) => result}
-  @syntax[]{(graphene:with-point3d (p x y z) body) => result}
   @syntax[]{(graphene:with-point3d (p p1) body) => result}
   @syntax[]{(graphene:with-point3d (p (v graphene:vec3-t)) body) => result}
+  @syntax[]{(graphene:with-point3d (p x y z) body) => result}
   @argument[p]{a @symbol{graphene:point3d-t} instance to create and initialize}
-  @argument[x]{a number coerced to a float for the x component of the point}
-  @argument[y]{a number coerced to a float for the y component of the point}
-  @argument[z]{a number coerced to a float for the z component of the point}
   @argument[p1]{a @symbol{graphene:point3d-t} instance to use for
     initialization}
   @argument[v]{a @symbol{graphene:vec3-t} instance to use for initialization}
+  @argument[x]{a number coerced to a float for the x component of the point}
+  @argument[y]{a number coerced to a float for the y component of the point}
+  @argument[z]{a number coerced to a float for the z component of the point}
   @begin{short}
     The @fun{graphene:with-point3d} macro allocates a new
     @symbol{graphene:point3d-t} instance, initializes the point with the given
@@ -114,7 +114,8 @@
     @begin{pre}
 (graphene:with-point3ds ((p1 0.3 0.5 0.7) (p2 p1))
   (list (graphene:point3d-x p2)
-        (graphene:point3d-y p2) (graphene:point3d-z p2)))
+        (graphene:point3d-y p2)
+        (graphene:point3d-z p2)))
 => (0.3 0.5 0.7)
     @end{pre}
   @end{dictionary}
@@ -123,26 +124,25 @@
   @see-macro{graphene:with-point3ds}
   @see-function{graphene:point3d-alloc}
   @see-function{graphene:point3d-free}"
-  (cond ((not args)
+  (cond ((null args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (point3d-alloc)))
             (point3d-init ,var 0.0 0.0 0.0)
             (unwind-protect
               (progn ,@body)
               (point3d-free ,var))))
-        ((not (second args))
+        ((null (second args))
          ;; We have one argument. The argument is of type point3d-t or vec3-t
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'point3d-t))
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'point3d-t))
                   ;; One argument with no type or of type point3d-t
                   `(let ((,var (point3d-alloc)))
                      (point3d-init-from-point ,var ,arg)
                      (unwind-protect
                        (progn ,@body)
                        (point3d-free ,var))))
-                 ((eq type 'vec3-t)
+                 ((eq type1 'vec3-t)
                   ;; One argument with type vec3-t
                   `(let ((,var (point3d-alloc)))
                      (point3d-init-from-vec3 ,var ,arg)
@@ -150,8 +150,8 @@
                        (progn ,@body)
                        (point3d-free ,var))))
                  (t
-                  (error "Type error in GRAPHENE:WITH-POINT3D")))))
-        ((not (fourth args))
+                  (error "Syntax error in GRAPHENE:WITH-POINT3D")))))
+        ((null (fourth args))
          ;; We have a list of three arguments with (x,y,z) values
          `(let ((,var (point3d-alloc)))
             (point3d-init ,var ,@args)
@@ -182,18 +182,21 @@
     @begin{pre}
 (graphene:with-point3ds (p1 (p2 1.2 1.3 1.4) (p3 p2))
   (list (list (graphene:point3d-x p1)
-              (graphene:point3d-y p1) (graphene:point3d-z p1))
+              (graphene:point3d-y p1)
+              (graphene:point3d-z p1))
         (list (graphene:point3d-x p2)
-              (graphene:point3d-y p2) (graphene:point3d-z p2))
+              (graphene:point3d-y p2)
+              (graphene:point3d-z p2))
         (list (graphene:point3d-x p3)
-              (graphene:point3d-y p3) (graphene:point3d-z p3))))
+              (graphene:point3d-y p3)
+              (graphene:point3d-z p3))))
 => ((0.0 0.0 0.0) (1.2 1.3 1.4) (1.2 1.3 1.4))
     @end{pre}
   @end{dictionary}
   @see-symbol{graphene:point3d-t}
   @see-macro{graphene:with-point3d}"
   (if vars
-      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+      (let ((var (mklist (first vars))))
         `(with-point3d ,var
            (with-point3ds ,(rest vars)
              ,@body)))
@@ -240,17 +243,12 @@
 => (1.0 0.5 5.0)
     @end{pre}
   @end{dictionary}
-  @see-constructor{graphene:point3d-init}
-  @see-constructor{graphene:point3d-init-from-point}
-  @see-constructor{graphene:point3d-init-from-vec3}
   @see-slot{graphene:point3d-x}
   @see-slot{graphene:point3d-y}
   @see-slot{graphene:point3d-z}
   @see-symbol{graphene:point-t}")
 
 (export 'point3d-t)
-
-;;; --- Acessor Implementations ------------------------------------------------
 
 ;;; --- graphene:point3d-x -----------------------------------------------------
 
@@ -775,7 +773,7 @@
   @see-symbol{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_point3d_normalize_viewport"
                         (:pointer (:struct point3d-t)) p
-                        (:pointer (:struct rect-t)) viewport
+                        :pointer viewport ; rect-t not known at this point
                         :float (coerce znear 'single-float)
                         :float (coerce zfar 'single-float)
                         (:pointer (:struct point3d-t)) result
@@ -785,4 +783,3 @@
 (export 'point3d-normalize-viewport)
 
 ;;; --- End of file graphene-point3d.lisp --------------------------------------
-

@@ -33,12 +33,9 @@
 ;;;
 ;;; Types and Values
 ;;;
-;;;     GRAPHENE_RECT_INIT_ZERO
 ;;;     graphene_rect_t
 ;;;
 ;;; Functions
-;;;
-;;;     GRAPHENE_RECT_INIT()
 ;;;
 ;;;     graphene_rect_alloc
 ;;;     graphene_rect_free
@@ -73,26 +70,18 @@
 ;;;     graphene_rect_interpolate
 ;;;     graphene_rect_zero
 ;;;     graphene_rect_scale
-;;;
-;;; Description
-;;;
-;;;     graphene_rect_t is a type representing a rectangle through an origin
-;;;     graphene_point_t point and a graphene_size_t size.
-;;;
-;;;     Operations on a graphene_rect_t will normalize the rectangle, to ensure
-;;;     that the origin is always the top-left corner of the rectangle and that
-;;;     the size is always positive.
 ;;; ----------------------------------------------------------------------------
 
 (in-package :graphene)
 
 (defmacro with-rect ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-2}
+ "@version{2023-12-9}
   @syntax[]{(graphene:with-rect (r) body) => result}
   @syntax[]{(graphene:with-rect (r src) body) => result}
   @syntax[]{(graphene:with-rect (r x y width height) body) => result}
   @argument[r]{a @symbol{graphene:rect-t} instance to create and initialize}
+  @argument[src]{a @symbol{graphene:rect-t} instance to use for initialization}
   @argument[x]{a number coerced to a float for the x coordinate of the
     rectangle}
   @argument[y]{a number coerced to a float for the y coordinate of the
@@ -100,7 +89,6 @@
   @argument[width]{a number coerced to a float with the width of the rectangle}
   @argument[height]{a number coerced to a float with the height of the
     rectangle}
-  @argument[src]{a @symbol{graphene:rect-t} instance to use for initialization}
   @begin{short}
     The @fun{graphene:with-rect} macro allocates a new @symbol{graphene:rect-t}
     instance, initializes the rectangle with the given values and executes the
@@ -121,19 +109,18 @@
   @see-macro{graphene:with-rects}
   @see-function{graphene:rect-alloc}
   @see-function{graphene:rect-free}"
-  (cond ((not args)
+  (cond ((null args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (rect-alloc)))
             (rect-init ,var 0.0 0.0 0.0 0.0)
             (unwind-protect
               (progn ,@body)
               (rect-free ,var))))
-        ((not (second args))
+        ((null (second args))
          ;; We have one argument. The argument must be of type rect-t.
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'rect-t))
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'rect-t))
                   ;; One argument with no type or of type rect-t
                   `(let ((,var (rect-alloc)))
                      (rect-init-from-rect ,var ,arg)
@@ -141,8 +128,8 @@
                        (progn ,@body)
                        (rect-free ,var))))
                  (t
-                  (error "Type error in GRAPHENE:WITH-RECT")))))
-        ((not (fifth args))
+                  (error "Syntax error in GRAPHENE:WITH-RECT")))))
+        ((null (fifth args))
          ;; We have a list of four arguments with (x,y,width,height) values
          `(let ((,var (rect-alloc)))
             (rect-init ,var ,@args)
@@ -179,17 +166,6 @@
       `(progn ,@body)))
 
 (export 'with-rects)
-
-;;; ----------------------------------------------------------------------------
-;;; GRAPHENE_RECT_INIT_ZERO
-;;;
-;;; #define GRAPHENE_RECT_INIT_ZERO GRAPHENE_RECT_INIT (0.f, 0.f, 0.f, 0.f)
-;;;
-;;; Initializes a graphene_rect_t to a degenerate rectangle with an origin in
-;;; (0, 0) and a size of 0.
-;;;
-;;; Since 1.10
-;;; ----------------------------------------------------------------------------
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_t
@@ -235,7 +211,7 @@
 
 (export 'rect-t)
 
-;;; --- rect-origin ------------------------------------------------------------
+;;; --- graphene:rect-origin ---------------------------------------------------
 
 (defun rect-origin (rect)
   (cffi:foreign-slot-pointer rect '(:struct rect-t) 'origin))
@@ -259,7 +235,7 @@
 
 (export 'rect-origin)
 
-;;; --- rect-size --------------------------------------------------------------
+;;; --- graphene:rect-size -----------------------------------------------------
 
 (defun rect-size (rect)
   (cffi:foreign-slot-pointer rect '(:struct rect-t) 'size))
@@ -284,35 +260,13 @@
 (export 'rect-size)
 
 ;;; ----------------------------------------------------------------------------
-;;; GRAPHENE_RECT_INIT()
-;;;
-;;; #define GRAPHENE_RECT_INIT(_x,_y,_w,_h)
-;;;
-;;; Initializes a graphene_rect_t when declaring it.
-;;;
-;;; _x :
-;;;     the X coordinate of the origin
-;;;
-;;; _y :
-;;;     the Y coordinate of the origin
-;;;
-;;; _w :
-;;;     the width
-;;;
-;;; _h :
-;;;     the height
-;;;
-;;; Since: 1.0
-;;; ----------------------------------------------------------------------------
-
-;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_alloc ()
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_rect_alloc" rect-alloc) (:pointer (:struct rect-t))
  #+liber-documentation
  "@version{2023-9-22}
-  @return{A new @symbol{graphene:rect-t} instance.}
+  @return{The new @symbol{graphene:rect-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:rect-t} instance.
   @end{short}
@@ -344,15 +298,14 @@
 
 (defun rect-init (r x y width height)
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @argument[x]{a number coerced to a single float with the x coordinate of the
+  @argument[x]{a number coerced to a float with the x coordinate of the
     rectangle}
-  @argument[y]{a number coerced to a single float with the y coordinate of the
+  @argument[y]{a number coerced to a float with the y coordinate of the
     rectangle}
-  @argument[width]{a number coerced to a single float with the width of the
-    rectangle}
-  @argument[height]{a number coerced to a single float with the height of the
+  @argument[width]{a number coerced to a float with the width of the rectangle}
+  @argument[height]{a number coerced to a float with the height of the
     rectangle}
   @return{The initialized @symbol{graphene:rect-t} instance.}
   @begin{short}
@@ -377,7 +330,7 @@
 (cffi:defcfun ("graphene_rect_init_from_rect" rect-init-from-rect)
     (:pointer (:struct rect-t))
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[src]{a @symbol{graphene:rect-t} instance}
   @return{The initialized @symbol{graphene:rect-t} instance.}
@@ -398,7 +351,7 @@
 
 (cffi:defcfun ("graphene_rect_equal" rect-equal) :bool
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[a]{a @symbol{graphene:rect-t} instance}
   @argument[b]{a @symbol{graphene:rect-t} instance}
   @return{@em{True} if the rectangles are equal.}
@@ -416,7 +369,7 @@
 (cffi:defcfun ("graphene_rect_normalize" rect-normalize)
     (:pointer (:struct rect-t))
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @return{The normalized @symbol{graphene:rect-t} instance.}
   @begin{short}
@@ -454,7 +407,7 @@
 
 (defun rect-center (r p)
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[p]{a @symbol{graphene:point-t} instance}
   @return{The @symbol{graphene:point-t} instance.}
@@ -477,7 +430,7 @@
 
 (defun rect-top-left (r p)
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[p]{a @symbol{graphene:point-t} instance}
   @return{The @symbol{graphene:point-t} instance}
@@ -500,7 +453,7 @@
 
 (defun rect-top-right (r p)
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[p]{a @symbol{graphene:point-t} instance}
   @return{The @symbol{graphene:point-t} instance}
@@ -523,7 +476,7 @@
 
 (defun rect-bottom-right (r p)
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[p]{a @symbol{graphene:point-t} instance}
   @return{The @symbol{graphene:point-t} instance}
@@ -546,7 +499,7 @@
 
 (defun rect-bottom-left (r p)
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[p]{a @symbol{graphene:point-t} instance}
   @return{The @symbol{graphene:point-t} instance}
@@ -569,9 +522,9 @@
 
 (cffi:defcfun ("graphene_rect_get_x" rect-x) :float
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @return{A single float with the normalized x coordinate of the rectangle.}
+  @return{The float with the normalized x coordinate of the rectangle.}
   @begin{short}
     Retrieves the normalized x coordinate of the origin of the given rectangle.
   @end{short}
@@ -586,9 +539,9 @@
 
 (cffi:defcfun ("graphene_rect_get_y" rect-y) :float
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @return{A single float with the normalized y coordinate of the rectangle.}
+  @return{The float with the normalized y coordinate of the rectangle.}
   @begin{short}
     Retrieves the normalized y coordinate of the origin of the given rectangle.
   @end{short}
@@ -603,9 +556,9 @@
 
 (cffi:defcfun ("graphene_rect_get_width" rect-width) :float
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @return{A single float with the normalized width of the rectangle.}
+  @return{The float with the normalized width of the rectangle.}
   @begin{short}
     Retrieves the normalized width of the given rectangle.
   @end{short}
@@ -620,9 +573,9 @@
 
 (cffi:defcfun ("graphene_rect_get_height" rect-height) :float
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @return{A single float with the normalized height of the rectangle.}
+  @return{The float with the normalized height of the rectangle.}
   @begin{short}
     Retrieves the normalized height of the given rectangle.
   @end{short}
@@ -637,9 +590,9 @@
 
 (cffi:defcfun ("graphene_rect_get_area" rect-area) :float
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @return{A single float with the area of the given normalized rectangle.}
+  @return{The float with the area of the given normalized rectangle.}
   @begin{short}
     Compute the area of the given normalized rectangle.
   @end{short}
@@ -650,23 +603,34 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_get_vertices ()
-;;;
-;;; void
-;;; graphene_rect_get_vertices (const graphene_rect_t *r,
-;;;                             graphene_vec2_t vertices[]);
-;;;
-;;; Computes the four vertices of a graphene_rect_t.
-;;;
-;;; r
-;;;     a graphene_rect_t
-;;;
-;;; vertices
-;;;     return location for an array of 4 graphene_vec2_t.
-;;;
-;;; Since 1.4
 ;;; ----------------------------------------------------------------------------
 
-;; TODO: Implement the function
+(cffi:defcfun ("graphene_rect_get_vertices" %rect-vertices) :void
+  (r (:pointer (:struct rect-t)))
+  (vertices :pointer))
+
+(defun rect-vertices (r vertices)
+ #+liber-documentation
+ "@version{2023-12-9}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[vertices]{a list with 4 @symbol{graphene:vec2-t} instances}
+  @return{The list with 4 @symbol{graphene:vec2-t} instances.}
+  @short{Computes the four vertices of a rectangle.}
+  @see-symbol{graphene:rect-t}
+  @see-symbol{graphene:vec2-t}"
+  (cffi:with-foreign-object (vertices-ar '(:struct vec2-t) 4)
+    (iter (for i from 0 below 4)
+          (for vertex in vertices)
+          (for ptr = (cffi:mem-aptr vertices-ar '(:struct vec2-t) i))
+          (vec2-init-from-vec2 ptr vertex))
+    (%rect-vertices r vertices-ar)
+    (iter (for i from 0 below 4)
+          (for vertex in vertices)
+          (for ptr = (cffi:mem-aptr vertices-ar '(:struct vec2-t) i))
+          (vec2-init-from-vec2 vertex ptr)
+          (collect vertex))))
+
+(export 'rect-vertices)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_union ()
@@ -674,11 +638,11 @@
 
 (defun rect-union (a b result)
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[a]{a @symbol{graphene:rect-t} instance}
   @argument[b]{a @symbol{graphene:rect-t} instance}
   @argument[result]{a @symbol{graphene:rect-t} instance}
-  @return{A @symbol{graphene:rect-t} instance.}
+  @return{The @symbol{graphene:rect-t} instance.}
   @begin{short}
     Computes the union of the two given rectangles.
   @end{short}
@@ -696,27 +660,26 @@
 ;;; graphene_rect_intersection ()
 ;;; ----------------------------------------------------------------------------
 
-;; TODO: Returns true if the two rectangles intersect. Change the implemenation?
-
 (defun rect-intersection (a b result)
  #+liber-documentation
- "@version{#2023-11-19}
+ "@version{2023-12-9}
   @argument[a]{a @symbol{graphene:rect-t} instance}
   @argument[b]{a @symbol{graphene:rect-t} instance}
   @argument[result]{a @symbol{graphene:rect-t} instance}
-  @return{A @symbol{graphene:rect-t} instance with the result.}
+  @return{The @symbol{graphene:rect-t} instance with the result, or @code{nil}
+    if the rectangles do not intersect.}
   @begin{short}
     Computes the intersection of the two given rectangles.
   @end{short}
   If the two rectangles do not intersect, @arg{result} will contain a degenerate
   rectangle with origin in (0, 0) and a size of 0.
   @see-symbol{graphene:rect-t}"
-  (cffi:foreign-funcall "graphene_rect_intersection"
-                        (:pointer (:struct rect-t)) a
-                        (:pointer (:struct rect-t)) b
-                        (:pointer (:struct rect-t)) result
-                        :bool)
-  result)
+  (when (cffi:foreign-funcall "graphene_rect_intersection"
+                              (:pointer (:struct rect-t)) a
+                              (:pointer (:struct rect-t)) b
+                              (:pointer (:struct rect-t)) result
+                              :bool)
+    result))
 
 (export 'rect-intersection)
 
@@ -726,7 +689,7 @@
 
 (cffi:defcfun ("graphene_rect_contains_point" rect-contains-point) :bool
  #+liber-documentation
- "@version{#2023-11-20}
+ "@version{2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[p]{a @symbol{graphene:point-t} instance}
   @return{@em{True} if the rectangle contains the point.}
@@ -744,7 +707,7 @@
 
 (cffi:defcfun ("graphene_rect_contains_rect" rect-contains-rect) :bool
  #+liber-documentation
- "@version{#2023-11-20}
+ "@version{2023-12-9}
   @argument[a]{a @symbol{graphene:rect-t} instance}
   @argument[b]{a @symbol{graphene:rect-t} instance}
   @return{@em{True} if the rectangle @arg{a} fully contains @arg{b}.}
@@ -761,10 +724,10 @@
 
 (defun rect-offset (r dx dy)
  #+liber-documentation
- "@version{#2023-11-20}
+ "@version{#2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @argument[dx]{a number coerced to a single float with the horizontal offset}
-  @argument[dy]{a number coerced to a single float with the vertical offset}
+  @argument[dx]{a number coerced to a float with the horizontal offset}
+  @argument[dy]{a number coerced to a float with the vertical offset}
   @return{The offset @symbol{graphene:rect-t} instance.}
   @begin{short}
     Offsets the origin by @arg{dx} and @arg{dy}.
@@ -781,29 +744,31 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_offset_r ()
-;;;
-;;; void
-;;; graphene_rect_offset_r (const graphene_rect_t *r,
-;;;                         float d_x,
-;;;                         float d_y,
-;;;                         graphene_rect_t *res);
-;;;
-;;; Offsets the origin of the given rectangle by d_x and d_y .
-;;;
-;;; The size of the rectangle is left unchanged.
-;;;
-;;; r
-;;;     a graphene_rect_t
-;;;
-;;; d_x
-;;;     the horizontal offset
-;;;
-;;; d_y
-;;;     the vertical offset
-;;;
-;;; res
-;;;     return location for the offset rectangle.
 ;;; ----------------------------------------------------------------------------
+
+(cffi:defcfun ("graphene_rect_offset_r" %rect-offset-r) :void
+  (r (:pointer (:struct rect-t)))
+  (dx :float)
+  (dy :float)
+  (result (:pointer (:struct rect-t))))
+
+(defun rect-offset-r (r dx dy result)
+ #+liber-documentation
+ "@version{#2023-12-12}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[dx]{a number coerced to a float with the horizontal offset}
+  @argument[dy]{a number coerced to a float with the vertical offset}
+  @argument[result]{a @symbol{graphene:rect-t} instance for the result}
+  @return{The offset @symbol{graphene:rect-t} instance.}
+  @begin{short}
+    Offsets the origin by @arg{dx} and @arg{dy}.
+  @end{short}
+  The size of the rectangle is unchanged.
+  @see-symbol{graphene:rect-t}"
+  (%rect-offset-r r (coerce dx 'single-float) (coerce dy 'single-float) result)
+  result)
+
+(export 'rect-offset-r)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_inset ()
@@ -811,11 +776,11 @@
 
 (defun rect-inset (r dx dy)
  #+liber-documentation
- "@version{#2023-11-20}
+ "@version{#2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @argument[dx]{a number coerced to a single float with the horizontal inset}
-  @argument[dy]{a number coerced to a single float with the vertical inset}
-  @return{A @symbol{graphene:rect-t} instance with the inset rectangle}
+  @argument[dx]{a number coerced to a float with the horizontal inset}
+  @argument[dy]{a number coerced to a float with the vertical inset}
+  @return{The @symbol{graphene:rect-t} instance with the inset rectangle}
   @begin{short}
     Changes the given rectangle to be smaller, or larger depending on the given
     inset parameters.
@@ -825,7 +790,7 @@
   values.
 
   The origin of the rectangle is offset by @arg{dx} and @arg{dy}, while the size
-  is adjusted by @arg{(2 * dx, 2 * dy)}. If @arg{dx} and @arg{dy}are positive
+  is adjusted by @arg{(2 * dx, 2 * dy)}. If @arg{dx} and @arg{dy} are positive
   values, the size of the rectangle is decreased. If @arg{dx} and @arg{dy} are
   negative values, the size of the rectangle is increased.
 
@@ -842,39 +807,42 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_inset_r ()
-;;;
-;;; void
-;;; graphene_rect_inset_r (const graphene_rect_t *r,
-;;;                        float d_x,
-;;;                        float d_y,
-;;;                        graphene_rect_t *res);
-;;;
-;;; Changes the given rectangle to be smaller, or larger depending on the given
-;;; inset parameters.
-;;;
-;;; To create an inset rectangle, use positive d_x or d_y values; to create a
-;;; larger, encompassing rectangle, use negative d_x or d_y values.
-;;;
-;;; The origin of the rectangle is offset by d_x and d_y , while the size is
-;;; adjusted by (2 * @d_x, 2 * @d_y). If d_x and d_y are positive values, the
-;;; size of the rectangle is decreased; if d_x and d_y are negative values, the
-;;; size of the rectangle is increased.
-;;;
-;;; If the size of the resulting inset rectangle has a negative width or height
-;;; then the size will be set to zero.
-;;;
-;;; r
-;;;     a graphene_rect_t
-;;;
-;;; d_x
-;;;     the horizontal inset
-;;;
-;;; d_y
-;;;     the vertical inset
-;;;
-;;; res
-;;;     return location for the inset rectangle.
 ;;; ----------------------------------------------------------------------------
+
+(cffi:defcfun ("graphene_rect_inset_r" %rect-inset-r) :void
+  (r (:pointer (:struct rect-t)))
+  (dx :float)
+  (dy :float)
+  (result (:pointer (:struct rect-t))))
+
+(defun rect-inset-r (r dx dy result)
+ #+liber-documentation
+ "@version{#2023-12-10}
+  @argument[r]{a @symbol{graphene:rect-t} instance}
+  @argument[dx]{a number coerced to a float with the horizontal inset}
+  @argument[dy]{a number coerced to a float with the vertical inset}
+  @argument[result]{a @symbol{graphene:rect-t} instance for the result}
+  @return{The @symbol{graphene:rect-t} instance with the inset rectangle.}
+  @begin{short}
+    Changes the given rectangle to be smaller, or larger depending on the given
+    inset parameters.
+  @end{short}
+  To create an inset rectangle, use positive @arg{dx} or @arg{dy} values. To
+  create a larger, encompassing rectangle, use negative @arg{dx} or @arg{dy}
+  values.
+
+  The origin of the rectangle is offset by @arg{dx} and @arg{dy}, while the size
+  is adjusted by @arg{(2 * dx, 2 * dy)}. If @arg{dx} and @arg{dy} are positive
+  values, the size of the rectangle is decreased. If @arg{dx} and @arg{dy} are
+  negative values, the size of the rectangle is increased.
+
+  If the size of the resulting inset rectangle has a negative width or height
+  then the size will be set to zero.
+  @see-symbol{graphene:rect-t}"
+  (%rect-inset-r r (coerce dx 'single-float) (coerce dy 'single-float) result)
+  result)
+
+(export 'rect-inset-r)
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_rect_round_to_pixel ()
@@ -936,10 +904,10 @@
 
 (defun rect-round-extents (r result)
  #+liber-documentation
- "@version{#2023-11-20}
+ "@version{#2023-12-9}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[result]{a @symbol{graphene:rect-t} instance}
-  @return{A @symbol{graphene:rect-t} instance with the rectangle with
+  @return{The @symbol{graphene:rect-t} instance with the rectangle with
     rounded extents.}
   @begin{short}
     Rounds the origin of the given rectangle to its nearest integer value and
@@ -1044,17 +1012,15 @@
  #+liber-documentation
  "@version{#2023-11-20}
   @argument[r]{a @symbol{graphene:rect-t} instance}
-  @argument[sh]{a number coerced to a single float with the horizontal scale
-    factor}
-  @argument[sc]{a number coerced to a single float with the vertical scale
-    factor}
+  @argument[sh]{a number coerced to a float with the horizontal scale factor}
+  @argument[sv]{a number coerced to a float with the vertical scale factor}
   @argument[result]{a @symbol{graphene:rect-t} instance}
   @return{The @symbol{graphene:rect-t} instance with the scaled rectangle.}
   @begin{short}
     Scales the size and origin of a rectangle horizontaly by @arg{sh}, and
     vertically by @arg{sv}.
   @end{short}
-  The @arg{result} parameter is normalized.
+  The returned rectangle is normalized.
   @see-symbol{graphene:rect-t}"
   (cffi:foreign-funcall "graphene_rect_scale"
                         (:pointer (:struct rect-t)) r

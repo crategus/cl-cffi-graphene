@@ -53,12 +53,12 @@
  #+liber-documentation
  "@version{2023-9-22}
   @syntax[]{(graphene:with-size (s) body) => result}
-  @syntax[]{(graphene:with-size (s width height) body) => result}
   @syntax[]{(graphene:with-size (s s1) body) => result}
+  @syntax[]{(graphene:with-size (s width height) body) => result}
   @argument[s]{a @symbol{graphene:size-t} instance to create and initialize}
+  @argument[s1]{a @symbol{graphene:size-t} instance to use for initialization}
   @argument[width]{a number coerced to a float for the width component}
   @argument[height]{a number coerced to a float for the height component}
-  @argument[s1]{a @symbol{graphene:size-t} instance to use for initialization}
   @begin{short}
     The @fun{graphene:with-size} macro allocates a new
     @symbol{graphene:size-t} instance, initializes the @symbol{graphene:size-t}
@@ -79,7 +79,7 @@
     values.
     @begin{pre}
 (graphene:with-size (s)
-  (list (size-width s) (size-height s)))
+  (list (graphene:size-width s) (graphene:size-height s)))
 => (0.0 0.0)
 (graphene:with-size (s 1.5 1.7)
   (list (graphene:size-width s) (graphene:size-height s)))
@@ -98,19 +98,18 @@
   @see-macro{graphene:with-sizes}
   @see-function{graphene:size-alloc}
   @see-function{graphene:size-free}"
-  (cond ((not args)
+  (cond ((null args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (size-alloc)))
             (size-init ,var 0.0 0.0)
             (unwind-protect
               (progn ,@body)
               (size-free ,var))))
-        ((not (second args))
+        ((null (second args))
          ;; We have one argument. The argument must be of type size-t.
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'size-t))
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'size-t))
                   ;; One argument with no type or of type size-t
                   `(let ((,var (size-alloc)))
                      (size-init-from-size ,var ,arg)
@@ -118,8 +117,8 @@
                        (progn ,@body)
                        (size-free ,var))))
                  (t
-                  (error "Type error in GRAPHENE:WITH-SIZE")))))
-        ((not (third args))
+                  (error "Syntax error in GRAPHENE:WITH-SIZE")))))
+        ((null (third args))
          ;; We have a list of two arguments with (width,height) values
          `(let ((,var (size-alloc)))
             (size-init ,var ,@args)
@@ -143,7 +142,7 @@
   @end{short}
   The macro performs the bindings sequentially, like the @sym{let*} macro.
 
-  Each point can be initialized with values using the syntax for the
+  Each size can be initialized with values using the syntax for the
   @fun{graphene:with-size} macro. See also the
   @fun{graphene:with-size} documentation.
   @begin[Examples]{dictionary}
@@ -158,7 +157,7 @@
   @see-symbol{graphene:size-t}
   @see-macro{graphene:with-size}"
   (if vars
-      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+      (let ((var (mklist (first vars))))
         `(with-size ,var
            (with-sizes ,(rest vars)
              ,@body)))
@@ -189,16 +188,18 @@
   (height :float))
   @end{pre}
   Access the coordinates with the @fun{graphene:size-width} and
-  @fun{graphene:size-height} functions.
+  @fun{graphene:size-height} functions. Use the @fun{graphene:with-size}
+  and @fun{graphene:with-sizes} macros to allocate a new
+  @symbol{graphene:size-t} instance and initialize the size with values.
   @see-symbol{graphene:size-t}
   @see-function{graphene:size-width}
-  @see-function{graphene:size-height}")
+  @see-function{graphene:size-height}
+  @see-function{graphene:with-size}
+  @see-function{graphene:with-sizes}")
 
 (export 'size-t)
 
-;;; --- Acessor Implementations ------------------------------------------------
-
-;;;     size-width
+;;; --- graphene:size-width ----------------------------------------------------
 
 (defun (setf size-width) (value size)
   (setf (cffi:foreign-slot-value size '(:struct size-t) 'width)
@@ -223,7 +224,7 @@
 
 (export 'size-width)
 
-;;;     size-heigth
+;;; --- graphene:size-heigth ---------------------------------------------------
 
 (defun (setf size-height) (value size)
   (setf (cffi:foreign-slot-value size '(:struct size-t) 'height)
@@ -305,7 +306,7 @@
 => 0.0
     @end{pre}
   @end{dictionary}
-  @see-symbol{graphene:point-t}")
+  @see-symbol{graphene:size-t}")
 
 (export 'size-zero)
 
@@ -428,4 +429,3 @@
 (export 'size-scale)
 
 ;;; --- End of file graphene.size.lisp -----------------------------------------
-

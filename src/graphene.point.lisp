@@ -54,16 +54,16 @@
 
 (defmacro with-point ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2023-12-11}
   @syntax[]{(graphene:with-point (p) body) => result}
-  @syntax[]{(graphene:with-point (p x y) body) => result}
   @syntax[]{(graphene:with-point (p p1) body) => result}
   @syntax[]{(graphene:with-point (p (v graphene:vec2-t)) body) => result}
+  @syntax[]{(graphene:with-point (p x y) body) => result}
   @argument[p]{a @symbol{graphene:point-t} instance to create and initialize}
-  @argument[x]{a number coerced to a float for the x component of the point}
-  @argument[y]{a number coerced to a float for the y component of the point}
   @argument[p1]{a @symbol{graphene:point-t} instance to use for initialization}
   @argument[v]{a @symbol{graphene:vec2-t} instance to use for initialization}
+  @argument[x]{a number coerced to a float for the x component of the point}
+  @argument[y]{a number coerced to a float for the y component of the point}
   @begin{short}
     The @fun{graphene:with-point} macro allocates a new
     @symbol{graphene:point-t} instance, initializes the point with the given
@@ -99,39 +99,31 @@
     (list (graphene:point-x p) (graphene:point-y p))))
 => (3.5 4.5)
     @end{pre}
-    This example uses the @fun{graphene:with-points} macro to initialize two
-    points. The second point is intialized with the values from the first point.
-    @begin{pre}
-(grapene:with-points ((p1 0.3 0.5) (p2 p1))
-  (list (graphene:point-x p2) (graphene:point-y p2)))
-=> (0.3 0.5)
-    @end{pre}
   @end{dictionary}
   @see-symbol{graphene:point-t}
   @see-symbol{graphene:vec2-t}
   @see-macro{graphene:with-points}
   @see-function{graphene:point-alloc}
   @see-function{graphene:point-free}"
-  (cond ((not args)
+  (cond ((null args)
          ;; We have no arguments, the default is initialization with zeros.
          `(let ((,var (point-alloc)))
             (point-init ,var 0.0 0.0)
             (unwind-protect
               (progn ,@body)
               (point-free ,var))))
-        ((not (second args))
-         ;; We have one argument. The argument must be of type point-t or vec2-t
-         (destructuring-bind (arg &optional type)
-             (if (listp (first args)) (first args) (list (first args)))
-           (cond ((or (not type)
-                      (eq type 'point-t))
+        ((null (second args))
+         ;; We have one argument, the argument must be of type point-t or vec2-t
+         (destructuring-bind (arg &optional type1) (mklist (first args))
+           (cond ((or (not type1)
+                      (eq type1 'point-t))
                   ;; One argument with no type or of type point-t
                   `(let ((,var (point-alloc)))
                      (point-init-from-point ,var ,arg)
                      (unwind-protect
                        (progn ,@body)
                        (point-free ,var))))
-                 ((eq type 'vec2-t)
+                 ((eq type1 'vec2-t)
                   ;; One argument of type vec2-t
                   `(let ((,var (point-alloc)))
                      (point-init-from-vec2 ,var ,arg)
@@ -139,7 +131,7 @@
                        (progn ,@body)
                        (point-free ,var))))
                  (t
-                  (error "Type error in GRAPHENE:WITH-POINT")))))
+                  (error "Syntax error in GRAPHENE:WITH-POINT")))))
         ((not (third args))
          ;; We have a list of two arguments with (x,y) values
          `(let ((,var (point-alloc)))
@@ -179,7 +171,7 @@
   @see-symbol{graphene:point-t}
   @see-macro{graphene:with-point}"
   (if vars
-      (let ((var (if (listp (first vars)) (first vars) (list (first vars)))))
+      (let ((var (mklist (first vars))))
         `(with-point ,var
            (with-points ,(rest vars)
              ,@body)))
@@ -222,9 +214,6 @@
 => (1.0 1.5)
     @end{pre}
   @end{dictionary}
-  @see-constructor{graphene:point-init}
-  @see-constructor{graphene:point-init-from-point}
-  @see-constructor{graphene:point-init-from-vec2}
   @see-slot{graphene:point-x}
   @see-slot{graphene:point-y}
   @see-symbol{graphene:point3d-t}
@@ -232,8 +221,6 @@
   @see-macro{graphene:with-points}")
 
 (export 'point-t)
-
-;;; --- Accessor Implementations -----------------------------------------------
 
 ;;; --- graphene:point-x -------------------------------------------------------
 
@@ -528,7 +515,7 @@
 
 (defun point-distance (a b)
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2023-12-11}
   @syntax[]{(graphene:point-distance a b) => dist, dx, dy}
   @argument[a]{a @symbol{graphene:point-t} instance}
   @argument[b]{a @symbol{graphene:point-t} instance}
@@ -536,6 +523,15 @@
   @argument[dx]{a float with the distance component of the x axis}
   @argument[dy]{a float with the distance component of the y axis}
   @short{Computes the distance between the two given points.}
+  @begin[Example]{dictionary}
+    @begin{pre}
+(graphene:with-points ((a 0 0) (b 1 1))
+  (graphene:point-distance a b))
+=> 1.4142135
+=> 1.0
+=> 1.0
+    @end{pre}
+  @end{dictionary}
   @see-symbol{graphene:point-t}"
   (cffi:with-foreign-objects ((dx :float) (dy :float))
     (values (%point-distance a b dx dy)
@@ -583,4 +579,3 @@
 (export 'point-interpolate)
 
 ;;; --- End of file graphene.point.lisp ----------------------------------------
-
