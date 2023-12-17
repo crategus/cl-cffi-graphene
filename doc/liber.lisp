@@ -26,7 +26,7 @@
 (push :liber-documentation *features*)
 
 (asdf:load-system :liber)
-(asdf:load-system :cl-cffi-graphene)
+(asdf:load-system :cl-cffi-graphene :force t)
 
 (defpackage :liber-graphene
   (:use :common-lisp)

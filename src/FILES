@@ -1,29 +1,26 @@
 Graphene
 
-Graphene is a library of data types commonly used to implement 2D-in-3D or full
-3D canvases. Graphene only contains math data types, like vectors and matrices;
-it does not deal with windowing system calls, event handling, drawing, or a full
-scene graph.
+  graphene.point.lisp          Point with 2 coordinates          Graphene 1.10
+  graphene.point3d.lisp        Point with 3 coordinates          Graphene 1.10
+  graphene.size.lisp           Size representation               Graphene 1.10
+  graphene.rectangle.lisp      Rectangular shape type            Graphene 1.10
+  graphene.quad.lisp           Four-vertex quadrilateral         Graphene 1.10
+  graphene.triangle.lisp       Triangle described by 3D points   Graphene 1.10
+  graphene.box.lisp            Axis-aligned bounding box         Graphene 1.10
+  graphene.sphere.lisp         Sphere                            Graphene 1.10
+  graphene.frustum.lisp        3D field of view                  Graphene 1.10
 
-  graphene.point.lisp               Point with 2 coordinates     Graphene 1.0  +
-  graphene.point3d.lisp             Point with 3 coordinates     Graphene 1.0  +
-  graphene.size.lisp                Size representation          Graphene 1.0  +
-
-Rectangle — Rectangular shape type
-Quad — Four-vertex quadrilateral
-Triangle — A triangle described by 3D points
-Box — Axis-aligned bounding box
-Sphere — A sphere
-Frustum — A 3D field of view
 SIMD vector — Low level floating point 4-sized vector
 SIMD matrix — Low level floating point 4 by 4 matrix
-Vectors — Vectors in 2, 3, and 4 dimensions
-Matrix — 4x4 matrices
-Euler — Euler angles
-Quaternion — Quaternion operations
-Plane — A plane in 3D space
-Ray — A ray emitted from an origin in a given direction
+
+  graphene.vector.lisp         Vectors                           Graphene 1.10
+  graphene.matrix.lisp         4x4 matrices                      Graphene 1.10
+  graphene.euler.lisp          Euler angles                      Graphene 1.10
+  graphene.quaternion.lisp     Quaternion operations             Graphene 1.10
+  graphene.plane.lisp          Plane in 3D space                 Graphene 1.10
+  graphene.ray.lisp            Ray emitted from an origin        Graphene 1.10
+
 Versioning information — Detemining the version of Graphene in use
 GObject integration — Types for GObject properties and signals
 
-;;; 2023-9-24
+2023-12-10

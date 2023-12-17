@@ -24,7 +24,7 @@
 
 (defsystem :cl-cffi-graphene
   :name "cl-cffi-graphene"
-  :version "0.3.0"
+  :version "0.4.0"
   :author  "Dieter Kaiser"
   :license "MIT"
   :depends-on (:cffi :iterate)
@@ -37,9 +37,9 @@
      (:file "graphene.init")
      (:file "graphene.point")
      (:file "graphene.size")
-     (:file "graphene.rectangle")
      (:file "graphene.point3d")
      (:file "graphene.vector")
+     (:file "graphene.rectangle")
      (:file "graphene.matrix")
      (:file "graphene.quad")
      (:file "graphene.box")
@@ -50,14 +50,13 @@
      (:file "graphene.quaternion")
      (:file "graphene.euler")
      (:file "graphene.ray")
-     (:file "graphene.utils")
      ))))
 
 ;; Definine a test operation for the library
 
 (defsystem :cl-cffi-graphene/test
   :name "cl-cffi-graphene/test"
-  :version "0.3.0"
+  :version "0.4.0"
   :author  "Dieter Kaiser"
   :license "MIT"
   :depends-on (:cl-cffi-graphene :fiveam)
@@ -86,4 +85,3 @@
                (:file "rtest-graphene-utils")))
 
 ;;; --- End of file cl-cffi-graphene.asd ---------------------------------------
-
