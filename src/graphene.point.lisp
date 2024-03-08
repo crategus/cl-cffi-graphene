@@ -54,11 +54,11 @@
 
 (defmacro with-point ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-11}
-  @syntax[]{(graphene:with-point (p) body) => result}
-  @syntax[]{(graphene:with-point (p p1) body) => result}
-  @syntax[]{(graphene:with-point (p (v graphene:vec2-t)) body) => result}
-  @syntax[]{(graphene:with-point (p x y) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-point (p) body) => result}
+  @syntax{(graphene:with-point (p p1) body) => result}
+  @syntax{(graphene:with-point (p (v graphene:vec2-t)) body) => result}
+  @syntax{(graphene:with-point (p x y) body) => result}
   @argument[p]{a @symbol{graphene:point-t} instance to create and initialize}
   @argument[p1]{a @symbol{graphene:point-t} instance to use for initialization}
   @argument[v]{a @symbol{graphene:vec2-t} instance to use for initialization}
@@ -146,8 +146,8 @@
 
 (defmacro with-points (vars &body body)
  #+liber-documentation
- "@version{2023-12-3}
-  @syntax[]{(graphene:with-points (p1 p2 p3 ... pn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-points (p1 p2 p3 ... pn) body) => result}
   @argument[p1 ... pn]{the newly created @symbol{graphene:point-t} instances}
   @argument[body]{a body that uses the bindings @arg{p1 ... pn}}
   @begin{short}
@@ -235,9 +235,9 @@
 (setf (liber:alias-for-function 'point-x)
       "Accessor"
       (documentation 'point-x 'function)
- "@version{2023-12-3}
-  @syntax[]{(graphene:point-x p) => x}
-  @syntax[]{(setf (graphene:point-x p) x)}
+ "@version{2024-1-20}
+  @syntax{(graphene:point-x p) => x}
+  @syntax{(setf (graphene:point-x p) x)}
   @argument[p]{a @symbol{graphene:point-t} instance}
   @argument[x]{a float with the x coordinate}
   @begin{short}
@@ -269,9 +269,9 @@
 (setf (liber:alias-for-function 'point-y)
       "Accessor"
       (documentation 'point-y 'function)
- "@version{2023-12-3}
-  @syntax[]{(graphene:point-y p) => y}
-  @syntax[]{(setf (graphene:point-y p) y)}
+ "@version{2024-1-20}
+  @syntax{(graphene:point-y p) => y}
+  @syntax{(setf (graphene:point-y p) y)}
   @argument[p]{a @symbol{graphene:point-t} instance}
   @argument[y]{a float with the y coordinate}
   @begin{short}
@@ -515,8 +515,8 @@
 
 (defun point-distance (a b)
  #+liber-documentation
- "@version{2023-12-11}
-  @syntax[]{(graphene:point-distance a b) => dist, dx, dy}
+ "@version{2024-1-20}
+  @syntax{(graphene:point-distance a b) => dist, dx, dy}
   @argument[a]{a @symbol{graphene:point-t} instance}
   @argument[b]{a @symbol{graphene:point-t} instance}
   @argument[dist]{a float with the distance between the two points}

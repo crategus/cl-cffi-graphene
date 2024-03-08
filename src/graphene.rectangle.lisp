@@ -76,10 +76,10 @@
 
 (defmacro with-rect ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-9}
-  @syntax[]{(graphene:with-rect (r) body) => result}
-  @syntax[]{(graphene:with-rect (r src) body) => result}
-  @syntax[]{(graphene:with-rect (r x y width height) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-rect (r) body) => result}
+  @syntax{(graphene:with-rect (r src) body) => result}
+  @syntax{(graphene:with-rect (r x y width height) body) => result}
   @argument[r]{a @symbol{graphene:rect-t} instance to create and initialize}
   @argument[src]{a @symbol{graphene:rect-t} instance to use for initialization}
   @argument[x]{a number coerced to a float for the x coordinate of the
@@ -143,8 +143,8 @@
 
 (defmacro with-rects (vars &body body)
  #+liber-documentation
- "@version{2023-12-2}
-  @syntax[]{(graphene:with-rects (r1 r2 r3 ... rn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-rects (r1 r2 r3 ... rn) body) => result}
   @argument[r1 ... rn]{the newly created @symbol{graphene:rect-t} instances}
   @argument[body]{a body that uses the bindings @arg{r1 ... rn}}
   @begin{short}
@@ -220,9 +220,9 @@
 (setf (liber:alias-for-function 'rect-origin)
       "Accessor"
       (documentation 'rect-origin 'function)
- "@version{2023-9-22}
-  @syntax[]{(graphene:rect-origin rect) => origin}
-  @syntax[]{(setf (graphene:rect-origin rect) origin)}
+ "@version{2024-1-20}
+  @syntax{(graphene:rect-origin rect) => origin}
+  @syntax{(setf (graphene:rect-origin rect) origin)}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
   @argument[origin]{a @symbol{graphene:point-t} instance with the origin of
     the rectangle}
@@ -244,9 +244,9 @@
 (setf (liber:alias-for-function 'rect-size)
       "Accessor"
       (documentation 'rect-size 'function)
- "@version{2023-9-22}
-  @syntax[]{(graphene:rect-size rect) => size}
-  @syntax[]{(setf (graphene:rect-size rect) size)}
+ "@version{2024-1-20}
+  @syntax{(graphene:rect-size rect) => size}
+  @syntax{(setf (graphene:rect-size rect) size)}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
   @argument[size]{a @symbol{graphene:size-t} instance with the size of
     the rectangle}

@@ -57,10 +57,10 @@
 (defmacro with-sphere ((var &rest args) &body body)
 
  #+liber-documentation
- "@version{2023-12-8}
-  @syntax[]{(graphene:with-sphere (sphere) body) => result}
-  @syntax[]{(graphene:with-sphere (sphere sphere1) body) => result}
-  @syntax[]{(graphene:with-sphere (sphere center radius) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-sphere (sphere) body) => result}
+  @syntax{(graphene:with-sphere (sphere sphere1) body) => result}
+  @syntax{(graphene:with-sphere (sphere center radius) body) => result}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance to create and
     initialize}
   @argument[sphere1]{a @symbol{graphene:sphere-t} instance to use for
@@ -133,8 +133,8 @@
 
 (defmacro with-spheres (vars &body body)
  #+liber-documentation
- "@version{2023-12-8}
-  @syntax[]{(graphene:with-spheres (sphere1 sphere2 ... spheren) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-spheres (sphere1 sphere2 ... spheren) body) => result}
   @argument[sphere1 ... spheren]{the newly created @symbol{graphene:sphere-t}
     instances}
   @argument[body]{a body that uses the bindings @arg{sphere1 ... spheren}}

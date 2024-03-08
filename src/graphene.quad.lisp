@@ -53,10 +53,10 @@
 
 (defmacro with-quad ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-11-20}
-  @syntax[]{(graphene:with-quad (q) body) => result}
-  @syntax[]{(graphene:with-quad (q r) body) => result}
-  @syntax[]{(graphene:with-quad (q p0 p1 p2 p3) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-quad (q) body) => result}
+  @syntax{(graphene:with-quad (q r) body) => result}
+  @syntax{(graphene:with-quad (q p0 p1 p2 p3) body) => result}
   @argument[q]{a @symbol{graphene:quad-t} instance to create and initialize}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @argument[p0]{a @symbol{graphene:point-t} instance with the first point}
@@ -116,8 +116,8 @@
 
 (defmacro with-quads (vars &body body)
  #+liber-documentation
- "@version{2023-11-20}
-  @syntax[]{(graphene:with-quads (q1 q2 q3 ... qn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-quads (q1 q2 q3 ... qn) body) => result}
   @argument[q1 ... qn]{the newly created @symbol{graphene:quad-t} instances}
   @argument[body]{a body that uses the bindings @arg{q1 ... qn}}
   @begin{short}
@@ -231,7 +231,7 @@
 (cffi:defcfun ("graphene_quad_init_from_rect" quad-init-from-rect)
     (:pointer (:struct quad-t))
  #+liber-documentation
- "@version{2020-11-20}
+ "@version{2023-11-20}
   @argument[q]{a @symbol{graphene:quad-t} instance to initialize}
   @argument[r]{a @symbol{graphene:rect-t} instance}
   @return{The initialized @symbol{graphene:quad-t} instance.}

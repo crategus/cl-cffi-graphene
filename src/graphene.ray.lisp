@@ -62,11 +62,11 @@
 
 (defmacro with-ray ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-ray (ray) body) => result}
-  @syntax[]{(graphene:with-ray (ray ray1) body) => result}
-  @syntax[]{(graphene:with-ray (ray origin direction) body) => result}
-  @syntax[]{(graphene:with-ray (ray (origin graphene:vec3-t) direction) body)
+ "@version{2024-1-20}
+  @syntax{(graphene:with-ray (ray) body) => result}
+  @syntax{(graphene:with-ray (ray ray1) body) => result}
+  @syntax{(graphene:with-ray (ray origin direction) body) => result}
+  @syntax{(graphene:with-ray (ray (origin graphene:vec3-t) direction) body)
     => result}
   @argument[ray]{a @symbol{graphene:ray-t} instance to create and initialize}
   @argument[ray1]{a @symbol{graphene:ray-t} instance to use for initialization}
@@ -145,8 +145,8 @@
 
 (defmacro with-rays (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-rays (ray1 ... rayn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-rays (ray1 ... rayn) body) => result}
   @argument[ray1 ... rayn]{the newly created @symbol{graphene:ray-t} instances}
   @argument[body]{a body that uses the bindings @arg{ray1 ... rayn}}
   @begin{short}

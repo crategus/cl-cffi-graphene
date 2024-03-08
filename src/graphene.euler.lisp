@@ -67,16 +67,16 @@
 
 (defmacro with-euler ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-euler (euler) body) => result}
-  @syntax[]{(graphene:with-euler (euler euler1) body) => result}
-  @syntax[]{(graphene:with-euler (euler matrix order) body) => result}
-  @syntax[]{(graphene:with-euler (euler (quat graphene:quaternion-t) order) body)
+ "@version{2024-1-20}
+  @syntax{(graphene:with-euler (euler) body) => result}
+  @syntax{(graphene:with-euler (euler euler1) body) => result}
+  @syntax{(graphene:with-euler (euler matrix order) body) => result}
+  @syntax{(graphene:with-euler (euler (quat graphene:quaternion-t) order) body)
     => result}
-  @syntax[]{(graphene:with-euler (euler (vec graphene:vec3-t) order) body)
+  @syntax{(graphene:with-euler (euler (vec graphene:vec3-t) order) body)
     => result}
-  @syntax[]{(graphene:with-euler (euler x y z) body) => result}
-  @syntax[]{(graphene:with-euler (euler x y z order) body) => result}
+  @syntax{(graphene:with-euler (euler x y z) body) => result}
+  @syntax{(graphene:with-euler (euler x y z order) body) => result}
   @argument[euler]{a @symbol{graphene:euler-t} instance to create and
     initialize}
   @argument[euler1]{a @symbol{graphene:euler-t} instance to use for
@@ -189,8 +189,8 @@
 
 (defmacro with-eulers (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-euler (euler1 ... eulern) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-euler (euler1 ... eulern) body) => result}
   @argument[euler1 ... eulern]{the newly created @symbol{graphene:euler-t}
     instances}
   @argument[body]{a body that uses the bindings @arg{euler1 ... eulern}}

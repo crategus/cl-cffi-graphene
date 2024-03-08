@@ -110,24 +110,24 @@
 
 (defmacro with-matrix ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-matrix (m) body) => result}
-  @syntax[]{(graphene:with-matrix (m m1) body) => result}
-  @syntax[]{(graphene:with-matrix (m (p graphene:point3d-t)) body) => result}
-  @syntax[]{(graphene:with-matrix (m angle (axis graphene:vec3-t)) body)
+ "@version{2024-1-20}
+  @syntax{(graphene:with-matrix (m) body) => result}
+  @syntax{(graphene:with-matrix (m m1) body) => result}
+  @syntax{(graphene:with-matrix (m (p graphene:point3d-t)) body) => result}
+  @syntax{(graphene:with-matrix (m angle (axis graphene:vec3-t)) body)
     => result}
-  @syntax[]{(graphene:with-matrix (m xskew yskew) body) => result}
-  @syntax[]{(graphene:with-matrix (m x y z) body) => result}
-  @syntax[]{(graphene:with-matrix (m (eye graphene:vec3-t) center up) body)
+  @syntax{(graphene:with-matrix (m xskew yskew) body) => result}
+  @syntax{(graphene:with-matrix (m x y z) body) => result}
+  @syntax{(graphene:with-matrix (m (eye graphene:vec3-t) center up) body)
     => result }
-  @syntax[]{(graphene:with-matrix (m fovy aspect znear zfar) body) => result}
-  @syntax[]{(graphene:with-matrix (m (v0 graphene:vec4-t) v1 v2 v3) body)
+  @syntax{(graphene:with-matrix (m fovy aspect znear zfar) body) => result}
+  @syntax{(graphene:with-matrix (m (v0 graphene:vec4-t) v1 v2 v3) body)
     => result}
-  @syntax[]{(graphene:with-matrix (m left right top bottom znear zfar) body)
+  @syntax{(graphene:with-matrix (m left right top bottom znear zfar) body)
     => result}
-  @syntax[]{(graphene:with-matrix (m (xx :double) yx xy yy x0 y0) body)
+  @syntax{(graphene:with-matrix (m (xx :double) yx xy yy x0 y0) body)
     => result}
-  @syntax[]{(graphene:with-matrix (m &rest args) body) => result}
+  @syntax{(graphene:with-matrix (m &rest args) body) => result}
   @argument[m]{a @symbol{graphene:matrix-t} instance to create and initialize}
   @argument[m1]{a @symbol{graphene:matrix-t} instance to use for initialization}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
@@ -294,8 +294,8 @@
 
 (defmacro with-matrices (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-matrices (matrix1 ... matrixn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-matrices (matrix1 ... matrixn) body) => result}
   @argument[matrix1 ... matrixn]{the newly created @symbol{graphene:matrix-t}
     instances}
   @argument[body]{a body that uses the bindings @arg{matrix1 ... matrixn}}
@@ -873,8 +873,8 @@ res = ⎡ A.x × B ⎤
 
 (defun matrix-to-2d (m)
  #+liber-documentation
- "@version{#2022-9-30}
-  @syntax[]{(matrix-to-2d matrix) => (list xx yx xy yy x0 y0)}
+ "@version{#2024-1-20}
+  @syntax{(matrix-to-2d matrix) => (list xx yx xy yy x0 y0)}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[xx]{a float with the xx member}
   @argument[yx]{a float with the yx member}

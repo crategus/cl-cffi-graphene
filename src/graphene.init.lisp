@@ -88,8 +88,8 @@
 
 (defmacro with-objects (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-objects (obj1 ... objn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-objects (obj1 ... objn) body) => result}
   @argument[obj1 ... objn]{the newly created Graphene instances}
   @argument[body]{a body that uses the bindings @arg{obj1 ... objn}}
   @begin{short}

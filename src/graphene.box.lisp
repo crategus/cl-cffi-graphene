@@ -73,11 +73,11 @@
 
 (defmacro with-box ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-8}
-  @syntax[]{(graphene:with-box (box) body) => result}
-  @syntax[]{(graphene:with-box (box box1) body) => result}
-  @syntax[]{(graphene:with-box (box pmin pmax) body) => result}
-  @syntax[]{(graphene:with-box (box (vmin graphene:vec3-t) vmax) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-box (box) body) => result}
+  @syntax{(graphene:with-box (box box1) body) => result}
+  @syntax{(graphene:with-box (box pmin pmax) body) => result}
+  @syntax{(graphene:with-box (box (vmin graphene:vec3-t) vmax) body) => result}
   @argument[box]{a @symbol{graphene:box-t} instance to create and initialize}
   @argument[box1]{a @symbol{graphene:box-t} instance to use for initialization}
   @argument[pmin]{a @symbol{graphene:point3d-t} instance to use for
@@ -164,8 +164,8 @@
 
 (defmacro with-boxes (vars &body body)
  #+liber-documentation
- "@version{2023-12-8}
-  @syntax[]{(graphene:with-boxes (box1 box2 box3 ... boxn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-boxes (box1 box2 box3 ... boxn) body) => result}
   @argument[box1 ... boxn]{the newly created @symbol{graphene:box-t} instances}
   @argument[body]{a body that uses the bindings @arg{box1 ... boxn}}
   @begin{short}
@@ -701,8 +701,8 @@
 
 (defun box-intersection (a b result)
  #+liber-documentation
- "@version{#2022-9-23}
-  @syntax[]{(box-intersection a b result) => result, success}
+ "@version{#2024-1-20}
+  @syntax{(box-intersection a b result) => result, success}
   @argument[a]{a @symbol{graphene:box-t} instance}
   @argument[b]{a @symbol{graphene:box-t} instance}
   @argument[result]{a @symbol{graphene:box-t} instance for the result}

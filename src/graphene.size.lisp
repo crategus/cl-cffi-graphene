@@ -51,10 +51,10 @@
 
 (defmacro with-size ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-9-22}
-  @syntax[]{(graphene:with-size (s) body) => result}
-  @syntax[]{(graphene:with-size (s s1) body) => result}
-  @syntax[]{(graphene:with-size (s width height) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-size (s) body) => result}
+  @syntax{(graphene:with-size (s s1) body) => result}
+  @syntax{(graphene:with-size (s width height) body) => result}
   @argument[s]{a @symbol{graphene:size-t} instance to create and initialize}
   @argument[s1]{a @symbol{graphene:size-t} instance to use for initialization}
   @argument[width]{a number coerced to a float for the width component}
@@ -132,8 +132,8 @@
 
 (defmacro with-sizes (vars &body body)
  #+liber-documentation
- "@version{2023-9-22}
-  @syntax[]{(graphene:with-sizes (s1 s2 s3 ... sn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-sizes (s1 s2 s3 ... sn) body) => result}
   @argument[s1 ... sn]{the newly created @symbol{graphene:size-t} instances}
   @argument[body]{a body that uses the bindings @arg{s1 ... sn}}
   @begin{short}
@@ -212,9 +212,9 @@
 (setf (liber:alias-for-function 'size-width)
       "Accessor"
       (documentation 'size-width 'function)
- "@version{2023-9-22}
-  @syntax[]{(graphene:size-width size) => width}
-  @syntax[]{(setf (graphene:size-width size) width)}
+ "@version{2024-1-20}
+  @syntax{(graphene:size-width size) => width}
+  @syntax{(setf (graphene:size-width size) width)}
   @argument[size]{a @symbol{graphene:size-t} instance}
   @argument[width]{a float with the width component}
   @begin{short}
@@ -237,9 +237,9 @@
 (setf (liber:alias-for-function 'size-height)
       "Accessor"
       (documentation 'size-height 'function)
- "@version{2023-9-22}
-  @syntax[]{(graphene:size-height size) => height}
-  @syntax[]{(setf (graphene:size-height size) height)}
+ "@version{2024-1-20}
+  @syntax{(graphene:size-height size) => height}
+  @syntax{(setf (graphene:size-height size) height)}
   @argument[size]{a @symbol{graphene:size-t} instance}
   @argument[width]{a float with the height component}
   @begin{short}

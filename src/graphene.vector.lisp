@@ -146,10 +146,10 @@
 
 (defmacro with-vec2 ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-vec2 (v) body) => result}
-  @syntax[]{(graphene:with-vec2 (v v1) body) => result}
-  @syntax[]{(graphene:with-vec2 (v x y) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-vec2 (v) body) => result}
+  @syntax{(graphene:with-vec2 (v v1) body) => result}
+  @syntax{(graphene:with-vec2 (v x y) body) => result}
   @argument[v]{a @symbol{graphene:vec2-t} instance to create and initialize}
   @argument[v1]{a @symbol{graphene:vec2-t} instance to use for initialization}
   @argument[x]{a float with the x component of the vector}
@@ -207,8 +207,8 @@
 
 (defmacro with-vec2s (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-vec2s (v1 v2 v3 ... vn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-vec2s (v1 v2 v3 ... vn) body) => result}
   @argument[v1 ... vn]{the newly created @symbol{graphene:vec2-t} instances}
   @argument[body]{a body that uses the bindings @arg{v1 ... vn}}
   @begin{short}
@@ -235,10 +235,10 @@
 
 (defmacro with-vec3 ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-vec3 (v) body) => result}
-  @syntax[]{(graphene:with-vec3 (v v1) body) => result}
-  @syntax[]{(graphene:with-vec3 (v x y z) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-vec3 (v) body) => result}
+  @syntax{(graphene:with-vec3 (v v1) body) => result}
+  @syntax{(graphene:with-vec3 (v x y z) body) => result}
   @argument[v]{a @symbol{graphene:vec3-t} instance to create and initialize}
   @argument[v1]{a @symbol{graphene:vec3-t} instance to use for initialization}
   @argument[x]{a float with the x component of the vector}
@@ -298,8 +298,8 @@
 
 (defmacro with-vec3s (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-vec3s (v1 v2 v3 ... vn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-vec3s (v1 v2 v3 ... vn) body) => result}
   @argument[v1 ... vn]{the newly created @symbol{graphene:vec3-t} instances}
   @argument[body]{a body that uses the bindings @arg{v1 ... vn}}
   @begin{short}
@@ -326,12 +326,12 @@
 
 (defmacro with-vec4 ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-vec4 (v) body) => result}
-  @syntax[]{(graphene:with-vec4 (v v1) body) => result}
-  @syntax[]{(graphene:with-vec4 (v v2 w) body) => result}
-  @syntax[]{(graphene:with-vec4 (v v3 z w) body) => result}
-  @syntax[]{(graphene:with-vec4 (v x y z w) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-vec4 (v) body) => result}
+  @syntax{(graphene:with-vec4 (v v1) body) => result}
+  @syntax{(graphene:with-vec4 (v v2 w) body) => result}
+  @syntax{(graphene:with-vec4 (v v3 z w) body) => result}
+  @syntax{(graphene:with-vec4 (v x y z w) body) => result}
   @argument[v]{a @symbol{graphene:vec4-t} instance to create and initialize}
   @argument[v1]{a @symbol{graphene:vec4-t} instance to use for initialization}
   @argument[v2]{a @symbol{graphene:vec3-t} instance to use for initialization}
@@ -424,8 +424,8 @@
 
 (defmacro with-vec4s (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-vec4s (v1 v2 v3 ... vn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-vec4s (v1 v2 v3 ... vn) body) => result}
   @argument[v1 ... vn]{the newly created @symbol{graphene:vec4-t} instances}
   @argument[body]{a body that uses the bindings @arg{v1 ... vn}}
   @begin{short}

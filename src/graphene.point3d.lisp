@@ -60,11 +60,11 @@
 
 (defmacro with-point3d ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-point3d (p) body) => result}
-  @syntax[]{(graphene:with-point3d (p p1) body) => result}
-  @syntax[]{(graphene:with-point3d (p (v graphene:vec3-t)) body) => result}
-  @syntax[]{(graphene:with-point3d (p x y z) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-point3d (p) body) => result}
+  @syntax{(graphene:with-point3d (p p1) body) => result}
+  @syntax{(graphene:with-point3d (p (v graphene:vec3-t)) body) => result}
+  @syntax{(graphene:with-point3d (p x y z) body) => result}
   @argument[p]{a @symbol{graphene:point3d-t} instance to create and initialize}
   @argument[p1]{a @symbol{graphene:point3d-t} instance to use for
     initialization}
@@ -165,8 +165,8 @@
 
 (defmacro with-point3ds (vars &body body)
  #+liber-documentation
- "@version{2023-12-3}
-  @syntax[]{(graphene:with-point3ds (p1 p2 p3 ... pn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-point3ds (p1 p2 p3 ... pn) body) => result}
   @argument[p1 ... pn]{the newly created @symbol{graphene:point3d-t} instances}
   @argument[body]{a body that uses the bindings @arg{p1 ... pn}}
   @begin{short}
@@ -263,9 +263,9 @@
 (setf (liber:alias-for-function 'point3d-x)
       "Accessor"
       (documentation 'point3d-x 'function)
- "@version{2023-12-3}
-  @syntax[]{(graphene:point3d-x p) => x}
-  @syntax[]{(setf (graphene:point3d-x p) x)}
+ "@version{2024-1-20}
+  @syntax{(graphene:point3d-x p) => x}
+  @syntax{(setf (graphene:point3d-x p) x)}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
   @argument[x]{a float with the x coordinate}
   @begin{short}
@@ -302,9 +302,9 @@
 (setf (liber:alias-for-function 'point3d-y)
       "Accessor"
       (documentation 'point3d-y 'function)
- "@version{2023-12-3}
-  @syntax[]{(graphene:point3d-y p) => y}
-  @syntax[]{(setf (graphene:point3d-y p) y)}
+ "@version{2024-1-20}
+  @syntax{(graphene:point3d-y p) => y}
+  @syntax{(setf (graphene:point3d-y p) y)}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
   @argument[x]{a float with the y coordinate}
   @begin{short}
@@ -330,9 +330,9 @@
 (setf (liber:alias-for-function 'point3d-z)
       "Accessor"
       (documentation 'point3d-z 'function)
- "@version{2023-12-3}
-  @syntax[]{(graphene:point3d-z p) => z}
-  @syntax[]{(setf (graphene:point3d-z p) z)}
+ "@version{2024-1-20}
+  @syntax{(graphene:point3d-z p) => z}
+  @syntax{(setf (graphene:point3d-z p) z)}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
   @argument[x]{a float with the z coordinate}
   @begin{short}
@@ -571,8 +571,8 @@
 
 (defun point3d-distance (a b delta)
  #+liber-documentation
- "@version{2023-12-3}
-  @syntax[]{(graphene:point-distance a b) => dist, delta}
+ "@version{2024-1-20}
+  @syntax{(graphene:point-distance a b) => dist, delta}
   @argument[a]{a @symbol{graphene:point3d-t} instance}
   @argument[b]{a @symbol{graphene:point3d-t} instance}
   @argument[delta]{a @symbol{graphene:vec3-t} instance with the calculated

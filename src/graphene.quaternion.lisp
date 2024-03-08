@@ -67,16 +67,16 @@
 
 (defmacro with-quaternion ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-quaternion (q) body) => result}
-  @syntax[]{(graphene:with-quaternion (q q1) body) => result}
-  @syntax[]{(graphene:with-quaternion (q (v graphene:vec4-t)) body) => result}
-  @syntax[]{(graphene:with-quaternion (q (m graphene:matrix-t)) body) => result}
-  @syntax[]{(graphene:with-quaternion (q (e graphene:euler-t)) body) => result}
-  @syntax[]{(graphene:with-quaternion (q angle axis) body) => result}
-  @syntax[]{(graphene:with-quaternion (q xdeg ydeg zdeg) body) => result}
-  @syntax[]{(graphene:with-quaternion (q xrad yrad zrad) body) => result}
-  @syntax[]{(graphene:with-quaternion (q x y z w) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-quaternion (q) body) => result}
+  @syntax{(graphene:with-quaternion (q q1) body) => result}
+  @syntax{(graphene:with-quaternion (q (v graphene:vec4-t)) body) => result}
+  @syntax{(graphene:with-quaternion (q (m graphene:matrix-t)) body) => result}
+  @syntax{(graphene:with-quaternion (q (e graphene:euler-t)) body) => result}
+  @syntax{(graphene:with-quaternion (q angle axis) body) => result}
+  @syntax{(graphene:with-quaternion (q xdeg ydeg zdeg) body) => result}
+  @syntax{(graphene:with-quaternion (q xrad yrad zrad) body) => result}
+  @syntax{(graphene:with-quaternion (q x y z w) body) => result}
   @argument[q]{a @symbol{graphene:quaternion-t} instance to create and
     initialize}
   @argument[q1]{a @symbol{graphene:quaternion-t} instance to use for
@@ -189,8 +189,8 @@
 
 (defmacro with-quaternions (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-quaternions (q1 ... qn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-quaternions (q1 ... qn) body) => result}
   @argument[q1 ... qn]{the newly created @symbol{graphene:quaternion-t}
     instances}
   @argument[body]{a body that uses the bindings @arg{q1 ... qn}}
@@ -543,8 +543,8 @@
 
 (defun quaternion-to-angles (quaternion)
  #+liber-documentation
- "@version{#2023-12-8}
-  @syntax[]{(graphene:quaternion-to-angles quaternion) => xdeg, ydeg, zdeg}
+ "@version{#2024-1-20}
+  @syntax{(graphene:quaternion-to-angles quaternion) => xdeg, ydeg, zdeg}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @return{The value list of floats with the rotation angles, in degrees.}
   @begin{short}
@@ -572,8 +572,8 @@
 
 (defun quaternion-to-radians (quaternion)
  #+liber-documentation
- "@version{#2023-12-8}
-  @syntax[]{(graphene:quaternion-to-angles quaternion) => xrad, yrad, zrad}
+ "@version{#2024-1-20}
+  @syntax{(graphene:quaternion-to-angles quaternion) => xrad, yrad, zrad}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @return{The value list of floats with the rotation angles, in radians.}
   @begin{short}
@@ -601,8 +601,8 @@
 
 (defun quaternion-to-angle-vec3 (quaternion axis)
  #+liber-documentation
- "@version{#2023-12-8}
-  @syntax[]{(graphene:quaternion-to-angle-vec3 quaterion result) => angle, result}
+ "@version{#2024-1-20}
+  @syntax{(graphene:quaternion-to-angle-vec3 quaterion result) => angle, result}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the rotation axis}
   @return{The value list with the angle in degrees and the

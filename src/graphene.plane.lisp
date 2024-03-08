@@ -57,14 +57,14 @@
 
 (defmacro with-plane ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-8}
-  @syntax[]{(graphene:with-plane (plane) body) => result}
-  @syntax[]{(graphene:with-plane (plane plane1) body) => result}
-  @syntax[]{(graphene:with-plane (plane (v graphene:vec4-t) body) => result}
-  @syntax[]{(graphene:with-plane (plane normal constant) body) => result}
-  @syntax[]{(graphene:with-plane (plane normal (point graphene:point3d-t)) body)
+ "@version{2024-1-20}
+  @syntax{(graphene:with-plane (plane) body) => result}
+  @syntax{(graphene:with-plane (plane plane1) body) => result}
+  @syntax{(graphene:with-plane (plane (v graphene:vec4-t) body) => result}
+  @syntax{(graphene:with-plane (plane normal constant) body) => result}
+  @syntax{(graphene:with-plane (plane normal (point graphene:point3d-t)) body)
     => result}
-  @syntax[]{(graphene:with-plane (plane a b c) body) => result}
+  @syntax{(graphene:with-plane (plane a b c) body) => result}
   @argument[plane]{a @symbol{graphene:plane-t} instance to create and
     initialize}
   @argument[plane1]{a @symbol{graphene:plane-t} instance to use for
@@ -162,8 +162,8 @@
 
 (defmacro with-planes (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-planes (plane1 ... planen) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-planes (plane1 ... planen) body) => result}
   @argument[plane1 ... planen]{the newly created @symbol{graphene:plane-t}
     instances}
   @argument[body]{a body that uses the bindings @arg{plane1 ... planen}}

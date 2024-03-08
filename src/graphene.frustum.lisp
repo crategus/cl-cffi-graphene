@@ -53,12 +53,12 @@
 
 (defmacro with-frustum ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-frustum (frustum) body) => result}
-  @syntax[]{(graphene:with-frustum (frustum frustum1) body) => result}
-  @syntax[]{(graphene:with-frustum (frustum (matrix graphene:matrix-t)) body)
+ "@version{2024-1-20}
+  @syntax{(graphene:with-frustum (frustum) body) => result}
+  @syntax{(graphene:with-frustum (frustum frustum1) body) => result}
+  @syntax{(graphene:with-frustum (frustum (matrix graphene:matrix-t)) body)
     => result}
-  @syntax[]{(graphene:with-frustum (frustum plane0 ... plane5) body) => result}
+  @syntax{(graphene:with-frustum (frustum plane0 ... plane5) body) => result}
   @argument[frustum]{a @symbol{graphene:frustum-t} instance to create and
     initialize}
   @argument[frustum1]{a @symbol{graphene:frustum-t} instance to use for
@@ -130,8 +130,8 @@
 
 (defmacro with-frustums (vars &body body)
  #+liber-documentation
- "@version{2023-12-10}
-  @syntax[]{(graphene:with-frustums (frustum1 ... frustumn) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-frustums (frustum1 ... frustumn) body) => result}
   @argument[frustum1 ... frustumn]{the newly created @symbol{graphene:frustum-t}
     instances}
   @argument[body]{a body that uses the bindings @arg{frustum1 ... frustumn}}

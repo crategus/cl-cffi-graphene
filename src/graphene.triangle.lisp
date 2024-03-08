@@ -59,10 +59,10 @@
 
 (defmacro with-triangle ((var &rest args) &body body)
  #+liber-documentation
- "@version{2023-12-9}
-  @syntax[]{(graphene:with-triangle (triangle) body) => result}
-  @syntax[]{(graphene:with-triangle (triangle p1 p2 p3) body) => result}
-  @syntax[]{(graphene:with-triangle (triangle v1 v2 v3) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-triangle (triangle) body) => result}
+  @syntax{(graphene:with-triangle (triangle p1 p2 p3) body) => result}
+  @syntax{(graphene:with-triangle (triangle v1 v2 v3) body) => result}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance to create and
     initialize}
   @argument[p1]{a @symbol{graphene:point3d-t} instance to use for
@@ -144,8 +144,8 @@
 
 (defmacro with-triangles (vars &body body)
  #+liber-documentation
- "@version{2023-12-9}
-  @syntax[]{(graphene:with-triangles (triangle1 ... trianglen) body) => result}
+ "@version{2024-1-20}
+  @syntax{(graphene:with-triangles (triangle1 ... trianglen) body) => result}
   @argument[triangle1 ... trianglen]{the newly created
     @symbol{graphene:triangle-t} instances}
   @argument[body]{a body that uses the bindings @arg{triangle1 ... trianglen}}
