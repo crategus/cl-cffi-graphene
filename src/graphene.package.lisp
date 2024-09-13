@@ -6,7 +6,7 @@
 ;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 - 2023 Dieter Kaiser
+;;; Copyright (C) 2022 - 2024 Dieter Kaiser
 ;;;
 ;;; Permission is hereby granted, free of charge, to any person obtaining a
 ;;; copy of this software and associated documentation files (the "Software"),
@@ -45,7 +45,6 @@
 (setf (documentation (find-package :graphene) t)
  "This is the API documentation of a Lisp binding to the Graphene library.
   @begin[Point]{section}
-    A point with 2 coordinates.
     @about-symbol{point-t}
     @about-function{point-x}
     @about-function{point-y}
@@ -64,7 +63,6 @@
     @about-function{point-interpolate}
   @end{section}
   @begin[Point3D]{section}
-    A point with 3 coordinates.
     @about-symbol{point3d-t}
     @about-function{point3d-x}
     @about-function{point3d-y}
@@ -90,7 +88,6 @@
     @about-function{point3d-normalize-viewport}
   @end{section}
   @begin[Size]{section}
-    Size representation.
     @about-symbol{size-t}
     @about-function{size-width}
     @about-function{size-height}
@@ -106,7 +103,6 @@
     @about-function{size-scale}
   @end{section}
   @begin[Rectangle]{section}
-    Rectangular shape type.
     @about-symbol{rect-t}
     @about-macro{with-rect}
     @about-macro{with-rects}
@@ -147,7 +143,6 @@
     @about-function{rect-scale}
   @end{section}
   @begin[Quad]{section}
-    Four-vertex quadrilateral.
     @about-symbol{quad-t}
     @about-macro{with-quad}
     @about-macro{with-quads}
@@ -161,7 +156,6 @@
     @about-function{quad-point}
   @end{section}
   @begin[Triangle]{section}
-    A triangle described by 3D points.
     @about-symbol{triangle-t}
     @about-macro{with-triangle}
     @about-macro{with-triangles}
@@ -183,7 +177,6 @@
     @about-function{triangle-equal}
   @end{section}
   @begin[Box]{section}
-    Axis-aligned bounding box.
     @about-symbol{box-t}
     @about-macro{with-box}
     @about-macro{with-boxes}
@@ -219,7 +212,6 @@
     @about-function{box-infinite}
   @end{section}
   @begin[Sphere]{section}
-    A sphere.
     @about-symbol{sphere-t}
     @about-macro{with-sphere}
     @about-macro{with-spheres}
@@ -239,7 +231,6 @@
     @about-function{sphere-equal}
   @end{section}
   @begin[Frustum]{section}
-    A 3D field of view.
     @about-symbol{frustum-t}
     @about-macro{with-frustum}
     @about-macro{with-frustums}
@@ -255,7 +246,6 @@
     @about-function{frustum-equal}
   @end{section}
   @begin[Vector]{section}
-    Vectors in 2, 3, and 4 dimensions.
     @about-variable{+vec2-len+}
     @about-variable{+vec3-len+}
     @about-variable{+vec4-len+}
@@ -364,7 +354,6 @@
     @about-function{vec4-w-axis}
   @end{section}
   @begin[Matrix]{section}
-    4x4 matrices.
     @about-symbol{matrix-t}
     @about-macro{with-matrix}
     @about-macro{with-matrices}
@@ -437,7 +426,6 @@
     @about-function{matrix-print}
   @end{section}
   @begin[Euler]{section}
-    Euler angles.
     @about-symbol{euler-order-t}
     @about-symbol{euler-t}
     @about-macro{with-euler}
@@ -445,7 +433,6 @@
     @about-function{euler-alloc}
     @about-function{euler-free}
     @about-function{euler-init}
-    @about-function{euler-init-with-order}
     @about-function{euler-init-from-matrix}
     @about-function{euler-init-from-quaternion}
     @about-function{euler-init-from-vec3}
@@ -465,7 +452,6 @@
     @about-function{euler-reorder}
   @end{section}
   @begin[Quaternion]{section}
-    Quaternion operations.
     @about-symbol{quaternion-t}
     @about-macro{with-quaternion}
     @about-macro{with-quaternions}
@@ -495,7 +481,6 @@
     @about-function{quaternion-slerp}
   @end{section}
   @begin[Plane]{section}
-    A plane in 3D space.
     @about-symbol{plane-t}
     @about-macro{with-plane}
     @about-macro{with-planes}
@@ -515,7 +500,6 @@
     @about-function{plane-constant}
   @end{section}
   @begin[Ray]{section}
-    A ray emitted from an origin in a given direction.
     @about-symbol{ray-intersection-kind-t}
     @about-symbol{ray-t}
     @about-macro{with-ray}
@@ -538,6 +522,6 @@
     @about-function{ray-intersects-box}
     @about-function{ray-intersect-triangle}
     @about-function{ray-intersects-triangle}
-  @end{section}
-  ")
+  @end{section}")
+
 ;;; --- End of file graphene.package.lisp --------------------------------------
