@@ -73,7 +73,7 @@
 
 (defmacro with-box ((var &rest args) &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2024-9-10}
   @syntax{(graphene:with-box (box) body) => result}
   @syntax{(graphene:with-box (box box1) body) => result}
   @syntax{(graphene:with-box (box pmin pmax) body) => result}
@@ -105,19 +105,19 @@
   @end{dictionary}
   @see-symbol{graphene:box-t}
   @see-symbol{graphene:point3d-t}
-  @see-symbol{grapene:vec3-t}
+  @see-symbol{graphene:vec3-t}
   @see-macro{graphene:with-boxes}
   @see-function{graphene:box-alloc}
   @see-function{graphene:box-free}"
   (cond ((null args)
-         ;; No arguments, the default is initialization with zeros.
+         ;; No arguments, the default is initialization with zeros
          `(let ((,var (box-alloc)))
             (box-init-from-box ,var (box-zero))
             (unwind-protect
               (progn ,@body)
               (box-free ,var))))
         ((null (second args))
-         ;; One argument, the argument must be of type box-t.
+         ;; One argument, the argument must be of type box-t
          (destructuring-bind (arg &optional type1) (mklist (first args))
            (cond ((or (not type1)
                       (eq type1 'box-t))
@@ -164,9 +164,9 @@
 
 (defmacro with-boxes (vars &body body)
  #+liber-documentation
- "@version{2024-1-20}
-  @syntax{(graphene:with-boxes (box1 box2 box3 ... boxn) body) => result}
-  @argument[box1 ... boxn]{the newly created @symbol{graphene:box-t} instances}
+ "@version{2024-9-10}
+  @syntax{(graphene:with-boxes (box1 box2 ... boxn) body) => result}
+  @argument[box1 ... boxn]{newly created @symbol{graphene:box-t} instances}
   @argument[body]{a body that uses the bindings @arg{box1 ... boxn}}
   @begin{short}
     The @fun{graphene:with-boxes} macro creates new variable bindings and
@@ -208,7 +208,7 @@
 (export 'box-t)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_box_alloc ()
+;;; graphene_box_alloc
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_box_alloc" box-alloc) (:pointer (:struct box-t))
@@ -227,7 +227,7 @@
 (export 'box-alloc)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_box_free ()
+;;; graphene_box_free
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_box_free" box-free) :void
@@ -244,17 +244,17 @@
 (export 'box-free)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_box_init ()
+;;; graphene_box_init
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_box_init" box-init) (:pointer (:struct box-t))
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2024-9-10}
   @argument[box]{a @symbol{graphene:box-t} instance to initialize}
-  @argument[min]{a @symbol{graphene:point3d-t} instance with the coordinates of
-    the minimum vertex}
-  @argument[max]{a @symbol{graphene:point3d-t} instance with the coordinates of
-    the maximum vertex}
+  @argument[pmin]{a @symbol{graphene:point3d-t} instance with the coordinates
+    of the minimum vertex}
+  @argument[pmax]{a @symbol{graphene:point3d-t} instance with the coordinates
+    of the maximum vertex}
   @return{The initialized @symbol{graphene:box-t} instance.}
   @begin{short}
     Initializes the given @symbol{graphene:box-t} instance with two vertices.
@@ -262,22 +262,22 @@
   @see-symbol{graphene:box-t}
   @see-symbol{graphene:point3d-t}"
   (box (:pointer (:struct box-t)))
-  (min (:pointer (:struct point3d-t)))
-  (max (:pointer (:struct point3d-t))))
+  (pmin (:pointer (:struct point3d-t)))
+  (pmax (:pointer (:struct point3d-t))))
 
 (export 'box-init)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_box_init_from_box ()
+;;; graphene_box_init_from_box
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_box_init_from_box" box-init-from-box)
     (:pointer (:struct box-t))
  #+liber-documentation
- "@version{#2022-9-22}
+ "@version{2024-9-10}
   @argument[box]{a @symbol{graphene:box-t} instance to initialize}
   @argument[source]{a @symbol{graphene:box-t} instance}
-  @return{The initialized @symbol{grpahene:box-t} instance.}
+  @return{The initialized @symbol{graphene:box-t} instance.}
   @begin{short}
     Initializes the given @symbol{graphene:box-t} instance with the vertices of
     another @symbol{graphene:box-t} instance.
@@ -289,7 +289,7 @@
 (export 'box-init-from-box)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_box_init_from_points ()
+;;; graphene_box_init_from_points
 ;;; ----------------------------------------------------------------------------
 
 (defun box-init-from-points (box arg)

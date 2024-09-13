@@ -68,8 +68,11 @@
 
 (test graphene-box-init
   (let ((box (graphene:box-alloc)))
-    (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
-      (is (cffi:pointer-eq box (graphene:box-init box p1 p2))))
+    (graphene:with-point3ds ((p1 0 1/2 4.0) (p2 1.5 2 6.0))
+      (is (cffi:pointer-eq box (graphene:box-init box p1 p2)))
+      (is (= 1.5 (graphene:box-width box)))
+      (is (= 1.5 (graphene:box-height box)))
+      (is (= 2.0 (graphene:box-depth box))))
     (graphene:box-free box)))
 
 ;;;     graphene_box_init_from_box
@@ -80,6 +83,7 @@
     (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
       (is (cffi:pointer-eq box2 (graphene:box-init box2 p1 p2)))
       (is (cffi:pointer-eq box1 (graphene:box-init-from-box box1 box2))))
+      (is (graphene:box-equal box1 box2))
     (graphene:box-free box1)
     (graphene:box-free box2)))
 
@@ -87,9 +91,12 @@
 
 (test graphene-box-init-from-points
   (let ((box (graphene:box-alloc)))
-    (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
+    (graphene:with-point3ds ((p1 0 1/2 4.0) (p2 1.5 2 6.0))
       (is (cffi:pointer-eq box
-                           (graphene:box-init-from-points box (list p1 p2)))))
+                           (graphene:box-init-from-points box (list p1 p2))))
+      (is (= 1.5 (graphene:box-width box)))
+      (is (= 1.5 (graphene:box-height box)))
+      (is (= 2.0 (graphene:box-depth box))))
     (graphene:box-free box)))
 
 ;;;     graphene_box_init_from_vec3
@@ -257,7 +264,9 @@
 
         (is (equal '(3.0 2.0 1.0)
                    (graphene:vec3-to-float (graphene:box-size box vector))))
-        (is (equal (list (graphene:box-width box) (graphene:box-height box) (graphene:box-depth box))
+        (is (equal (list (graphene:box-width box)
+                         (graphene:box-height box)
+                         (graphene:box-depth box))
                    (graphene:vec3-to-float (graphene:box-size box vector))))))))
 
 ;;;     graphene_box_get_bounding_sphere
@@ -390,4 +399,4 @@
 ;;;     graphene_box_empty
 ;;;     graphene_box_infinite
 
-;;; 2023-12-10
+;;; 2024-9-9
