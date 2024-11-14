@@ -6,7 +6,7 @@
 ;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 - 2023 Dieter Kaiser
+;;; Copyright (C) 2022 - 2024 Dieter Kaiser
 ;;;
 ;;; Permission is hereby granted, free of charge, to any person obtaining a
 ;;; copy of this software and associated documentation files (the "Software"),
@@ -191,21 +191,22 @@
 (setf (liber:alias-for-symbol 'point-t)
       "CStruct"
       (liber:symbol-documentation 'point-t)
- "@version{2023-12-3}
+ "@version{2024-11-9}
+  @begin{declaration}
+(cffi:defcstruct point-t
+  (x :float)
+  (y :float))
+  @end{declaration}
   @begin{short}
     The @symbol{graphene:point-t} structure is a data structure capable of
     describing a point with two coordinates x and y of type float.
   @end{short}
-  @begin{pre}
-(cffi:defcstruct point-t
-  (x :float)
-  (y :float))
-  @end{pre}
+
   Access the coordinates with the @fun{graphene:point-x} and
   @fun{graphene:point-y} functions. Use the @macro{graphene:with-point} and
   @macro{graphene:with-points} macros to allocate a new
   @symbol{graphene:point-t} instance and initialize the point with values.
-  @begin[Example]{dictionary}
+  @begin[Examples]{dictionary}
     Allocate and initialize a point with values.
     @begin{pre}
 (graphene:with-point (p 1.0 1.5)

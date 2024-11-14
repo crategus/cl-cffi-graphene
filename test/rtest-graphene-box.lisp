@@ -87,8 +87,9 @@
     (graphene:box-free box1)
     (graphene:box-free box2)))
 
-;;;     graphene_box_init_from_points
+;;;     graphene_box_init_from_points                       not needed
 
+#+nil
 (test graphene-box-init-from-points
   (let ((box (graphene:box-alloc)))
     (graphene:with-point3ds ((p1 0 1/2 4.0) (p2 1.5 2 6.0))
@@ -107,8 +108,9 @@
       (is (cffi:pointer-eq box (graphene:box-init-from-vec3 box v1 v2))))
     (graphene:box-free box)))
 
-;;;     graphene_box_init_from_vectors
+;;;     graphene_box_init_from_vectors                      not needed
 
+#+nil
 (test graphene-box-init-from-vectors
   (let ((box (graphene:box-alloc)))
     (graphene:with-vec3s ((v1 0 0 0) (v2 1 1 1))
@@ -304,9 +306,47 @@
                                          (list v0 v1 v2 v3 v4 v5 v6 v7)))))))))
 
 ;;;     graphene_box_union
+
+(test graphene-box-union
+  (graphene:with-box (result)
+    (is (graphene:box-equal (graphene:box-one-minus-one)
+                            (graphene:box-union (graphene:box-one)
+                                                (graphene:box-minus-one)
+                                                result)))))
+
 ;;;     graphene_box_intersection
+
+(test graphene-box-intersection
+  (graphene:with-box (result)
+    (is (graphene:box-equal (graphene:box-zero)
+                            (graphene:box-intersection (graphene:box-one)
+                                                       (graphene:box-minus-one)
+                                                       result)))
+    (is (graphene:box-equal (graphene:box-minus-one)
+                            (graphene:box-intersection (graphene:box-one-minus-one)
+                                                       (graphene:box-minus-one)
+                                                       result)))
+    (is (graphene:box-equal (graphene:box-one)
+                            (graphene:box-intersection (graphene:box-one-minus-one)
+                                                       (graphene:box-one)
+                                                       result)))))
+
 ;;;     graphene_box_contains_box
+
+(test graphene-box-contains-box
+
+  (is (graphene:box-contains-box (graphene:box-one-minus-one)
+                                 (graphene:box-one)))
+  (is (graphene:box-contains-box (graphene:box-one-minus-one)
+                                 (graphene:box-minus-one))))
+
 ;;;     graphene_box_contains_point
+
+(test graphene-box-contains-point
+  (graphene:with-point3d (point 0.5 0.5 0.5)
+    (is-true (graphene:box-contains-point (graphene:box-one) point))
+    (is-false (graphene:box-contains-point (graphene:box-minus-one) point))
+    (is-true (graphene:box-contains-point (graphene:box-one-minus-one) point))))
 
 ;;;     graphene_box_zero
 
@@ -397,6 +437,37 @@
       (is (=  1.0 (graphene:point3d-z (graphene:box-max box max)))))))
 
 ;;;     graphene_box_empty
+
+(test graphene-box-empty
+  (graphene:with-point3ds (min max)
+    (is (= sb-ext:single-float-positive-infinity
+           (graphene:point3d-x (graphene:box-min (graphene:box-empty) min))))
+    (is (= sb-ext:single-float-positive-infinity
+           (graphene:point3d-y (graphene:box-min (graphene:box-empty) min))))
+    (is (= sb-ext:single-float-positive-infinity
+           (graphene:point3d-z (graphene:box-min (graphene:box-empty) min))))
+    (is (= sb-ext:single-float-negative-infinity
+           (graphene:point3d-x (graphene:box-max (graphene:box-empty) max))))
+    (is (= sb-ext:single-float-negative-infinity
+           (graphene:point3d-y (graphene:box-max (graphene:box-empty) max))))
+    (is (= sb-ext:single-float-negative-infinity
+           (graphene:point3d-z (graphene:box-max (graphene:box-empty) max))))))
+
 ;;;     graphene_box_infinite
 
-;;; 2024-9-9
+(test graphene-box-infinite
+  (graphene:with-point3ds (min max)
+    (is (= sb-ext:single-float-negative-infinity
+           (graphene:point3d-x (graphene:box-min (graphene:box-infinite) min))))
+    (is (= sb-ext:single-float-negative-infinity
+           (graphene:point3d-y (graphene:box-min (graphene:box-infinite) min))))
+    (is (= sb-ext:single-float-negative-infinity
+           (graphene:point3d-z (graphene:box-min (graphene:box-infinite) min))))
+    (is (= sb-ext:single-float-positive-infinity
+           (graphene:point3d-x (graphene:box-max (graphene:box-infinite) max))))
+    (is (= sb-ext:single-float-positive-infinity
+           (graphene:point3d-y (graphene:box-max (graphene:box-infinite) max))))
+    (is (= sb-ext:single-float-positive-infinity
+           (graphene:point3d-z (graphene:box-max (graphene:box-infinite) max))))))
+
+;;; 2024-11-12
