@@ -78,64 +78,200 @@
 
 ;;;     graphene_matrix_init_identity
 
-#+nil
 (test graphene-matrix-init-identity
   (graphene:with-matrix (matrix)
     (is (cffi:pointer-eq matrix
-                    (graphene:matrix-init-identity matrix)))
+                         (graphene:matrix-init-identity matrix)))
     (is (graphene:matrix-is-identity matrix))))
 
 ;;;     graphene_matrix_init_from_float
 
-#+nil
-(test graphene-matrix-init-from-float.1
+(test graphene-matrix-init-from-float
   (graphene:with-matrix (matrix  1.0  2.0  3.0  4.0
                                  5.0  6.0  7.0  8.0
                                  9.0 10.0 11.0 12.0
                                 13.0 14.0 15.0 16.0)
-    (is (equal '(1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0
-                 12.0 13.0 14.0 15.0 16.0)
+    (is (equal '( 1.0  2.0  3.0  4.0
+                  5.0  6.0  7.0  8.0
+                  9.0 10.0 11.0 12.0
+                 13.0 14.0 15.0 16.0)
                (graphene:matrix-to-float matrix)))))
-
-#+nil
-(test graphene-matrix-init-from-float.2
-  (graphene:with-matrix (matrix)
-    ;; More than 16 values are ignored.
-    (let ((values '(1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0
-                    14.0 15.0 16.0 17.0 18.0)))
-      (is (cffi:pointerp (setf matrix
-                          (graphene:matrix-init-from-float matrix values))))
-      (is (equal '(1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0
-                    14.0 15.0 16.0)
-                 (graphene:matrix-to-float matrix))))))
-
-#+nil
-(test graphene-matrix-init-from-float.3
-  (graphene:with-matrix (matrix)
-    ;; The list of values does not contain 16 values.
-    (let ((values '(1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0)))
-      (signals (error)
-               (graphene:matrix-init-from-float matrix values)))))
 
 ;;;     graphene_matrix_init_from_vec4
 
+(test graphene-matrix-init-form-vec4
+  (graphene:with-vec4s ((v0 1 0 0 0)
+                        (v1 0 1 0 0)
+                        (v2 0 0 1 0)
+                        (v3 0 0 0 1))
+     (graphene:with-matrix (matrix)
+       (is (cffi:pointer-eq matrix
+                            (graphene:matrix-init-from-vec4 matrix
+                                                            v0 v1 v2 v3)))
+       (is (equal '(1.0 0.0 0.0 0.0
+                    0.0 1.0 0.0 0.0
+                    0.0 0.0 1.0 0.0
+                    0.0 0.0 0.0 1.0)
+                  (graphene:matrix-to-float matrix))))))
+
 ;;;     graphene_matrix_init_from_matrix
 
-#+nil
 (test graphene-matrix-init-from-matrix
-  (graphene:with-matrix (matrix1)
-    (graphene:with-matrix (matrix2)
-      (is (graphene:matrix-is-identity
+  (graphene:with-matrices (matrix1 matrix2)
+    (is (graphene:matrix-is-identity
             (setf matrix1 (graphene:matrix-init-identity matrix1))))
-      (is (graphene:matrix-is-identity
+    (is (graphene:matrix-is-identity
             (setf matrix2
-                  (graphene:matrix-init-from-matrix matrix2 matrix1)))))))
+                  (graphene:matrix-init-from-matrix matrix2 matrix1))))))
 
 ;;;     graphene_matrix_init_from_2d
+
+(test graphene-matrix-init-from-2d
+  (graphene:with-matrix (matrix)
+    (is (cffi:pointer-eq matrix
+                         (graphene:matrix-init-from-2d matrix 1 2 3 4 5 6)))
+    (is (equal '(1.0 2.0 0.0 0.0
+                 3.0 4.0 0.0 0.0
+                 0.0 0.0 1.0 0.0
+                 5.0 6.0 0.0 1.0)
+               (graphene:matrix-to-float matrix)))))
+
 ;;;     graphene_matrix_init_perspective
+
+(test graphene-matrix-init-perspective
+  (let ((fovy 60) (aspect 2) (znear 1) (zfar 10))
+    (graphene:with-matrices (matrix matrix1)
+
+      (let* ((s (/ 1 (tan (/ (* fovy pi) 360))))
+             (s1 (/ s aspect))
+             (a (/ (+ zfar znear) (- znear zfar)))
+             (b (/ (* 2 zfar znear) (- znear zfar))))
+        (graphene:matrix-init-from-float matrix1
+                s1  0  0   0
+                0   s  0   0
+                0   0  a  -1
+                0   0  b   0)
+          (is (equal '(0.8660254 0.0 0.0 0.0
+                       0.0 1.7320508 0.0 0.0
+                       0.0 0.0 -1.2222222 -1.0
+                       0.0 0.0 -2.2222223 0.0)
+                     (graphene:matrix-to-float matrix1)))
+
+      (is (cffi:pointer-eq matrix
+                           (graphene:matrix-init-perspective matrix
+                                                             fovy
+                                                             aspect
+                                                             znear
+                                                             zfar)))
+      (is (equal '(0.86602545 0.0 0.0 0.0
+                   0.0 1.7320509 0.0 0.0
+                   0.0 0.0 -1.2222222 -1.0
+                   0.0 0.0 -2.2222223 0.0)
+                 (graphene:matrix-to-float matrix)))
+      (is (graphene:matrix-near matrix matrix1 1.0e-6))
+))))
+
 ;;;     graphene_matrix_init_ortho
 ;;;     graphene_matrix_init_look_at
+
 ;;;     graphene_matrix_init_frustum
+
+(test graphene-matrix-init-frustum
+  (graphene:with-matrices (matrix1 matrix2)
+    (let ((left 0) (right 1) (bottom 0) (top 1) (znear 1) (zfar 2))
+      ;; Initialize MATRIX1 from the definition
+      (is (cffi:pointer-eq matrix1
+                           (graphene:matrix-init-from-float matrix1
+                               ;; first row
+                               (/ (* 2 znear) (- right left))
+                               0
+                               0
+                               0
+                               ;; second row
+                               0
+                               (/ (* 2 znear) (- top bottom))
+                               0
+                               0
+                               ;; third row
+                               (/ (+ right left) (- right left))
+                               (/ (+ top bottom) (- top bottom))
+                               (- (/ (+ zfar znear) (- zfar znear)))
+                               -1
+                               ;; fourth row
+                               0
+                               0
+                               (- (/ (* 2 zfar znear) (- zfar znear)))
+                               0)))
+      (is (every #'approx-equal
+                 '(2.0  0.0   0.0   0.0
+                   0.0  2.0   0.0   0.0
+                   1.0  1.0  -3.0  -1.0
+                   0.0  0.0  -4.0   0.0) (graphene:matrix-to-float matrix1)))
+      ;; Initalize MATRIX2 from the given frustum values
+      (is (cffi:pointer-eq matrix2
+                           (graphene:matrix-init-frustum matrix2
+                                                         left
+                                                         right
+                                                         bottom
+                                                         top
+                                                         znear
+                                                         zfar)))
+      (is (every #'approx-equal
+                 '(2.0  0.0   0.0   0.0
+                   0.0  2.0   0.0   0.0
+                   1.0  1.0  -3.0  -1.0
+                   0.0  0.0  -4.0   0.0) (graphene:matrix-to-float matrix2)))
+      ;; MATRIX1 and MATRIX2 are equal
+      (is (graphene:matrix-equal matrix1 matrix2)))))
+
+(test graphene-matrix-init-frustum.1
+  (graphene:with-matrices (matrix1 matrix2)
+    (let ((left -1) (right 1) (bottom -1) (top 1) (znear 1) (zfar 2))
+      ;; Initialize MATRIX1 from the definition
+      (is (cffi:pointer-eq matrix1
+                           (graphene:matrix-init-from-float matrix1
+                               ;; first row
+                               (/ (* 2 znear) (- right left))
+                               0
+                               0
+                               0
+                               ;; second row
+                               0
+                               (/ (* 2 znear) (- top bottom))
+                               0
+                               0
+                               ;; third row
+                               (/ (+ right left) (- right left))
+                               (/ (+ top bottom) (- top bottom))
+                               (- (/ (+ zfar znear) (- zfar znear)))
+                               -1
+                               ;; fourth row
+                               0
+                               0
+                               (- (/ (* 2 zfar znear) (- zfar znear)))
+                               0)))
+      (is (every #'approx-equal
+                 '(1.0  0.0   0.0   0.0
+                   0.0  1.0   0.0   0.0
+                   0.0  0.0  -3.0  -1.0
+                   0.0  0.0  -4.0   0.0) (graphene:matrix-to-float matrix1)))
+      ;; Initalize MATRIX2 from the given frustum values
+      (is (cffi:pointer-eq matrix2
+                           (graphene:matrix-init-frustum matrix2
+                                                         left
+                                                         right
+                                                         bottom
+                                                         top
+                                                         znear
+                                                         zfar)))
+      (is (every #'approx-equal
+                 '(1.0  0.0   0.0   0.0
+                   0.0  1.0   0.0   0.0
+                   0.0  0.0  -3.0  -1.0
+                   0.0  0.0  -4.0   0.0) (graphene:matrix-to-float matrix2)))
+      ;; MATRIX1 and MATRIX2 are equal
+      (is (graphene:matrix-equal matrix1 matrix2)))))
+
 ;;;     graphene_matrix_init_scale
 ;;;     graphene_matrix_init_translate
 ;;;     graphene_matrix_init_rotate
