@@ -856,7 +856,7 @@
 ;;; Use graphene_rect_round() instead
 ;;;
 ;;; Rounds the origin and the size of the given rectangle to their nearest
-;;; integer values; the rounding is guaranteed to be large enough to contain
+;;; integers; the rounding is guaranteed to be large enough to contain
 ;;; the original rectangle.
 ;;;
 ;;; r
@@ -910,9 +910,9 @@
   @return{The @symbol{graphene:rect-t} instance with the rectangle with
     rounded extents.}
   @begin{short}
-    Rounds the origin of the given rectangle to its nearest integer value and
-    and recompute the size so that the rectangle is large enough to contain all
-    the conrners of the original rectangle.
+    Rounds the origin of the given rectangle to its nearest integers recompute
+    the size so that the rectangle is large enough to contain all the corners
+    of the original rectangle.
   @end{short}
 
   This function is the equivalent of calling floor on the coordinates of the

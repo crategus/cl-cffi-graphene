@@ -458,12 +458,12 @@
 (export 'plane-distance)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_transform ()
+;;; graphene_plane_transform
 ;;; ----------------------------------------------------------------------------
 
 (defun plane-transform (plane matrix normal result)
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{#2024-12-29}
   @argument[plane]{a @symbol{graphene:plane-t} instance}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[normal]{a @symbol{graphene:matrix-t} instance}
@@ -478,7 +478,7 @@
   beforehand to avoid incurring in the cost of recomputing it every time.
   @see-symbol{graphene:plane-t}
   @see-symbol{graphene:matrix-t}"
-  (let ((normal (if normal normal (cffi:null-pointer))))
+  (let ((normal (or normal (cffi:null-pointer))))
     (cffi:foreign-funcall "graphene_plane_transform"
                           (:pointer (:struct plane-t)) plane
                           (:pointer (:struct matrix-t)) matrix

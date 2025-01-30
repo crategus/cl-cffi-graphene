@@ -6,7 +6,7 @@
 ;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the Lisp
 ;;; binding is available from <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
-;;; Copyright (C) 2022 - 2023 Dieter Kaiser
+;;; Copyright (C) 2022 - 2024 Dieter Kaiser
 ;;;
 ;;; Permission is hereby granted, free of charge, to any person obtaining a
 ;;; copy of this software and associated documentation files (the "Software"),
@@ -53,7 +53,7 @@
 
 (defmacro with-frustum ((var &rest args) &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2024-12-26}
   @syntax{(graphene:with-frustum (frustum) body) => result}
   @syntax{(graphene:with-frustum (frustum frustum1) body) => result}
   @syntax{(graphene:with-frustum (frustum (matrix graphene:matrix-t)) body)
@@ -65,8 +65,8 @@
     initialization}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance to use for
     initialization}
-  @argument[plane0 ... plane5]{the six @symbol{graphene:plane-t} instances to
-    use for initialization}
+  @argument[plane0 ... plane5]{six @symbol{graphene:plane-t} instances to use
+    for initialization}
   @begin{short}
     The @fun{graphene:with-frustum} macro allocates a new
     @symbol{graphene:frustum-t} instance, initializes the frustum with the given
@@ -81,8 +81,8 @@
   function is used for initialization with the matrix. The initialization from
   six planes is done with the @fun{graphene:frustum-init} function.
   @begin[Note]{dictionary}
-    The memory is allocated with the @fun{graphene:box-alloc} function and
-    released with the @fun{graphene:box-free} function.
+    The memory is allocated with the @fun{graphene:frustum-alloc} function and
+    released with the @fun{graphene:frustum-free} function.
   @end{dictionary}
   @see-symbol{graphene:frustum-t}
   @see-symbol{graphene:matrix-t}
@@ -130,9 +130,9 @@
 
 (defmacro with-frustums (vars &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2024-12-26}
   @syntax{(graphene:with-frustums (frustum1 ... frustumn) body) => result}
-  @argument[frustum1 ... frustumn]{the newly created @symbol{graphene:frustum-t}
+  @argument[frustum1 ... frustumn]{newly created @symbol{graphene:frustum-t}
     instances}
   @argument[body]{a body that uses the bindings @arg{frustum1 ... frustumn}}
   @begin{short}
@@ -141,7 +141,7 @@
   @end{short}
   The macro performs the bindings sequentially, like the @sym{let*} macro.
 
-  Each point can be initialized with values using the syntax for the
+  Each frustum can be initialized with values using the syntax for the
   @fun{graphene:with-frustum} macro. See also the @fun{graphene:with-frustum}
   documentation.
   @see-symbol{graphene:frustum-t}
@@ -165,44 +165,49 @@
 (setf (liber:alias-for-symbol 'frustum-t)
       "CStruct"
       (liber:symbol-documentation 'frustum-t)
- "@version{2023-12-10}
+ "@version{2024-12-26}
   @begin{short}
-    A @symbol{graphene:frustum-t} structure represents a volume of space
+    The @symbol{graphene:frustum-t} structure represents a volume of space
     delimited by planes.
   @end{short}
   It is usually employed to represent the field of view of a camera, and can be
   used to determine whether an object falls within that view, to efficiently
-  remove invisible objects from the render process.")
+  remove invisible objects from the render process.
+
+  Use the @fun{graphene:with-frustum} and @fun{graphene:with-frustums} macros
+  to create and initalize @symbol{graphene:frustum-t} instances.
+  @see-function{graphene:with-frustum}
+  @see-function{graphene:with-frustums}")
 
 (export 'frustum-t)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_alloc ()
+;;; graphene_frustum_alloc
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_frustum_alloc" frustum-alloc)
     (:pointer (:struct frustum-t))
  #+liber-documentation
- "@version{2023-12-10}
-  @return{The newly allocated @symbol{graphene:frustum-t} instance. Use the
-    @fun{graphene:frustum-free} function to free the resources allocated by this
-    function.}
+ "@version{2024-12-26}
+  @return{The newly allocated @symbol{graphene:frustum-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:frustum-t} instance.
   @end{short}
-  The contents of the returned structure are undefined.
+  The contents of the returned structure are undefined. Use the
+  @fun{graphene:frustum-free} function to free the resources allocated by this
+  function.
   @see-symbol{graphene:frustum-t}
   @see-function{graphene:frustum-free}")
 
 (export 'frustum-alloc)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_free ()
+;;; graphene_frustum_free
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_frustum_free" frustum-free) :void
  #+liber-documentation
- "@version{2023-12-10}
+ "@version{2024-12-26}
   @argument[frustum]{a @symbol{graphene:frustum-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:frustum-alloc} function.
@@ -214,16 +219,16 @@
 (export 'frustum-free)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_init ()
+;;; graphene_frustum_init
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_frustum_init" frustum-init)
     (:pointer (:struct frustum-t))
  #+liber-documentation
- "@version{#2022-9-29}
-  @argument[frustum]{a @symbol{graphene:frustum-t} instance}
-  @argument[p0 ... p5]{the six @symbol{graphene:plane-t} instances with a
-    clipping plane}
+ "@version{2024-12-26}
+  @argument[frustum]{a @symbol{graphene:frustum-t} instance to initialize}
+  @argument[p0 ... p5]{six @symbol{graphene:plane-t} instances with a clipping
+    plane}
   @return{The initialized @symbol{graphene:frustum-t} instance.}
   @begin{short}
     Initializes the given @symbol{graphene:frustum-t} instance using the
@@ -242,13 +247,13 @@
 (export 'frustum-init)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_init_from_frustum ()
+;;; graphene_frustum_init_from_frustum
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_frustum_init_from_frustum" frustum-init-from-frustum)
     (:pointer (:struct frustum-t))
  #+liber-documentation
- "@version{#2022-9-29}
+ "@version{2024-12-26}
   @argument[frustum]{a @symbol{graphene:frustum-t} instance to initialize}
   @argument[source]{a @symbol{graphene:frustum-t} instance}
   @return{The initialized @symbol{graphene:frustum-t} instance.}
@@ -263,18 +268,18 @@
 (export 'frustum-init-from-frustum)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_init_from_matrix ()
+;;; graphene_frustum_init_from_matrix
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_frustum_init_from_matrix" frustum-init-from-matrix)
     (:pointer (:struct frustum-t))
  #+liber-documentation
- "@version{#2022-9-29}
+ "@version{2024-12-26}
   @argument[frustum]{a @symbol{graphene:frustum-t} instance to initialize}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The initialized @symbol{graphene:frustum-t} instance.}
   @begin{short}
-    Initializes the given @symbol{graphene:frustum-t} instance using given
+    Initializes the given @symbol{graphene:frustum-t} instance using the given
     matrix.
   @end{short}
   @see-symbol{graphene:frustum-t}
@@ -285,8 +290,11 @@
 (export 'frustum-init-from-matrix)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_get_planes ()
+;;; graphene_frustum_get_planes
 ;;; ----------------------------------------------------------------------------
+
+;; TODO: Consider to change the implementation. Do not pass in a list,
+;; but the planes as &rest args
 
 (cffi:defcfun ("graphene_frustum_get_planes" %frustum-planes) :void
   (frustum (:pointer (:struct frustum-t)))
@@ -294,7 +302,7 @@
 
 (defun frustum-planes (frustum planes)
  #+liber-documentation
- "@version{2023-12-10}
+ "@version{2024-12-26}
   @argument[frustum]{a @symbol{graphene:frustum-t} instance}
   @argument[planes]{a list with six @symbol{graphene:plane-t} instances}
   @return{The list of six @symbol{graphene:plane-t} instances.}
@@ -315,15 +323,15 @@
 (export 'frustum-planes)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_contains_point ()
+;;; graphene_frustum_contains_point
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_frustum_contains_point" frustum-contains-point) :bool
  #+liber-documentation
- "@version{#2022-9-29}
-  @argument[frustum]{a @symbol{graphene:frustum-t} instance to initialize}
+ "@version{2024-12-26}
+  @argument[frustum]{a @symbol{graphene:frustum-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
-  @return{@em{True} if the point is inside the frustum.}
+  @return{@em{True} if @arg{point} is inside @arg{frustum}.}
   @begin{short}
     Checks whether a point is inside the volume defined by the given frustum.
   @end{short}
@@ -335,16 +343,16 @@
 (export 'frustum-contains-point)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_intersects_sphere ()
+;;; graphene_frustum_intersects_sphere
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_frustum_intersects_sphere" frustum-intersects-sphere)
     :bool
  #+liber-documentation
- "@version{#2022-9-29}
-  @argument[frustum]{a @symbol{graphene:frustum-t} instance to initialize}
+ "@version{2024-12-26}
+  @argument[frustum]{a @symbol{graphene:frustum-t} instance}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
-  @return{@em{True} if the shpere intersects the frustum.}
+  @return{@em{True} if @arg{shpere} intersects @arg{frustum}.}
   @begin{short}
     Checks whether the given sphere intersects a plane of the frustum.
   @end{short}
@@ -356,15 +364,15 @@
 (export 'frustum-intersects-sphere)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_intersects_box ()
+;;; graphene_frustum_intersects_box
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_frustum_intersects_box" frustum-intersects-box) :bool
  #+liber-documentation
- "@version{#2022-9-29}
-  @argument[frustum]{a @symbol{graphene:frustum-t} instance to initialize}
+ "@version{2024-12-26}
+  @argument[frustum]{a @symbol{graphene:frustum-t} instance}
   @argument[box]{a @symbol{graphene:box-t} instance}
-  @return{@em{True} if the box intersects the frustum.}
+  @return{@em{True} if @arg{box} intersects @arg{frustum}.}
   @begin{short}
     Checks whether the given box intersects a plane of the frustum.
   @end{short}
@@ -376,12 +384,12 @@
 (export 'frustum-intersects-box)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_frustum_equal ()
+;;; graphene_frustum_equal
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_frustum_equal" frustum-equal) :bool
  #+liber-documentation
- "@version{#2022-9-29}
+ "@version{2024-12-26}
   @argument[a]{a @symbol{graphene:frustum-t} instance}
   @argument[b]{a @symbol{graphene:frustum-t} instance}
   @return{@em{True} if the given frustums are equal.}

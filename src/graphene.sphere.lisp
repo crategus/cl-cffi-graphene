@@ -240,7 +240,7 @@
 (export 'sphere-init)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_init_from_points ()
+;;; graphene_sphere_init_from_points
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_init_from_points" %sphere-init-from-points)
@@ -252,7 +252,7 @@
 
 (defun sphere-init-from-points (sphere points center)
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2024-12-29}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance to initialize}
   @argument[points]{a list of @symbol{graphene:point3d-t} instances}
   @argument[center]{a @symbol{graphne:point3d-t} instance with the center of
@@ -267,7 +267,7 @@
   @see-symbol{graphene:sphere-t}
   @see-symbol{graphene:point3d-t}"
   (let ((n-points (length points))
-        (center (if center center (cffi:null-pointer))))
+        (center (or center (cffi:null-pointer))))
     (cffi:with-foreign-object (points-ar '(:struct point3d-t) n-points)
       (iter (for i from 0 below n-points)
             (for point in points)
@@ -278,7 +278,7 @@
 (export 'sphere-init-from-points)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_init_from_vectors ()
+;;; graphene_sphere_init_from_vectors
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_init_from_vectors" %sphere-init-from-vectors)
@@ -290,7 +290,7 @@
 
 (defun sphere-init-from-vectors (sphere vectors center)
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2024-12-29}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance to initialize}
   @argument[vectors]{a list of @symbol{graphene:vec3-t} instances}
   @argument[center]{a @symbol{graphne:point3d-t} instance with the center of
@@ -306,7 +306,7 @@
   @see-symbol{graphene:vec3-t}
   @see-symbol{graphene:point3d-t}"
   (let ((n-vectors (length vectors))
-        (center (if center center (cffi:null-pointer))))
+        (center (or center (cffi:null-pointer))))
     (cffi:with-foreign-object (vectors-ar '(:struct vec3-t) n-vectors)
       (iter (for i from 0 below n-vectors)
             (for vec in vectors)

@@ -8,7 +8,7 @@ Graphene
   graphene.triangle.lisp       Triangle described by 3D points   Graphene 1.10
   graphene.box.lisp            Axis-aligned bounding box         Graphene 1.10 .
   graphene.sphere.lisp         Sphere                            Graphene 1.10
-  graphene.frustum.lisp        3D field of view                  Graphene 1.10
+  graphene.frustum.lisp        3D field of view                  Graphene 1.10 .
 
 SIMD vector — Low level floating point 4-sized vector
 SIMD matrix — Low level floating point 4 by 4 matrix
@@ -23,4 +23,4 @@ SIMD matrix — Low level floating point 4 by 4 matrix
 Versioning information — Detemining the version of Graphene in use
 GObject integration — Types for GObject properties and signals
 
-2024-11-12
+2024-12-26
