@@ -80,7 +80,7 @@
   After execution of the body the allocated memory for the point is released.
 
   When no argument is given the components of the point are initialized to zero.
-  The initialization with three float values uses the
+  The initialization with three single floats uses the
   @fun{graphene:point3d-init} function. The initialization from another point
   is done with the @fun{graphene:point3d-init-from-point} function. That is the
   default when no type specifier for the value is given. If the value has the
@@ -91,7 +91,7 @@
     released with the @fun{graphene:point3d-free} function.
   @end{dictionary}
   @begin[Examples]{dictionary}
-    Initialize a point with no value and three float values.
+    Initialize a point with no value and three single floats.
     @begin{pre}
 (graphene:with-point3d (p)
   (list (graphene:point3d-x p) (graphene:point3d-y p) (graphene:point3d-z p)))

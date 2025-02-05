@@ -87,7 +87,7 @@
   @argument[quat]{a @symbol{graphene:quaternion-t} instance to use for
     initialization}
   @argument[vec]{a @symbol{graphene:vec3-t} instance to use for initialization}
-  @argument[x, y, z]{a number coerced to a float value}
+  @argument[x, y, z]{a number coerced to a single float}
   @argument[order]{a @symbol{graphene:euler-order-t} value}
   @begin{short}
     The @fun{graphene:with-euler} macro allocates a new

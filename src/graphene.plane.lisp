@@ -75,7 +75,7 @@
   @argument[point]{a @symbol{graphene:point3d-t} instance to use for
     initialization}
   @argument[a, b, c]{a @symbol{graphene:point3d-t} instance}
-  @argument[constant]{a float value}
+  @argument[constant]{a single float}
   @begin{short}
     The @fun{graphene:with-plane} macro allocates a new
     @symbol{graphene:plane-t} instance, initializes the box with the given
@@ -193,7 +193,7 @@
 
 ;; We need the size of the graphene:plant-t structure for the implementation of
 ;; the graphene:frustum-planes function. This function needs a size of 8 float
-;; values and not 5 float values. Is this correct through the whole library?
+;; values and not 5 single floats. Is this correct through the whole library?
 (cffi:defcstruct plane-t
   (normal :float :count 4)
   (constant :float :count 4))

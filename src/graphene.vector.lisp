@@ -666,7 +666,7 @@
  #+liber-documentation
  "@version{2024-12-26}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
-  @argument[arg]{a list with two numbers coerced to float values}
+  @argument[arg]{a list with two numbers coerced to single floats}
   @return{The initialized @symbol{graphene:vec2-t} instance.}
   @short{Initializes @arg{v} with the contents of the given list.}
   @begin[Note]{dictionary}
@@ -695,7 +695,7 @@
  #+liber-documentation
  "@version{2024-12-26}
   @argument[v]{a @symbol{graphene:vec2-t} instance}
-  @return{The list with the float values for the components of @arg{v}.}
+  @return{The list with the single floats for the components of @arg{v}.}
   @begin{short}
     Stores the components of @arg{v} into a list.
   @end{short}
@@ -1213,7 +1213,7 @@
  #+liber-documentation
  "@version{2024-12-26}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @argument[arg]{a list with three numbers coerced to float values}
+  @argument[arg]{a list with three numbers coerced to single floats}
   @return{The initialized @symbol{graphene:vec3-t} instance.}
   @short{Initializes @arg{v} with the contents of the given list.}
   @begin[Note]{dictionary}
@@ -1242,7 +1242,7 @@
  #+liber-documentation
  "@version{2024-12-26}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{The list with the float values of the components of @arg{v}.}
+  @return{The list with the single floats of the components of @arg{v}.}
   @begin{short}
     Stores the components of @arg{v} into a list.
   @end{short}
@@ -1981,7 +1981,7 @@
  #+liber-documentation
  "@version{2024-12-26}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @argument[arg]{a list with four numbers coerced to float values}
+  @argument[arg]{a list with four numbers coerced to single floats}
   @return{The initialized @symbol{graphene:vec4-t} instance.}
   @short{Initializes @arg{v} with the contents of the given list.}
   @begin[Note]{dictionary}
@@ -2010,7 +2010,7 @@
  #+liber-documentation
  "@version{2024-12-26}
   @argument[v]{a @symbol{graphene:vec4-t} instance}
-  @return{The list with the float values of the components of @arg{v}.}
+  @return{The list with the single floats of the components of @arg{v}.}
   @begin{short}
     Stores the components of @arg{v} into a list.
   @end{short}

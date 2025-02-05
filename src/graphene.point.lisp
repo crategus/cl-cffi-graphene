@@ -72,7 +72,7 @@
   After execution of the body the allocated memory for the point is released.
 
   When no argument is given the components of the point are initialized to zero.
-  The initialization with two float values uses the @fun{graphene:point-init}
+  The initialization with two single floats uses the @fun{graphene:point-init}
   function. The initialization from another point is done with the
   @fun{graphene:point-init-from-point} function. That is the default when no
   type specifier for the value is given. If the value has the type specifier
@@ -83,7 +83,7 @@
     released with the @fun{graphene:point-free} function.
   @end{dictionary}
   @begin[Examples]{dictionary}
-    Initialize a point with no value and two float values.
+    Initialize a point with no value and two single floats.
     @begin{pre}
 (graphene:with-point (p)
   (list (graphene:point-x p) (graphene:point-y p)))

@@ -98,7 +98,7 @@
   released.
 
   When no argument is given the components of the rectangle are initialized to
-  zero. The initialization with four float values uses the
+  zero. The initialization with four single floats uses the
   @fun{graphene:rect-init} function. The initialization from another rectangle
   is done with the @fun{graphene:rect-init-from-rect} function.
   @begin[Note]{dictionary}

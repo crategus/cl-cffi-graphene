@@ -133,8 +133,8 @@
   @argument[p]{a @symbol{graphene:point3d-t} instance}
   @argument[axis, eye, center, up]{a @symbol{graphene:vec3-t} instance}
   @argument[v0,v1,v2,v3]{a @symbol{graphene:vec4-t} instance}
-  @argument[xx, yx, xy, yy, x0, y0]{a double float value}
-  @argument[other values]{a single float value}
+  @argument[xx, yx, xy, yy, x0, y0]{a double float}
+  @argument[other values]{a single float}
   @begin{short}
     The @fun{graphene:with-matrix} macro allocates a new
     @symbol{graphene:matrix-t} instance, initializes the matrix with the given
@@ -436,7 +436,7 @@ res = ⎡ A.x × B ⎤
  #+liber-documentation
  "@version{2024-12-30}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @argument[values]{16 numbers coerced to single float values}
+  @argument[values]{16 numbers coerced to single floats}
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @short{Initializes the matrix with the given numbers.}
   @see-symbol{graphene:matrix-t}"
@@ -521,7 +521,7 @@ res = ⎡ A.x × B ⎤
   This function can be used to convert between an affine matrix type from
   other libraries and a @symbol{graphene:matrix-t} instance.
   @begin[Notes]{dictionary}
-    All numbers are coerced to a double float value before being passed to the
+    All numbers are coerced to a double float before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -554,7 +554,7 @@ res = ⎡ A.x × B ⎤
     Initializes the matrix with a perspective projection.
   @end{short}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float value before being passed to the
+    All numbers are coerced to a single float before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -585,7 +585,7 @@ res = ⎡ A.x × B ⎤
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @short{Initializes the matrix with an orthographic projection.}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float value before being passed to the
+    All numbers are coerced to a single float before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -671,7 +671,7 @@ res = ⎡ A.x × B ⎤
 l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @end{pre}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float value before being passed to the
+    All numbers are coerced to a single float before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}
@@ -702,7 +702,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @short{Initializes the matrix with the given scaling factors.}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float value before being passed to the
+    All numbers are coerced to a single float before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -743,14 +743,14 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
  "@version{#2024-12-30}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[angle]{a number for the rotation angle, in degrees}
-  @argument[axis]{a @symbol{graphene:vec3-t} instance with the axis vector}
+  @argument[axis]{a @symbol{graphene:vec3-t} instance for the axis vector}
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @begin{short}
     Initializes the matrix to represent a rotation of angle degrees on the axis
     represented by the axis vector.
   @end{short}
   @begin[Notes]{dictionary}
-    The @arg{angle} argument is coerced to a single float value before being
+    The @arg{angle} argument is coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -777,7 +777,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
     Initializes the matrix with a skew transformation with the given factors.
   @end{short}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float value before being passed to the
+    All numbers are coerced to a single float before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -965,9 +965,9 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
  #+liber-documentation
  "@version{#2024-12-30}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @argument[row]{an unsigned integer with the row index}
-  @argument[col]{an unsigned integer with the column index}
-  @return{The single float value at the given indices.}
+  @argument[row]{an unsigned integer for the row index}
+  @argument[col]{an unsigned integer for the column index}
+  @return{The single float at the given indices.}
   @begin{short}
     Retrieves the value at the given @arg{row} and @arg{col} index.
   @end{short}
@@ -1012,7 +1012,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
  #+liber-documentation
  "@version{#2024-12-30}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The single float value for the value of the determinat.}
+  @return{The single float for the value of the determinat.}
   @begin{short}
     Computes the determinant of the given matrix.
   @end{short}
@@ -1479,7 +1479,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   This is the equivalent of calling the @fun{graphene:matrix-init-rotate}
   function and then multiplying the matrix with the rotation matrix.
   @begin[Notes]{dictionary}
-    The @arg{angle} argument is coerced to a single float value before being
+    The @arg{angle} argument is coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{gaphene:matrix-t}
@@ -1510,7 +1510,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @end{short}
   See also the @fun{graphene:matrix-rotate} function.
   @begin[Notes]{dictionary}
-    The @arg{angle} argument is coerced to a single float value before being
+    The @arg{angle} argument is coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}
@@ -1539,7 +1539,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @end{short}
   See also the @fun{graphene:matrix-rotate} function.
   @begin[Notes]{dictionary}
-    The @arg{angle} argument is coerced to a single float value before being
+    The @arg{angle} argument is coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}
@@ -1568,7 +1568,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @end{short}
   See also the @fun{graphene:matrix-rotate} function.
   @begin[Notes]{dictionary}
-    The @arg{angle} argument is coerced to a single float value before being
+    The @arg{angle} argument is coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -1648,7 +1648,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   This is the equivalent of calling the @fun{graphene:matrix-init-scale}
   function and then multiplying the matrix with the scale matrix.
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float value before being passed to the
+    All numbers are coerced to a single float before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}
@@ -1675,7 +1675,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @return{The @symbol{graphene:matrix-t} instance with the result.}
   @short{Adds a skew of @arg{factor} on the X and Y axis to the given matrix.}
   @begin[Notes]{dictionary}
-    The @arg{factor} argument is coerced to a single float value before being
+    The @arg{factor} argument is coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -1701,7 +1701,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
     Adds a skew of @arg{factor} on the X and Z axis to the given matrix.
   @end{short}
   @begin[Notes]{dictionary}
-    The @arg{factor} argument is coerced to a single float value before being
+    The @arg{factor} argument is coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -1727,7 +1727,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
     Adds a skew of @arg{factor} on the Y and Z axis to the given matrix.
   @end{short}
   @begin[Notes]{dictionary}
-    The @arg{factor} argument is coerced to a single float value before being
+    The @arg{factor} argument is coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -1793,7 +1793,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @return{The @symbol{graphene:matrix-t} instance with the perpective matrix.}
   @short{Applies a perspective of depth to the matrix.}
   @begin[Notes]{dictionary}
-    The @arg{depth} argument ist coerced to a single float value before being
+    The @arg{depth} argument ist coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -1833,7 +1833,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
  #+liber-documentation
  "@version{#2024-12-30}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The single float value with the translation component.}
+  @return{The single float with the translation component.}
   @begin{short}
     Retrieves the translation component on the X axis from the given matrix.
   @end{short}
@@ -1850,7 +1850,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
  #+liber-documentation
  "@version{#2024-12-30}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The single float value with the translation component.}
+  @return{The single float with the translation component.}
   @begin{short}
     Retrieves the translation component on the Y axis from the given matrix.
   @end{short}
@@ -1867,7 +1867,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
  #+liber-documentation
  "@version{#2024-12-30}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The single float value with the translation component.}
+  @return{The single float with the translation component.}
   @begin{short}
     Retrieves the translation component on the Z axis from the given matrix.
   @end{short}
@@ -1884,7 +1884,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
  #+liber-documentation
  "@version{#2024-12-30}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The single float value with the scaling factor.}
+  @return{The single float with the scaling factor.}
   @begin{short}
     Retrieves the scaling factor on the X axis in the given matrix.
   @end{short}
@@ -1901,7 +1901,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
  #+liber-documentation
  "@version{#2024-12-30}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The single float value with the scaling factor.}
+  @return{The single float with the scaling factor.}
   @begin{short}
     Retrieves the scaling factor on the Y axis in the given matrix.
   @end{short}
@@ -1918,7 +1918,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
  #+liber-documentation
  "@version{#2024-12-300}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The single float value with the scaling factor.}
+  @return{The single float with the scaling factor.}
   @short{Retrieves the scaling factor on the Z axis in the given matrix.}
   @see-symbol{graphene:matrix-t}"
   (matrix (:pointer (:struct matrix-t))))
@@ -1980,7 +1980,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   interpolation cannot be performed, and this function will return an identity
   matrix.
   @begin[Notes]{dictionary}
-    The @arg{factor} argument ist coerced to a double float value before being
+    The @arg{factor} argument ist coerced to a double float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}
@@ -2062,8 +2062,7 @@ else
  "@version{#2024-12-30}
   @argument[a]{a @symbol{graphene:matrix-t} instance}
   @argument[b]{a @symbol{graphene:matrix-t} instance}
-  @argument[epsilon]{a single float value for the threshold between the two
-    matrices}
+  @argument[epsilon]{a single float for the threshold between the two matrices}
   @return{@em{True} if the two matrices are near each other, @em{false}
     otherwise.}
   @begin{short}
@@ -2071,7 +2070,7 @@ else
     the given @arg{epsilon} of each other.
   @end{short}
   @begin[Notes]{dictionary}
-    The @arg{epsilon} argument ist coerced to a single float value before being
+    The @arg{epsilon} argument ist coerced to a single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
