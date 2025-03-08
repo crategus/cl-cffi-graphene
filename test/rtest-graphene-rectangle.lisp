@@ -22,7 +22,7 @@
 
 ;;; --- Macros -----------------------------------------------------------------
 
-;;;     with-rect
+;;;     graphene:with-rect
 
 (test graphene-with-rect.1
   (graphene:with-rect (r)
@@ -52,7 +52,7 @@
     (is (= 3.0 (graphene:rect-width r)))
     (is (= 4.0 (graphene:rect-height r)))))
 
-;;;     with-rects
+;;;     graphene:with-rects
 
 (test graphene-with-rects
   (graphene:with-rects (r1 (r2 1 2 3 4) (r3 r2) (r4 (r2 graphene:rect-t)))
@@ -185,16 +185,15 @@
     (is-false (graphene:rect-equal rect2 rect3))))
 
 ;;;     graphene_rect_normalize
+;;;     graphene_rect_normalize_r
 
 (test graphene-rect-normalize
-  (graphene:with-rect (rect -4 -3 -2 -1)
-    (is (cffi:pointerp (setf rect (graphene:rect-normalize rect))))
-    (is (= -6.0 (graphene:rect-x rect)))
-    (is (= -4.0 (graphene:rect-y rect)))
-    (is (= 2.0 (graphene:rect-width rect)))
-    (is (= 1.0 (graphene:rect-height rect)))))
-
-;;;     graphene_rect_normalize_r
+  (graphene:with-rects ((rect -4 -3 -2 -1) result)
+    (graphene:rect-normalize rect result)
+    (is (= -6.0 (graphene:rect-x result)))
+    (is (= -4.0 (graphene:rect-y result)))
+    (is (= 2.0 (graphene:rect-width result)))
+    (is (= 1.0 (graphene:rect-height result)))))
 
 ;;;     graphene_rect_get_center
 
@@ -316,14 +315,83 @@
 
 ;;;     graphene_rect_offset
 ;;;     graphene_rect_offset_r
+
+(test graphene-rect-offset
+  (graphene:with-rects ((rect 1 2 3 4) result)
+    (graphene:rect-offset rect 0.5 0.5 result)
+    (is (= 1.5 (graphene:rect-x result)))
+    (is (= 2.5 (graphene:rect-y result)))
+    (is (= 3.0 (graphene:rect-width result)))
+    (is (= 4.0 (graphene:rect-height result)))))
+
 ;;;     graphene_rect_inset
 ;;;     graphene_rect_inset_r
-;;;     graphene_rect_round_to_pixel
-;;;     graphene_rect_round
+
+(test graphene-rect-inset.1
+  (graphene:with-rects ((rect 1 2 3 4) result)
+    (graphene:rect-inset rect 0.5 0.5 result)
+    (is (= 1.5 (graphene:rect-x result)))
+    (is (= 2.5 (graphene:rect-y result)))
+    (is (= 2.0 (graphene:rect-width result)))
+    (is (= 3.0 (graphene:rect-height result)))))
+
+(test graphene-rect-inset.2
+  (graphene:with-rects ((rect 1 2 3 4) result)
+    (graphene:rect-inset rect -0.5 -0.5 result)
+    (is (= 0.5 (graphene:rect-x result)))
+    (is (= 1.5 (graphene:rect-y result)))
+    (is (= 4.0 (graphene:rect-width result)))
+    (is (= 5.0 (graphene:rect-height result)))))
+
 ;;;     graphene_rect_round_extents
+
+(test graphene-rect-round-extents
+  (graphene:with-rects ((rect 0.5 1.5 2.5 3.5) result)
+    (graphene:rect-round-extents rect result)
+    (is (= 0.0 (graphene:rect-x result)))
+    (is (= 1.0 (graphene:rect-y result)))
+    (is (= 3.0 (graphene:rect-width result)))
+    (is (= 4.0 (graphene:rect-height result)))))
+
 ;;;     graphene_rect_expand
+
+(test graphene-rect-expand
+  (graphene:with-rects ((rect 0 0 5 5) result)
+    (graphene:with-point (point 10 20)
+      (graphene:rect-expand rect point result)
+      (is (=  0.0 (graphene:rect-x result)))
+      (is (=  0.0 (graphene:rect-y result)))
+      (is (= 10.0 (graphene:rect-width result)))
+      (is (= 20.0 (graphene:rect-height result))))))
+
 ;;;     graphene_rect_interpolate
+
+(test graphene-rect-interpolate
+  (graphene:with-rects ((rect1 0 0 5 5) (rect2 2 3 10 20) result)
+    (graphene:rect-interpolate rect1 rect2 0.5 result)
+    (is (=  1.0 (graphene:rect-x result)))
+    (is (=  1.5 (graphene:rect-y result)))
+    (is (=  7.5 (graphene:rect-width result)))
+    (is (= 12.5 (graphene:rect-height result)))))
+
 ;;;     graphene_rect_zero
+
+(test graphene-rect-zero
+  (graphene:with-rect (rect)
+    (graphene:rect-init-from-rect rect (graphene:rect-zero))
+    (is (= 0.0 (graphene:rect-x rect)))
+    (is (= 0.0 (graphene:rect-y rect)))
+    (is (= 0.0 (graphene:rect-width rect)))
+    (is (= 0.0 (graphene:rect-height rect)))))
+
 ;;;     graphene_rect_scale
 
-;;; 2023-12-9
+(test graphene-rect-scale
+  (graphene:with-rects ((rect 1 2 3 4) result)
+    (graphene:rect-scale rect 2 3 result)
+      (is (=  2.0 (graphene:rect-x result)))
+      (is (=  6.0 (graphene:rect-y result)))
+      (is (=  6.0 (graphene:rect-width result)))
+      (is (= 12.0 (graphene:rect-height result)))))
+
+;;; 2025-3-8
