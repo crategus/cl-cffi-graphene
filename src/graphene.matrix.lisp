@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -110,7 +110,7 @@
 
 (defmacro with-matrix ((var &rest args) &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-6}
   @syntax{(graphene:with-matrix (m) body) => result}
   @syntax{(graphene:with-matrix (m m1) body) => result}
   @syntax{(graphene:with-matrix (m (p graphene:point3d-t)) body) => result}
@@ -174,114 +174,107 @@
               (matrix-free ,var))))
         ((null (second args))
          ;; One argument, the argument must be of type matrix-t or point3d-t
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 'matrix-t))
-                  ;; One argument with no type or of type matrix-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'matrix-t)
+                  ;; One argument of type matrix-t
                   `(let ((,var (matrix-alloc)))
-                     (matrix-init-from-matrix ,var ,arg)
+                     (matrix-init-from-matrix ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (matrix-free ,var))))
                  ((eq type1 'point3d-t)
                   ;; One argument of type point3d-t
                   `(let ((,var (matrix-alloc)))
-                     (matrix-init-translate ,var ,arg)
+                     (matrix-init-translate ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (matrix-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-MATRIX")))))
+                  ;; One argument of no type, default is matrix-t
+                  `(let ((,var (matrix-alloc)))
+                     (matrix-init-from-matrix ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (matrix-free ,var)))))))
         ((null (third args))
-         ;; Two arguments, the first can be of type point3d-t or vec3-t
-         (destructuring-bind ((arg1 &optional type1)
-                              (arg2 &optional type2))
+         ;; Two arguments, first of type float and second of type vec3-t or
+         ;; type float
+         (dbind ((arg1 &optional type1 &rest rest1)
+                 (arg2 &optional type2 &rest rest2))
              (list (mklist (first args)) (mklist (second args)))
-           (cond ((and (or (not type1)
-                           (eq type1 :float))
-                       (eq type2 'vec3-t))
-                  ;; First argument with no type or of type :float and
-                  ;; second argument with type vec3-t
+           (declare (ignore arg1 type1 rest1 rest2))
+           (cond ((eq type2 'vec3-t)
+                  ;; First argument of type float and second argument of
+                  ;; type vec3-t
                   `(let ((,var (matrix-alloc)))
-                     (matrix-init-rotate ,var ,arg1 ,arg2)
-                     (unwind-protect
-                       (progn ,@body)
-                       (matrix-free ,var))))
-                 ((and (or (not type1)
-                           (eq type1 :float))
-                       (or (not type2)
-                           (eq type2 :float)))
-                  ;; First argument with no type or of type :float and second
-                  ;;;argument with no type or type :float
-                  `(let ((,var (matrix-alloc)))
-                     (matrix-init-skew ,var ,arg1 ,arg2)
+                     (matrix-init-rotate ,var ,(first args) ,arg2)
                      (unwind-protect
                        (progn ,@body)
                        (matrix-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-MATRIX")))))
+                  ;; Two arguments of type float
+                  `(let ((,var (matrix-alloc)))
+                     (matrix-init-skew ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (matrix-free ,var)))))))
         ((null (fourth args))
-         ;; Three arguments, the first can be of type :float or vec3-t
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 :float))
-                    ;; First argument with no type or of type :float.
+         ;; Three arguments, the first can be of type float or vec3-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'vec3-t)
+                  ;; First argument of type vec3-t
+                  `(let ((,var (matrix-alloc)))
+                     (matrix-init-look-at ,var ,arg1 ,@(rest args))
+                     (unwind-protect
+                       (progn ,@body)
+                       (matrix-free ,var))))
+                 (t
+                    ;; First argument of no type, default is float
                     `(let ((,var (matrix-alloc)))
-                       (matrix-init-scale ,var ,arg ,@(rest args))
+                       (matrix-init-scale ,var ,@args)
                        (unwind-protect
                          (progn ,@body)
-                         (matrix-free ,var))))
-                 ((eq type1 'vec3-t)
-                  ;; First argument with type vec3-t
-                  `(let ((,var (matrix-alloc)))
-                     (matrix-init-look-at ,var,arg ,@(rest args))
-                     (unwind-protect
-                       (progn ,@body)
-                       (matrix-free ,var))))
-                 (t
-                  (error "Syntax error in GRAPHENE:WITH-MATRIX")))))
+                         (matrix-free ,var)))))))
         ((null (fifth args))
          ;; Four arguments, the first can be of type :float or vec4-t
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((and (or (not type1)
-                           (eq type1 :float)))
-                    ;; First argument with no type or of type :float.
-                    `(let ((,var (matrix-alloc)))
-                       (matrix-init-perspective ,var ,arg ,@(rest args))
-                       (unwind-protect
-                         (progn ,@body)
-                         (matrix-free ,var))))
-                 ((eq type1 'vec4-t)
-                  ;; First argument with type vec4-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'vec4-t)
+                  ;; First argument of type vec4-t
                   `(let ((,var (matrix-alloc)))
-                     (matrix-init-from-vec4 ,var ,arg ,@(rest args))
+                     (matrix-init-from-vec4 ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (matrix-free ,var))))
-                   (t
-                    (error "syntax error in GRAPHENE:WITH-MATRIX")))))
+                 (t
+                  ;; First argument with no type, default is float
+                  `(let ((,var (matrix-alloc)))
+                     (matrix-init-perspective ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (matrix-free ,var)))))))
         ((null (seventh args))
-         ;; Six arguments, the first can be of type :float or :double
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((and (or (not type1)
-                           (eq type1 :float)))
-                    ;; First argument with no type or of type :float.
-                    `(let ((,var (matrix-alloc)))
-                       (matrix-init-ortho ,var ,arg ,@(rest args))
-                       (unwind-protect
-                         (progn ,@body)
-                         (matrix-free ,var))))
-                 ((eq type1 :double)
-                  ;; First argument with type :double
+         ;; Six arguments, first can be of type single float or double float
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 :double)
+                  ;; First argument of type double float
                   `(let ((,var (matrix-alloc)))
-                     (matrix-init-from-2d ,var ,arg ,@(rest args))
+                     (matrix-init-from-2d ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (matrix-free ,var))))
-                   (t
-                    (error "Syntax error in GRAPHENE:WITH-MATRIX")))))
+                 (t
+                  ;; Six arguments of type single float
+                  `(let ((,var (matrix-alloc)))
+                     (matrix-init-ortho ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (matrix-free ,var)))))))
         ((null (nth 16 args))
-         ;; Sixteen arguments of type float
+         ;; Sixteen arguments of type single float
          `(let ((,var (matrix-alloc)))
             (matrix-init-from-float ,var ,@args)
             (unwind-protect
@@ -294,7 +287,7 @@
 
 (defmacro with-matrices (vars &body body)
  #+liber-documentation
- "@version{2024-12-30}
+ "@version{2025-4-6}
   @syntax{(graphene:with-matrices (matrix1 ... matrixn) body) => result}
   @argument[matrix1 ... matrixn]{newly created @symbol{graphene:matrix-t}
     instances}
@@ -329,7 +322,10 @@
 (setf (liber:alias-for-symbol 'matrix-t)
       "CStruct"
       (liber:symbol-documentation 'matrix-t)
- "@version{#2024-12-30}
+ "@version{2025-4-6}
+  @begin{declaration}
+(cffi:defcstruct matrix-t)
+  @end{declaration}
   @begin{short}
     The @symbol{graphene:matrix-t} structure is a type that provides a 4x4
     square matrix, useful for representing 3D transformations.
@@ -381,9 +377,11 @@ res = ⎡ A.x × B ⎤
 (cffi:defcfun ("graphene_matrix_alloc" matrix-alloc)
     (:pointer (:struct matrix-t))
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @return{The newly allocated @symbol{graphene:matrix-t} instance.}
-  @short{Allocates a new @symbol{graphene:matrix-t} instance.}
+  @begin{short}
+    Allocates a new @symbol{graphene:matrix-t} instance.
+  @end{short}
   The contents of the returned structure are undefined.
   @see-symbol{graphene:matrix-t}
   @see-function{graphene:matrix-free}")
@@ -396,7 +394,7 @@ res = ⎡ A.x × B ⎤
 
 (cffi:defcfun ("graphene_matrix_free" matrix-free) :void
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:matrix-alloc} function.
@@ -414,7 +412,7 @@ res = ⎡ A.x × B ⎤
 (cffi:defcfun ("graphene_matrix_init_identity" matrix-init-identity)
     (:pointer (:struct matrix-t))
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @short{Initializes the matrix with the identity matrix.}
@@ -434,7 +432,7 @@ res = ⎡ A.x × B ⎤
 
 (defun matrix-init-from-float (matrix &rest args)
  #+liber-documentation
- "@version{2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[values]{16 numbers coerced to single floats}
   @return{The initialized @symbol{graphene:matrix-t} instance.}
@@ -458,12 +456,12 @@ res = ⎡ A.x × B ⎤
 (cffi:defcfun ("graphene_matrix_init_from_vec4" matrix-init-from-vec4)
     (:pointer (:struct matrix-t))
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[m]{a @symbol{graphene:matrix-t} instance}
-  @argument[v0]{a @symbol{graphene:vec4-t} instance with a row vector}
-  @argument[v1]{a @symbol{graphene:vec4-t} instance with a row vector}
-  @argument[v2]{a @symbol{graphene:vec4-t} instance with a row vector}
-  @argument[v3]{a @symbol{graphene:vec4-t} instance with a row vector}
+  @argument[v0]{a @symbol{graphene:vec4-t} instance for a row vector}
+  @argument[v1]{a @symbol{graphene:vec4-t} instance for a row vector}
+  @argument[v2]{a @symbol{graphene:vec4-t} instance for a row vector}
+  @argument[v3]{a @symbol{graphene:vec4-t} instance for a row vector}
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @short{Initializes the matrix with the given four row vectors.}
   @see-symbol{graphene:matrix-t}
@@ -483,9 +481,9 @@ res = ⎡ A.x × B ⎤
 (cffi:defcfun ("graphene_matrix_init_from_matrix" matrix-init-from-matrix)
     (:pointer (:struct matrix-t))
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @argument[source]{a @symbol{graphene:matrix.t} instance}
+  @argument[source]{a @symbol{graphene:matrix-t} instance}
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @short{Initializes the matrix using the values of the given matrix.}
   @see-symbol{graphene:matrix-t}"
@@ -500,7 +498,7 @@ res = ⎡ A.x × B ⎤
 
 (defun matrix-init-from-2d (matrix xx yx xy yy x0 y0)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[xx]{a number for the xx member}
   @argument[yx]{a number for the yx member}
@@ -521,7 +519,7 @@ res = ⎡ A.x × B ⎤
   This function can be used to convert between an affine matrix type from
   other libraries and a @symbol{graphene:matrix-t} instance.
   @begin[Notes]{dictionary}
-    All numbers are coerced to a double float before being passed to the
+    All numbers are coerced to double floats before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -543,7 +541,7 @@ res = ⎡ A.x × B ⎤
 
 (defun matrix-init-perspective (matrix fovy aspect znear zfar)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[fovy]{a number for the field of view angle, in degrees}
   @argument[aspect]{a number for the aspect value}
@@ -554,7 +552,7 @@ res = ⎡ A.x × B ⎤
     Initializes the matrix with a perspective projection.
   @end{short}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float before being passed to the
+    All numbers are coerced to single floats before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -574,18 +572,18 @@ res = ⎡ A.x × B ⎤
 
 (defun matrix-init-ortho (matrix left right top bottom znear zfar)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[left]{a number for the left edge of the clipping plane}
   @argument[right]{a number for the right edge of the clipping plane}
   @argument[top]{a number for the top edge of the clipping plane}
   @argument[bottom]{a number for the bottom edge of the clipping plane}
   @argument[znear]{a number for the distance of the near clipping plane}
-  @argument[zfar]{a number or the distance of the far clipping plane}
+  @argument[zfar]{a number for the distance of the far clipping plane}
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @short{Initializes the matrix with an orthographic projection.}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float before being passed to the
+    All numbers are coerced to single floats before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -608,14 +606,14 @@ res = ⎡ A.x × B ⎤
 (cffi:defcfun ("graphene_matrix_init_look_at" matrix-init-look-at)
     (:pointer (:struct matrix-t))
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[eye]{a @symbol{graphene:vec3-t} instance for the vector describing
     the position to look from}
   @argument[center]{a @symbol{graphene:vec3-t} instance for the vector
     describing the position at}
   @argument[up]{a @symbol{graphene:vec3-t} instance for the vector describing
-    the world's upward direction, usually, this is the y axis vector returned
+    the world's upward direction, usually, this is the Y axis vector returned
     from the @fun{graphene:vec3-y-axis} function}
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @begin{short}
@@ -649,7 +647,7 @@ res = ⎡ A.x × B ⎤
 
 (defun matrix-init-frustum (matrix left right bottom top znear zfar)
  #+liber-documentation
- "@version{2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[left]{a number for the left edge of the clipping plane}
   @argument[right]{a number for the right edge of the clipping plane}
@@ -671,7 +669,7 @@ res = ⎡ A.x × B ⎤
 l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @end{pre}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float before being passed to the
+    All numbers are coerced to single floats before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}
@@ -694,7 +692,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-init-scale (matrix x y z)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[x]{a number for the scale factor on the X axis}
   @argument[y]{a number for the scale factor on the Y axis}
@@ -702,7 +700,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @short{Initializes the matrix with the given scaling factors.}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float before being passed to the
+    All numbers are coerced to single floats before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -722,9 +720,9 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 (cffi:defcfun ("graphene_matrix_init_translate" matrix-init-translate)
     (:pointer (:struct matrix-t))
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @argument[point]{a @symbol{graphene:point3d-t} instance with the translation
+  @argument[point]{a @symbol{graphene:point3d-t} instance for the translation
     coordinates}
   @return{The initialized @symbol{graphene:matrix-t} instance.}
   @short{Initializes the matrix with a translation to given coordinates.}
@@ -740,7 +738,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-init-rotate (matrix angle axis)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[angle]{a number for the rotation angle, in degrees}
   @argument[axis]{a @symbol{graphene:vec3-t} instance for the axis vector}
@@ -768,7 +766,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-init-skew (matrix xskew yskew)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[xskew]{a number for the skew factor, in radians, on the X axis}
   @argument[yskew]{a number for the skew factor, in radians, on the Y axis}
@@ -777,7 +775,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
     Initializes the matrix with a skew transformation with the given factors.
   @end{short}
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float before being passed to the
+    All numbers are coerced to single floats before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -795,7 +793,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_is_identity" matrix-is-identity) :bool
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{@em{True} if @arg{matrix} is the identity matrix.}
   @short{Checks whether the given matrix is the identity matrix.}
@@ -810,10 +808,12 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_is_2d" matrix-is-2d) :bool
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{@em{True} if @arg{matrix} is compatible with an affine transformation
-    matrix.}
+  @begin{return}
+    @em{True} if @arg{matrix} is compatible with an affine transformation
+    matrix.
+  @end{return}
   @begin{short}
     Checks whether the given matrix is compatible with an a 2D affine
     transformation matrix.
@@ -830,7 +830,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 (cffi:defcfun ("graphene_matrix_is_backface_visible" matrix-is-backface-visible)
     :bool
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{@em{True} if the back face of @arg{matrix} is visible.}
   @short{Checks whether the matrix has a visible back face.}
@@ -845,7 +845,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_is_singular" matrix-is-singular) :bool
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{@em{True} if @arg{matrix} is singular.}
   @short{Checks whether the matrix is singular.}
@@ -864,9 +864,9 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-to-float (matrix)
  #+liber-documentation
- "@version{2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The list with the floating point values.}
+  @return{The list with the single floats.}
   @begin{short}
     Converts the matrix to a list of floating point values.
   @end{short}
@@ -893,17 +893,19 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-to-2d (matrix)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @syntax{(graphene:matrix-to-2d matrix) => (list xx yx xy yy x0 y0)}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @argument[xx]{a double float with the xx member}
-  @argument[yx]{a double float with the yx member}
-  @argument[xy]{a double float with the xy member}
-  @argument[yy]{a double float with the yy member}
-  @argument[x0]{a double float with the x0 member}
-  @argument[y0]{a double float with the y0 member}
-  @return{The list with the floating point values, or @code{nil} if @arg{matrix}
-    is not compatible with an affine transformation matrix.}
+  @argument[xx]{a double float for the xx member}
+  @argument[yx]{a double float for the yx member}
+  @argument[xy]{a double float for the xy member}
+  @argument[yy]{a double float for the yy member}
+  @argument[x0]{a double float for the x0 member}
+  @argument[y0]{a double float for the y0 member}
+  @begin{return}
+    The list with the single floats, or @code{nil} if @arg{matrix} is not
+    compatible with an affine transformation matrix.
+  @end{return}
   @begin{short}
     Converts the matrix to an affine transformation matrix, if the given matrix
     is compatible.
@@ -924,12 +926,12 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
                               (x0 :double)
                               (y0 :double))
     (when (%matrix-to-2d matrix xx yx xy yy x0 y0)
-      (values (cffi:mem-ref xx :double)
-              (cffi:mem-ref yx :double)
-              (cffi:mem-ref xy :double)
-              (cffi:mem-ref yy :double)
-              (cffi:mem-ref x0 :double)
-              (cffi:mem-ref y0 :double)))))
+      (list (cffi:mem-ref xx :double)
+            (cffi:mem-ref yx :double)
+            (cffi:mem-ref xy :double)
+            (cffi:mem-ref yy :double)
+            (cffi:mem-ref x0 :double)
+            (cffi:mem-ref y0 :double)))))
 
 (export 'matrix-to-2d)
 
@@ -939,9 +941,9 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-row (matrix index result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @argument[index]{an unsigned integer with the index of the row vector}
+  @argument[index]{an unsigned integer for the index of the row vector}
   @argument[result]{a @symbol{graphene:vec4-t} instance}
   @return{The @symbol{graphene:vec4-t} instance  with the row vector.}
   @begin{short}
@@ -963,7 +965,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_get_value" matrix-value) :float
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[row]{an unsigned integer for the row index}
   @argument[col]{an unsigned integer for the column index}
@@ -984,7 +986,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-multiply (a b result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[a]{a @symbol{graphene:matrix-t} instance}
   @argument[b]{a @symbol{graphene:matrix-t} instance}
   @argument[result]{a @symbol{graphene:matrix-t} instance}
@@ -1010,9 +1012,9 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_determinant" matrix-determinant) :float
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The single float for the value of the determinat.}
+  @return{The single float with the value of the determinat.}
   @begin{short}
     Computes the determinant of the given matrix.
   @end{short}
@@ -1027,7 +1029,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transform-vec4 (matrix vector result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[vector]{a @symbol{graphene:vec4-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance}
@@ -1050,7 +1052,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transform-vec3 (matrix vector result)
  #+liber-documentation
- "@version{#2023-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[vector]{a @symbol{graphene:vec3-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance}
@@ -1078,7 +1080,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transform-point (matrix point result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[point]{a @symbol{graphene:point-t} instance}
   @argument[result]{a @symbol{graphene:point-t} instance}
@@ -1107,7 +1109,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transform-point3d (matrix point result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
   @argument[result]{a @symbol{graphene:point3d-t} instance}
@@ -1136,7 +1138,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transform-rect (matrix rect result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
   @argument[result]{a @symbol{graphene:quad-t} instance}
@@ -1164,12 +1166,14 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transform-bounds (matrix rect result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
   @argument[result]{a @symbol{graphene:rect-t} instance}
-  @return{The @symbol{graphene:rect-t} instance with the bounds of the
-    transformed rectangle.}
+  @begin{return}
+    The @symbol{graphene:rect-t} instance with the bounds of the transformed
+    rectangle.
+  @end{return}
   @begin{short}
     Transforms each corner of the rectangle using the given matrix.
   @end{short}
@@ -1193,12 +1197,13 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transform-box (matrix box result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[box]{a @symbol{graphene:box-t} instance}
   @argument[result]{a @symbol{graphene:box-t} instance}
-  @return{The @symbol{graphene:box-t} instance with the bounds the transformed
-    box.}
+  @begin{return}
+    The @symbol{graphene:box-t} instance with the bounds the transformed box.
+  @end{return}
   @begin{short}
     Transforms the vertices of the box using the given matrix.
   @end{short}
@@ -1221,12 +1226,14 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transform-sphere (matrix sphere result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @argument[result]{a @symbol{graphene:sphere-t} instance}
-  @return{The @symbol{graphene:sphere-t} instance with the bounds of the
-    transformed sphere.}
+  @begin{return}
+    The @symbol{graphene:sphere-t} instance with the bounds of the
+    transformed sphere.
+  @end{return}
   @begin{short}
     Transforms the sphere using the given matrix.
   @end{short}
@@ -1248,7 +1255,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transform-ray (matrix ray result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[result]{a @symbol{graphene:ray-t} instance}
@@ -1273,7 +1280,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-project-point (matrix point result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[point]{a @symbol{graphene:point-t} instance}
   @argument[result]{a @symbol{graphene:point-t} instance}
@@ -1298,7 +1305,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-project-rect-bounds (matrix rect result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
   @argument[result]{a @symbol{graphene:rect-t} instance}
@@ -1325,7 +1332,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-project-rect (matrix rect result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
   @argument[result]{a @symbol{graphene:quad-t} instance}
@@ -1353,13 +1360,15 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-untransform-point (matrix point bounds result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[point]{a @symbol{graphene:point-t} instance}
   @argument[bounds]{a @symbol{graphene:rect-t} instance}
   @argument[result]{a @symbol{graphene:point-t} instance}
-  @return{The @symbol{graphene:point-t} instance with the untransformed point,
-    if sucessfully, otherwise @code{nil}.}
+  @begin{return}
+    The @symbol{graphene:point-t} instance with the untransformed point,
+    if sucessfully, otherwise @code{nil}.
+  @end{return}
   @begin{short}
     Undoes the transformation of the point using the given matrix, within the
     given axis aligned rectangular bounds.
@@ -1383,13 +1392,14 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-untransform-bounds (matrix rect bounds result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
   @argument[bounds]{a @symbol{graphene:rect-t} instance}
   @argument[result]{a @symbol{graphene:rect-t} instance}
-  @return{The @symbol{graphene:rect-t} instance with the untransformed
-    rectangle.}
+  @begin{return}
+    The @symbol{graphene:rect-t} instance with the untransformed rectangle.
+  @end{return}
   @begin{short}
     Undoes the transformation on the corners of the rectangle using the given
     matrix, within the given axis aligned rectangular bounds.
@@ -1412,7 +1422,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-unproject-point3d (projection modelview point result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[projection]{a @symbol{graphene:matrix-t} instance}
   @argument[modelview]{a @symbol{graphene:matrix-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
@@ -1440,7 +1450,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-translate (matrix pos)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[pos]{a @symbol{graphene:point3d-t} instance}
   @return{The @symbol{graphene:matrix} instance with the result.}
@@ -1467,7 +1477,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-rotate (matrix angle axis)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[angle]{a number for the rotation angle, in degrees}
   @argument[axis]{a @symbol{graphene:vec3-t} instance with rotation axis}
@@ -1500,7 +1510,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-rotate-x (matrix angle)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[angle]{a number for the rotation angle, in degrees}
   @return{The @symbol{graphene:matrix} instance with the result.}
@@ -1529,7 +1539,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-rotate-y (matrix angle)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[angle]{a number for the rotation angle, in degrees}
   @return{The @symbol{graphene:matrix-t} instance with the result.}
@@ -1558,7 +1568,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-rotate-z (matrix angle)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[angle]{a number for the rotation angle, in degrees}
   @return{The @symbol{graphene:matrix-t} instance with the result.}
@@ -1568,7 +1578,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   @end{short}
   See also the @fun{graphene:matrix-rotate} function.
   @begin[Notes]{dictionary}
-    The @arg{angle} argument is coerced to a single float before being
+    The @arg{angle} argument is coerced to single float before being
     passed to the foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}"
@@ -1586,7 +1596,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-rotate-quaternion (matrix quaternion)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @begin{short}
@@ -1612,7 +1622,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-rotate-euler (matrix euler)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
   @return{The @symbol{graphene:matrix-t} instance with the result.}
@@ -1636,7 +1646,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-scale (matrix xfactor yfactor zfactor)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[xfactor]{a number for the scaling factor on the X axis}
   @argument[yfactor]{a number for the scaling factor on the Y axis}
@@ -1648,7 +1658,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
   This is the equivalent of calling the @fun{graphene:matrix-init-scale}
   function and then multiplying the matrix with the scale matrix.
   @begin[Notes]{dictionary}
-    All numbers are coerced to a single float before being passed to the
+    All numbers are coerced to single floats before being passed to the
     foreign C function.
   @end{dictionary}
   @see-symbol{graphene:matrix-t}
@@ -1669,7 +1679,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-skew-xy (matrix factor)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[factor]{a number for the skew factor}
   @return{The @symbol{graphene:matrix-t} instance with the result.}
@@ -1693,7 +1703,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-skew-xz (matrix factor)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[factor]{a number for the skew factor}
   @return{The @symbol{graphene:matrix-t} instance with the result.}
@@ -1719,7 +1729,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-skew-yz (matrix factor)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[factor]{a number for the skew factor}
   @return{The @symbol{graphene:matrix-t} instance with the result.}
@@ -1745,7 +1755,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-transpose (matrix result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[result]{a @symbol{graphene:matrix-t} instance}
   @return{The @symbol{graphene:matrix-t} instance with the transposed matrix.}
@@ -1767,10 +1777,12 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-inverse (matrix result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
-  @return{The @symbol{graphene:matrix-t} instance with the inversed matrix,
-    @code{nil} if the matrix is not invertible.}
+  @begin{return}
+    The @symbol{graphene:matrix-t} instance with the inversed matrix,
+    @code{nil} if the matrix is not invertible.
+  @end{return}
   @short{Inverts the given matrix.}
   @see-symbol{graphene:matrix-t}"
   (when (cffi:foreign-funcall "graphene_matrix_inverse"
@@ -1787,7 +1799,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-perspective (matrix depth result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[depth]{a number for the depth of the perspective}
   @return{The @symbol{graphene:matrix-t} instance with the perpective matrix.}
@@ -1812,7 +1824,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-normalize (matrix result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The @symbol{graphene:matrix-t} instance with the normalized matrix.}
   @short{Normalizes the given matrix.}
@@ -1831,7 +1843,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_get_x_translation" matrix-x-translation) :float
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The single float with the translation component.}
   @begin{short}
@@ -1848,7 +1860,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_get_y_translation" matrix-y-translation) :float
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The single float with the translation component.}
   @begin{short}
@@ -1865,7 +1877,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_get_z_translation" matrix-z-translation) :float
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The single float with the translation component.}
   @begin{short}
@@ -1882,7 +1894,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_get_x_scale" matrix-x-scale) :float
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The single float with the scaling factor.}
   @begin{short}
@@ -1899,7 +1911,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_get_y_scale" matrix-y-scale) :float
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The single float with the scaling factor.}
   @begin{short}
@@ -1916,7 +1928,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_get_z_scale" matrix-z-scale) :float
  #+liber-documentation
- "@version{#2024-12-300}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The single float with the scaling factor.}
   @short{Retrieves the scaling factor on the Z axis in the given matrix.}
@@ -1931,7 +1943,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_decompose" matrix-decompose) :bool
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[translate]{a @symbol{graphene:vec3-t} instance}
   @argument[scale]{a @symbol{graphene:vec3-t} instance}
@@ -1966,7 +1978,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (defun matrix-interpolate (a b factor result)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[a]{a @symbol{graphene:matrix-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
   @argument[factor]{a number for the linear interpolation factor}
@@ -2001,7 +2013,7 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 
 (cffi:defcfun ("graphene_matrix_equal" matrix-equal) :bool
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[a]{a @symbol{graphene:matrix-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
   @return{@em{True} if the two matrices are equal, @em{false} otherwise.}
@@ -2016,9 +2028,11 @@ l = left, r = right, b = bottom, t = top, n = znear, f = zfar
 ;;; graphene_matrix_equal_fast
 ;;; ----------------------------------------------------------------------------
 
+;; TODO: Show Lisp example code
+
 (cffi:defcfun ("graphene_matrix_equal_fast" matrix-equal-fast) :bool
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[a]{a @symbol{graphene:matrix-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
   @return{@em{True} if the two matrices are equal, @em{false} otherwise.}
@@ -2059,7 +2073,7 @@ else
 
 (defun matrix-near (a b epsilon)
  #+liber-documentation
- "@version{#2024-12-30}
+ "@version{#2025-4-6}
   @argument[a]{a @symbol{graphene:matrix-t} instance}
   @argument[b]{a @symbol{graphene:matrix-t} instance}
   @argument[epsilon]{a single float for the threshold between the two matrices}

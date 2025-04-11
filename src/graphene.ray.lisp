@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -62,7 +62,7 @@
 
 (defmacro with-ray ((var &rest args) &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-7}
   @syntax{(graphene:with-ray (ray) body) => result}
   @syntax{(graphene:with-ray (ray ray1) body) => result}
   @syntax{(graphene:with-ray (ray origin direction) body) => result}
@@ -80,7 +80,7 @@
     that uses the ray.
   @end{short}
   After execution of the body the allocated memory for the box is released.
-  @begin[Note]{dictionary}
+  @begin[Notes]{dictionary}
     The memory is allocated with the @fun{graphene:ray-alloc} function and
     released with the @fun{graphene:ray-free} function.
   @end{dictionary}
@@ -91,53 +91,55 @@
   @see-function{graphene:ray-alloc}
   @see-function{graphene:ray-free}"
   (cond ((null args)
-         ;; We have no arguments, the default is no initialization
+         ;; No arguments, the default is no initialization
          `(let ((,var (ray-alloc)))
             (unwind-protect
               (progn ,@body)
               (ray-free ,var))))
         ((null (second args))
-         ;; We have one argument. The argument must be of type ray-t.
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 'ray-t))
-                  ;; One argument with no type or of type ray-t
+         ;; One argument of type ray-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'ray-t)
+                  ;; One argument of type ray-t
                   `(let ((,var (ray-alloc)))
-                     (ray-init-from-ray ,var ,arg)
+                     (ray-init-from-ray ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (ray-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-RAY")))))
+                  ;; One argument of no type, default is ray-t
+                  `(let ((,var (ray-alloc)))
+                     (ray-init-from-ray ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (ray-free ,var)))))))
         ((null (third args))
-         ;; We have two arguments. The first can be of type point3d-t or
+         ;; Two arguments. The first can be of type point3d-t or
          ;; vec3-t. The second argument must be of type vec3-t
-         (destructuring-bind ((arg1 &optional type1)
-                              (arg2 &optional type2))
-             (list (mklist (first args)) (mklist (second args)))
-           (cond ((and (or (not type1)
-                           (eq type1 'point3d-t))
-                       (or (not type2)
-                           (eq type2 'vec3-t)))
-                  ;; First argument with no type or of type point3d-t and
-                  ;; second argument with no type or type vec3-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'point3d-t)
+                  ;; First argument of type point3d-t
                   `(let ((,var (ray-alloc)))
-                     (ray-init ,var ,arg1 ,arg2)
+                     (ray-init ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (ray-free ,var))))
-                 ((and (eq type1 'vec3-t)
-                       (or (not type2)
-                           (eq type2 'vec3-t)))
-                  ;; First argument of type vec3-t and second argument with
-                  ;; no type or type vec3-t
+                 ((eq type1 'vec3-t)
+                  ;; First argument of type vec3-t
                   `(let ((,var (ray-alloc)))
-                     (ray-init-from-vec3 ,var ,arg1 ,arg2)
+                     (ray-init-from-vec3 ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (ray-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-RAY")))))
+                  ;; First argument of no type, default is point3d-t
+                  `(let ((,var (ray-alloc)))
+                     (ray-init ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (ray-free ,var)))))))
         (t
          (error "Syntax error in GRAPHENE:WITH-RAY"))))
 
@@ -145,9 +147,9 @@
 
 (defmacro with-rays (vars &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-7}
   @syntax{(graphene:with-rays (ray1 ... rayn) body) => result}
-  @argument[ray1 ... rayn]{the newly created @symbol{graphene:ray-t} instances}
+  @argument[ray1 ... rayn]{newly created @symbol{graphene:ray-t} instances}
   @argument[body]{a body that uses the bindings @arg{ray1 ... rayn}}
   @begin{short}
     The @fun{graphene:with-rays} macro creates new variable bindings and
@@ -182,19 +184,21 @@
 (setf (liber:alias-for-symbol 'ray-intersection-kind-t)
       "CEnum"
       (liber:symbol-documentation 'ray-intersection-kind-t)
- "@version{#2023-12-5}
-  @short{The type of intersection.}
-  @begin{pre}
+ "@version{#2025-4-7}
+  @begin{declaration}
 (cffi:defcenum ray-intersection-kind-t
   :none
   :enter
   :leave)
-  @end{pre}
-  @begin[code]{table}
-    @entry[:none]{No intersection.}
-    @entry[:enter]{The ray is entering the intersected object.}
-    @entry[:leave]{The ray is leaving the intersected object.}
-  @end{table}
+  @end{declaration}
+  @begin{values}
+    @begin[code]{table}
+      @entry[:none]{No intersection.}
+      @entry[:enter]{The ray is entering the intersected object.}
+      @entry[:leave]{The ray is leaving the intersected object.}
+    @end{table}
+  @end{values}
+  @short{The type of intersection.}
   @see-symbol{graphene:ray-t}")
 
 (export 'ray-intersection-kind-t)
@@ -209,7 +213,10 @@
 (setf (liber:alias-for-symbol 'ray-t)
       "CStruct"
       (liber:symbol-documentation 'ray-t)
- "@version{2023-12-5}
+ "@version{2025-4-7}
+  @begin{declaration}
+(cffi:defcstruct ray-t)
+  @end{declaration}
   @begin{short}
     The @symbol{graphene:ray-t} structure is a structure representing a ray
     emitted by an origin, identified by a point in 3D space, in a given
@@ -222,32 +229,32 @@
 (export 'ray-t)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_ray_alloc ()
+;;;graphene_ray_alloc
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_alloc" ray-alloc)
     (:pointer (:struct ray-t))
  #+liber-documentation
- "@version{2023-12-5}
+ "@version{2025-4-7}
   @return{The newly allocated @symbol{graphene:ray-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:ray-t} instance.
   @end{short}
   The contents of the returned structure are undefined. Use the
-    @fun{graphene:ray-free} function to free the resources allocated by this
-    function.
+  @fun{graphene:ray-free} function to free the resources allocated by this
+  function.
   @see-symbol{graphene:ray-t}
   @see-function{graphene:ray-free}")
 
 (export 'ray-alloc)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_ray_free ()
+;;;graphene_ray_free
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_free" ray-free) :void
  #+liber-documentation
- "@version{2023-12-5}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:ray-alloc} function.
@@ -259,16 +266,16 @@
 (export 'ray-free)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_ray_init ()
+;;;graphene_ray_init
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_init" ray-init) (:pointer (:struct ray-t))
  #+liber-documentation
- "@version{2023-12-5}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance to be initialized}
-  @argument[origin]{a @symbol{graphene:point3d-t} instance with the origin of
+  @argument[origin]{a @symbol{graphene:point3d-t} instance for the origin of
     the ray}
-  @argument[direction]{a @symbol{graphene:vec3-t} instance with the direction
+  @argument[direction]{a @symbol{graphene:vec3-t} instance for the direction
     vector}
   @return{The initialized @symbol{graphene:ray-t} instance.}
   @begin{short}
@@ -286,13 +293,13 @@
 (export 'ray-init)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_init_from_ray ()
+;;; graphene_ray_init_from_ray
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_init_from_ray" ray-init-from-ray)
     (:pointer (:struct ray-t))
  #+liber-documentation
- "@version{2023-12-5}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance to initialize}
   @argument[source]{a @symbol{graphene:ray-t} instance}
   @return{The initialized @symbol{graphene:ray-t} instance.}
@@ -307,13 +314,13 @@
 (export 'ray-init-from-ray)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_init_from_vec3 ()
+;;; graphene_ray_init_from_vec3
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_init_from_vec3" ray-init-from-vec3)
     (:pointer (:struct ray-t))
  #+liber-documentation
- "@version{2023-12-5}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance to initialize}
   @argument[origin]{a @symbol{graphene:vec3-t} instance}
   @argument[direction]{a @symbol{graphene:vec3-t}_instance}
@@ -328,12 +335,12 @@
 (export 'ray-init-from-vec3)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_get_origin ()
+;;; graphene_ray_get_origin
 ;;; ----------------------------------------------------------------------------
 
 (defun ray-origin (ray origin)
  #+liber-documentation
- "@version{2023-12-5}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[origin]{a @symbol{graphene:point3d-t} instance for the origin}
   @return{The @symbol{graphene:point3d-t} instance with the origin.}
@@ -349,12 +356,12 @@
 (export 'ray-origin)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_get_direction ()
+;;; graphene_ray_get_direction
 ;;; ----------------------------------------------------------------------------
 
 (defun ray-direction (ray direction)
  #+liber-documentation
- "@version{2023-12-5}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[direction]{a @symbol{graphene:vec3-t} instance for the direction}
   @return{The @symbol{graphene:vec3-t} instance with the direction.}
@@ -370,16 +377,16 @@
 (export 'ray-direction)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_get_position_at ()
+;;; graphene_ray_get_position_at
 ;;; ----------------------------------------------------------------------------
 
-(defun ray-position-at (ray parameter position)
+(defun ray-position-at (ray parameter pos)
  #+liber-documentation
- "@version{2023-12-5}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
-  @argument[parameter]{a number coerced to a float with the distance along the
-    ray}
-  @argument[position]{a @symbol{graphene:point3d-t} instance for the position}
+  @argument[parameter]{a number coerced to a single float for the distance
+    along the ray}
+  @argument[pos]{a @symbol{graphene:point3d-t} instance for the position}
   @return{The @symbol{graphene:point3d-t} instance with the position}
   @begin{short}
     Retrieves the coordinates of a point at the distance @arg{parameter} along
@@ -390,23 +397,23 @@
   (cffi:foreign-funcall "graphene_ray_get_position_at"
                         (:pointer (:struct ray-t)) ray
                         :float (coerce parameter 'single-float)
-                        (:pointer (:struct point3d-t)) position
+                        (:pointer (:struct point3d-t)) pos
                         :void)
-  position)
+  pos)
 
 (export 'ray-position-at)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_get_distance_to_point ()
+;;; graphene_ray_get_distance_to_point
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_get_distance_to_point" ray-distance-to-point)
     :float
  #+liber-documentation
- "@version{2023-12-5}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
-  @return{The float with the distance of the point.}
+  @return{The single float with the distance of the point.}
   @begin{short}
     Computes the distance of the closest approach between the given ray and the
     point.
@@ -421,16 +428,18 @@
 (export 'ray-distance-to-point)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_get_distance_to_plane ()
+;;; graphene_ray_get_distance_to_plane
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_get_distance_to_plane" ray-distance-to-plane)
     :float
  #+liber-documentation
- "@version{#2023-12-6}
+ "@version{#2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[plane]{a @symbol{graphene:plane-t} instance}
-  @return{The float with the distance of the origin of the ray from the plane}
+  @begin{return}
+    The single float with the distance of the origin of the ray from the plane.
+  @end{return}
   @begin{short}
     Computes the distance of the origin of the given ray from the given plane.
   @end{short}
@@ -444,12 +453,12 @@
 (export 'ray-distance-to-plane)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_get_closest_point_to_point ()
+;;; graphene_ray_get_closest_point_to_point
 ;;; ----------------------------------------------------------------------------
 
 (defun ray-closest-point-to-point (ray point result)
  #+liber-documentation
- "@version{#2023-12-6}
+ "@version{#2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
   @argument[result]{a @symbol{graphene:point3d-t} instance for the result}
@@ -469,12 +478,12 @@
 (export 'ray-closest-point-to-point)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_equal ()
+;;; graphene_ray_equal
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_equal" ray-equal) :bool
  #+liber-documentation
- "@version{#2023-12-6}
+ "@version{#2025-4-7}
   @argument[a]{a @symbol{graphene:ray-t} instance}
   @argument[b]{a @symbol{graphene:ray-t} instance}
   @return{@em{True} if the given are equal.}
@@ -486,18 +495,18 @@
 (export 'ray-equal)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_intersect_sphere ()
+;;; graphene_ray_intersect_sphere
 ;;; ----------------------------------------------------------------------------
 
 (defun ray-intersect-sphere (ray sphere)
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @begin{return}
     @arg{kind} -- a @symbol{graphene:ray-intersection-kind-t} value @br{}
-    @arg{dist} -- a float with the distance of the point on the ray that
-    intersects the sphere
+    @arg{dist} -- a single float with the distance of the point on the ray that
+      intersects the sphere
   @end{return}
   @short{Intersects the given ray with the given sphere.}
   @see-symbol{graphene:ray-t}
@@ -514,12 +523,12 @@
 (export 'ray-intersect-sphere)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_intersects_sphere ()
+;;; graphene_ray_intersects_sphere
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_intersects_sphere" ray-intersects-sphere) :bool
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @return{@em{True} if the ray intersects the sphere.}
@@ -532,18 +541,18 @@
 (export 'ray-intersects-sphere)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_intersect_box ()
+;;; graphene_ray_intersect_box
 ;;; ----------------------------------------------------------------------------
 
 (defun ray-intersect-box (ray box)
  #+liber-documentation
- "@version{#2023-12-6}
+ "@version{#2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[box]{a @symbol{graphene:box-t} instance}
   @begin{return}
     @arg{kind} -- a @symbol{graphene:ray-intersection-kind-t} value @br{}
-    @arg{dist} -- a float with the distance of the point on the ray that
-    intersects the box
+    @arg{dist} -- a single float with the distance of the point on the ray
+      that intersects the box
   @end{return}
   @short{Intersects the given ray with the given box.}
   @see-symbol{graphene:ray-t}
@@ -560,12 +569,12 @@
 (export 'ray-intersect-box)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_intersects_box ()
+;;; graphene_ray_intersects_box
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_intersects_box" ray-intersects-box) :bool
  #+liber-documentation
- "@version{#2023-12-6}
+ "@version{#2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[box]{a @symbol{graphene:box-t} instance}
   @return{@em{True} if the ray intersects the box.}
@@ -578,18 +587,18 @@
 (export 'ray-intersects-box)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_intersect_triangle ()
+;;; graphene_ray_intersect_triangle
 ;;; ----------------------------------------------------------------------------
 
 (defun ray-intersect-triangle (ray triangle)
  #+liber-documentation
- "@version{#2023-12-6}
+ "@version{#2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[box]{a @symbol{graphene:triangle-t} instance}
   @begin{return}
     @arg{kind} -- a @symbol{graphene:ray-intersection-kind-t} value @br{}
-    @arg{dist} -- a float with the distance of the point on the ray that
-    intersects the triangle
+    @arg{dist} -- a single float with the distance of the point on the ray
+      that intersects the triangle
   @end{return}
   @short{Intersects the given ray with the given triangle.}
   @see-symbol{graphene:ray-t}
@@ -606,12 +615,12 @@
 (export 'ray-intersect-triangle)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_ray_intersects_triangle ()
+;;; graphene_ray_intersects_triangle
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_ray_intersects_triangle" ray-intersects-triangle) :bool
  #+liber-documentation
- "@version{#2023-12-6}
+ "@version{#2025-4-7}
   @argument[ray]{a @symbol{graphene:ray-t} instance}
   @argument[box]{a @symbol{graphene:triangle-t} instance}
   @return{@em{True} if the ray intersects the triangle.}

@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -43,7 +43,10 @@
 
 #+liber-documentation
 (setf (documentation (find-package :graphene) t)
- "This is the API documentation of a Lisp binding to the Graphene library.
+ "The Graphene library is a thin layer of mathematical types for 3D libraries.
+  The library is implemented for use with the
+  @url[https://www.crategus.com/books/cl-cffi-gtk4]{cl-cffi-gtk4} library.
+  This is the API documentation for the Lisp binding to the Graphene library.
   @begin[Point]{section}
     @about-symbol{point-t}
     @about-function{point-x}
@@ -246,112 +249,118 @@
     @about-function{frustum-equal}
   @end{section}
   @begin[Vector]{section}
-    @about-variable{+vec2-len+}
-    @about-variable{+vec3-len+}
-    @about-variable{+vec4-len+}
-    @about-symbol{vec2-t}
-    @about-macro{with-vec2}
-    @about-macro{with-vec2s}
-    @about-function{vec2-alloc}
-    @about-function{vec2-free}
-    @about-function{vec2-init}
-    @about-function{vec2-init-from-vec2}
-    @about-function{vec2-init-from-float}
-    @about-function{vec2-to-float}
-    @about-function{vec2-add}
-    @about-function{vec2-subtract}
-    @about-function{vec2-multiply}
-    @about-function{vec2-divide}
-    @about-function{vec2-dot}
-    @about-function{vec2-scale}
-    @about-function{vec2-length}
-    @about-function{vec2-normalize}
-    @about-function{vec2-negate}
-    @about-function{vec2-equal}
-    @about-function{vec2-near}
-    @about-function{vec2-min}
-    @about-function{vec2-max}
-    @about-function{vec2-interpolate}
-    @about-function{vec2-x}
-    @about-function{vec2-y}
-    @about-function{vec2-zero}
-    @about-function{vec2-one}
-    @about-function{vec2-x-axis}
-    @about-function{vec2-y-axis}
-    @about-symbol{vec3-t}
-    @about-macro{with-vec3}
-    @about-macro{with-vec3s}
-    @about-function{vec3-alloc}
-    @about-function{vec3-free}
-    @about-function{vec3-init}
-    @about-function{vec3-init-from-vec3}
-    @about-function{vec3-init-from-float}
-    @about-function{vec3-to-float}
-    @about-function{vec3-add}
-    @about-function{vec3-subtract}
-    @about-function{vec3-multiply}
-    @about-function{vec3-divide}
-    @about-function{vec3-cross}
-    @about-function{vec3-dot}
-    @about-function{vec3-scale}
-    @about-function{vec3-length}
-    @about-function{vec3-normalize}
-    @about-function{vec3-negate}
-    @about-function{vec3-equal}
-    @about-function{vec3-near}
-    @about-function{vec3-min}
-    @about-function{vec3-max}
-    @about-function{vec3-interpolate}
-    @about-function{vec3-x}
-    @about-function{vec3-y}
-    @about-function{vec3-z}
-    @about-function{vec3-xy}
-    @about-function{vec3-xy0}
-    @about-function{vec3-xyz0}
-    @about-function{vec3-xyz1}
-    @about-function{vec3-xyzw}
-    @about-function{vec3-zero}
-    @about-function{vec3-one}
-    @about-function{vec3-x-axis}
-    @about-function{vec3-y-axis}
-    @about-function{vec3-z-axis}
-    @about-symbol{vec4-t}
-    @about-macro{with-vec4}
-    @about-macro{with-vec4s}
-    @about-function{vec4-alloc}
-    @about-function{vec4-free}
-    @about-function{vec4-init}
-    @about-function{vec4-init-from-vec4}
-    @about-function{vec4-init-from-vec3}
-    @about-function{vec4-init-from-vec2}
-    @about-function{vec4-init-from-float}
-    @about-function{vec4-to-float}
-    @about-function{vec4-add}
-    @about-function{vec4-subtract}
-    @about-function{vec4-multiply}
-    @about-function{vec4-divide}
-    @about-function{vec4-dot}
-    @about-function{vec4-scale}
-    @about-function{vec4-length}
-    @about-function{vec4-normalize}
-    @about-function{vec4-negate}
-    @about-function{vec4-equal}
-    @about-function{vec4-near}
-    @about-function{vec4-min}
-    @about-function{vec4-max}
-    @about-function{vec4-interpolate}
-    @about-function{vec4-x}
-    @about-function{vec4-y}
-    @about-function{vec4-z}
-    @about-function{vec4-w}
-    @about-function{vec4-xy}
-    @about-function{vec4-xyz}
-    @about-function{vec4-zero}
-    @about-function{vec4-one}
-    @about-function{vec4-x-axis}
-    @about-function{vec4-y-axis}
-    @about-function{vec4-z-axis}
-    @about-function{vec4-w-axis}
+    @begin[graphene:vec2-t]{subsection}
+      @about-variable{+vec2-len+}
+      @about-symbol{vec2-t}
+      @about-macro{with-vec2}
+      @about-macro{with-vec2s}
+      @about-function{vec2-alloc}
+      @about-function{vec2-free}
+      @about-function{vec2-init}
+      @about-function{vec2-init-from-vec2}
+      @about-function{vec2-init-from-float}
+      @about-function{vec2-to-float}
+      @about-function{vec2-add}
+      @about-function{vec2-subtract}
+      @about-function{vec2-multiply}
+      @about-function{vec2-divide}
+      @about-function{vec2-dot}
+      @about-function{vec2-scale}
+      @about-function{vec2-length}
+      @about-function{vec2-normalize}
+      @about-function{vec2-negate}
+      @about-function{vec2-equal}
+      @about-function{vec2-near}
+      @about-function{vec2-min}
+      @about-function{vec2-max}
+      @about-function{vec2-interpolate}
+      @about-function{vec2-x}
+      @about-function{vec2-y}
+      @about-function{vec2-zero}
+      @about-function{vec2-one}
+      @about-function{vec2-x-axis}
+      @about-function{vec2-y-axis}
+    @end{subsection}
+    @begin[graphene:vec3-t]{subsection}
+      @about-variable{+vec3-len+}
+      @about-symbol{vec3-t}
+      @about-macro{with-vec3}
+      @about-macro{with-vec3s}
+      @about-function{vec3-alloc}
+      @about-function{vec3-free}
+      @about-function{vec3-init}
+      @about-function{vec3-init-from-vec3}
+      @about-function{vec3-init-from-float}
+      @about-function{vec3-to-float}
+      @about-function{vec3-add}
+      @about-function{vec3-subtract}
+      @about-function{vec3-multiply}
+      @about-function{vec3-divide}
+      @about-function{vec3-cross}
+      @about-function{vec3-dot}
+      @about-function{vec3-scale}
+      @about-function{vec3-length}
+      @about-function{vec3-normalize}
+      @about-function{vec3-negate}
+      @about-function{vec3-equal}
+      @about-function{vec3-near}
+      @about-function{vec3-min}
+      @about-function{vec3-max}
+      @about-function{vec3-interpolate}
+      @about-function{vec3-x}
+      @about-function{vec3-y}
+      @about-function{vec3-z}
+      @about-function{vec3-xy}
+      @about-function{vec3-xy0}
+      @about-function{vec3-xyz0}
+      @about-function{vec3-xyz1}
+      @about-function{vec3-xyzw}
+      @about-function{vec3-zero}
+      @about-function{vec3-one}
+      @about-function{vec3-x-axis}
+      @about-function{vec3-y-axis}
+      @about-function{vec3-z-axis}
+    @end{subsection}
+    @begin[graphene:vec4-t]{subsection}
+      @about-variable{+vec4-len+}
+      @about-symbol{vec4-t}
+      @about-macro{with-vec4}
+      @about-macro{with-vec4s}
+      @about-function{vec4-alloc}
+      @about-function{vec4-free}
+      @about-function{vec4-init}
+      @about-function{vec4-init-from-vec4}
+      @about-function{vec4-init-from-vec3}
+      @about-function{vec4-init-from-vec2}
+      @about-function{vec4-init-from-float}
+      @about-function{vec4-to-float}
+      @about-function{vec4-add}
+      @about-function{vec4-subtract}
+      @about-function{vec4-multiply}
+      @about-function{vec4-divide}
+      @about-function{vec4-dot}
+      @about-function{vec4-scale}
+      @about-function{vec4-length}
+      @about-function{vec4-normalize}
+      @about-function{vec4-negate}
+      @about-function{vec4-equal}
+      @about-function{vec4-near}
+      @about-function{vec4-min}
+      @about-function{vec4-max}
+      @about-function{vec4-interpolate}
+      @about-function{vec4-x}
+      @about-function{vec4-y}
+      @about-function{vec4-z}
+      @about-function{vec4-w}
+      @about-function{vec4-xy}
+      @about-function{vec4-xyz}
+      @about-function{vec4-zero}
+      @about-function{vec4-one}
+      @about-function{vec4-x-axis}
+      @about-function{vec4-y-axis}
+      @about-function{vec4-z-axis}
+      @about-function{vec4-w-axis}
+    @end{subsection}
   @end{section}
   @begin[Matrix]{section}
     @about-symbol{matrix-t}

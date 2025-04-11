@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -67,7 +67,7 @@
 
 (defmacro with-quaternion ((var &rest args) &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-7}
   @syntax{(graphene:with-quaternion (q) body) => result}
   @syntax{(graphene:with-quaternion (q q1) body) => result}
   @syntax{(graphene:with-quaternion (q (v graphene:vec4-t)) body) => result}
@@ -84,10 +84,10 @@
   @argument[v]{a @symbol{graphene:vec4-t} instance to use for initialization}
   @argument[e]{a @symbol{graphene:euler-t} instance to use for initialization}
   @argument[axis]{a @symbol{graphene:vec3-t} instance to use for initialization}
-  @argument[angle]{a float with the rotation on a given axis}
-  @argument[xdeg, ydeg, zdeg]{a float with the rotation angle, in degrees}
-  @argument[xrad, yrad, zrad]{a float with the rotation angle, in radians}
-  @argument[x, y, z, w]{a float with the component of a quaternion}
+  @argument[angle]{a single float for the rotation on a given axis}
+  @argument[xdeg, ydeg, zdeg]{a single float for the rotation angle, in degrees}
+  @argument[xrad, yrad, zrad]{a single float for the rotation angle, in radians}
+  @argument[x, y, z, w]{a single float for the component of a quaternion}
   @begin{short}
     The @fun{graphene:with-quaternion} macro allocates a new
     @symbol{graphene:quaternion-t} instance, initializes the box with the given
@@ -95,7 +95,7 @@
   @end{short}
   After execution of the body the allocated memory for the quaternion is
   released.
-  @begin[Note]{dictionary}
+  @begin[Notes]{dictionary}
     The memory is allocated with the @fun{graphene:quaternion-alloc} function
     and released with the @fun{graphene:quaternion-free} function.
   @end{dictionary}
@@ -108,7 +108,7 @@
   @see-function{graphene:quaternion-alloc}
   @see-function{graphene:quaternion-free}"
   (cond ((null args)
-         ;; No arguments, the default is initialization with zeros.
+         ;; No argument, the default is initialization with zeros
          `(let ((,var (quaternion-alloc)))
             (quaternion-init ,var 0.0 0.0 0.0 0.0)
             (unwind-protect
@@ -116,65 +116,75 @@
               (quaternion-free ,var))))
         ((null (second args))
          ;; One argument
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 'quaternion-t))
-                  ;; One argument with no type or of type quaternion-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'quaternion-t)
+                  ;; One argument of type quaternion-t
                   `(let ((,var (quaternion-alloc)))
-                     (quaternion-init-from-quaternion ,var ,arg)
+                     (quaternion-init-from-quaternion ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (quaternion-free ,var))))
                  ((eq type1 'vec4-t)
-                  ;; One argument with type vec4-t
+                  ;; One argument of type vec4-t
                   `(let ((,var (quaternion-alloc)))
-                     (quaternion-init-from-vec4 ,var ,arg)
+                     (quaternion-init-from-vec4 ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (quaternion-free ,var))))
                  ((eq type1 'matrix-t)
-                  ;; One argument with type matrix-t
+                  ;; One argument of type matrix-t
                   `(let ((,var (quaternion-alloc)))
-                     (quaternion-init-from-matrix ,var ,arg)
+                     (quaternion-init-from-matrix ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (quaternion-free ,var))))
                  ((eq type1 'euler-t)
-                  ;; One argument with type euler-t
+                  ;; One argument of type euler-t
                   `(let ((,var (quaternion-alloc)))
-                     (quaternion-init-from-euler ,var ,arg)
+                     (quaternion-init-from-euler ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (quaternion-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-QUATERNION")))))
+                  ;; One argument of no type, default is quaternion-t
+                  `(let ((,var (quaternion-alloc)))
+                     (quaternion-init-from-quaternion ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (quaternion-free ,var)))))))
         ((null (third args))
-         ;; Two arguments, these must be a float and a vec3-t
+         ;; Two arguments, these must be a single float and a vec3-t
          `(let ((,var (quaternion-alloc)))
             (quaternion-init-from-angle-vec3 ,var ,@args)
             (unwind-protect
               (progn ,@body)
               (quaternion-free ,var))))
         ((null (fourth args))
-         ;; Three arguments, 3 floats in deegres or in radians
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 :deg))
-                  ;; First argument with no type or of type :deg
+         ;; Three arguments, 3 single floats in deegres or in radians
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 :deg)
+                  ;; First argument of type :deg
                   `(let ((,var (quaternion-alloc)))
-                       (quaternion-init-from-angles ,var ,arg ,@(rest args))
+                       (quaternion-init-from-angles ,var ,arg1 ,@(rest args))
                        (unwind-protect
                          (progn ,@body)
                          (quaternion-free ,var))))
                  ((eq type1 :rad)
-                  ;; First argument with type :rad
+                  ;; First argument of type :rad
                   `(let ((,var (quaternion-alloc)))
-                       (quaternion-init-from-radians ,var ,arg ,@(rest args))
+                       (quaternion-init-from-radians ,var ,arg1 ,@(rest args))
                        (unwind-protect
                          (progn ,@body)
                          (quaternion-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-QUATERNION")))))
+                  ;; No type, default is :deg
+                  `(let ((,var (quaternion-alloc)))
+                       (quaternion-init-from-angles ,var ,@args)
+                       (unwind-protect
+                         (progn ,@body)
+                         (quaternion-free ,var)))))))
         ((null (fifth args))
          ;; Four arguments of type float
          `(let ((,var (quaternion-alloc)))
@@ -189,10 +199,9 @@
 
 (defmacro with-quaternions (vars &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-7}
   @syntax{(graphene:with-quaternions (q1 ... qn) body) => result}
-  @argument[q1 ... qn]{the newly created @symbol{graphene:quaternion-t}
-    instances}
+  @argument[q1 ... qn]{newly created @symbol{graphene:quaternion-t} instances}
   @argument[body]{a body that uses the bindings @arg{q1 ... qn}}
   @begin{short}
     The @fun{graphene:with-quaternions} macro creates new variable bindings and
@@ -224,7 +233,10 @@
 (setf (liber:alias-for-symbol 'quaternion-t)
       "CStruct"
       (liber:symbol-documentation 'quaternion-t)
- "@version{#2023-12-8}
+ "@version{2025-4-7}
+  @begin{declaration}
+(cffi:defcstruct quaternion-t)
+  @end{declaration}
   @begin{short}
     Quaternions are a mathematical entity that can be used to represent rotation
     transformations in 3D space.
@@ -236,13 +248,13 @@
 (export 'quaternion-t)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_alloc ()
+;;; graphene_quaternion_alloc
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_alloc" quaternion-alloc)
     (:pointer (:struct quaternion-t))
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{2025-4-7}
   @return{The newly allocated @symbol{graphene:quaternion-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:quaternion-t} instance.
@@ -256,12 +268,12 @@
 (export 'quaternion-alloc)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_free ()
+;;; graphene_quaternion_free
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_free" quaternion-free) :void
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:quaternion-alloc}
@@ -274,21 +286,21 @@
 (export 'quaternion-free)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_init ()
+;;; graphene_quaternion_init
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init (quaternion x y z w)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
-  @argument[x]{a number coerced to a float with the first component of the
-    quaterion}
-  @argument[y]{a number coerced to a float with the second component of the
-    quaterion}
-  @argument[z]{a number coerced to a float with the third component of the
-    quaterion}
-  @argument[x]{a number coerced to a float with the fourth component of the
-    quaterion}
+  @argument[x]{a number coerced to a single float for the first component of
+    the quaterion}
+  @argument[y]{a number coerced to a single float for the second component of
+    the quaterion}
+  @argument[z]{a number coerced to a single float for the third component of
+    the quaterion}
+  @argument[x]{a number coerced to a single float for the fourth component of
+    the quaterion}
   @return{The initialized @symbol{graphene:quaternion-t} instance.}
   @short{Initializes a quaternion using the given four values.}
   @see-symbol{graphene:quaternion-t}"
@@ -303,13 +315,13 @@
 (export 'quaternion-init)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_init_identity ()
+;;; graphene_quaternion_init_identity
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_init_identity" quaternion-init-identity)
     (:pointer (:struct quaternion-t))
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance to initialize}
   @return{The initialized @symbol{graphene:quaternion-t} instance.}
   @short{Initializes a quaternion using the identity transformation.}
@@ -319,14 +331,14 @@
 (export 'quaternion-init-identity)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_init_from_quaternion ().
+;;; graphene_quaternion_init_from_quaternion
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_init_from_quaternion"
                quaternion-init-from-quaternion)
     (:pointer (:struct quaternion-t))
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @argument[source]{a @symbol{graphene:quaternion-t} instance}
   @return{The initialized @symbol{graphene:quaternion-t} instance.}
@@ -338,32 +350,32 @@
 (export 'quaternion-init-from-quaternion)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_init_from_vec4 ()
+;;; graphene_quaternion_init_from_vec4
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_init_from_vec4" quaternion-init-from-vec4)
     (:pointer (:struct quaternion-t))
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
-  @argument[source]{a @symbol{graphene:vec4-t} instance}
+  @argument[vec]{a @symbol{graphene:vec4-t} instance}
   @return{The initialized @symbol{graphene:quaternion-t} instance.}
   @short{Initializes a quaternion with the values from @arg{source}.}
   @see-symbol{graphene:quaternion-t}
   @see-symbol{graphene:vec4-t}"
   (quaternion (:pointer (:struct quaternion-t)))
-  (source (:pointer (:struct vec4-t))))
+  (vec (:pointer (:struct vec4-t))))
 
 (export 'quaternion-init-from-vec4)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_init_from_matrix ()
+;;; graphene_quaternion_init_from_matrix
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_init_from_matrix"
                quaternion-init-from-matrix) (:pointer (:struct quaternion-t))
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @return{The initialized @symbol{graphene:quaternion-t} instance.}
@@ -374,24 +386,24 @@
   @see-symbol{graphene:quaternion-t}
   @see-symbol{graphene:matrix-t}"
   (quaternion (:pointer (:struct quaternion-t)))
-  (source (:pointer (:struct matrix-t))))
+  (matrix (:pointer (:struct matrix-t))))
 
 (export 'quaternion-init-from-matrix)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_init_from_angles ()
+;;; graphene_quaternion_init_from_angles
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init-from-angles (quaternion xdeg ydeg zdeg)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance to initialize}
-  @argument[xdeg]{a number coerced to a float with the rotation angle on the
-    x axis (yaw), in degrees}
-  @argument[ydeg]{a number coerced to a float with the rotation angle on the
-    y axis (pitch), in degrees}
-  @argument[zdeg]{a number coerced to a float with the rotation angle on the
-    z axis (roll), in degrees}
+  @argument[xdeg]{a number coerced to a single float for the rotation angle on
+    the X axis (yaw), in degrees}
+  @argument[ydeg]{a number coerced to a single float for the rotation angle on
+    the Y axis (pitch), in degrees}
+  @argument[zdeg]{a number coerced to a single float for the rotation angle on
+    the Z axis (roll), in degrees}
   @return{The initialized @symbol{graphene:quaternion-t} instance.}
   @begin{short}
     Initializes a quaternion using the values of the Euler angles on each axis.
@@ -408,19 +420,19 @@
 (export 'quaternion-init-from-angles)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_init_from_radians ()
+;;; graphene_quaternion_init_from_radians
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init-from-radians (quaternion xrad yrad zrad)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance to initalize}
-  @argument[xrad]{a number coerced to a float with the rotation angle on the
-    x axis (yaw), in radians}
-  @argument[yrad]{a number coerced to a float with the rotation angle on the
-    y axis (pitch), in radians}
-  @argument[zrad]{a number coerced to a float with the rotation angle on the
-    z axis (roll), in radians}
+  @argument[xrad]{a number coerced to a single float for the rotation angle on
+    the X axis (yaw), in radians}
+  @argument[yrad]{a number coerced to a single float for the rotation angle on
+    the Y axis (pitch), in radians}
+  @argument[zrad]{a number coerced to a single float for the rotation angle on
+    the Z axis (roll), in radians}
   @return{The initialized @symbol{graphene:quaternion-t} instance.}
   @begin{short}
     Initializes a quaternion using the values of the Euler angles on each axis.
@@ -437,16 +449,16 @@
 (export 'quaternion-init-from-radians)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_init_from_angle_vec3 ()
+;;; graphene_quaternion_init_from_angle_vec3
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-init-from-angle-vec3 (quaternion angle axis)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance to initalize}
-  @argument[angle]{a number coerced to a float with the rotation on a given
-    axis, in degrees}
-  @argument[axis]{a @symbol{graphene:vec3-t} instance with the axis of
+  @argument[angle]{a number coerced to a single float for the rotation on a
+    given axis, in degrees}
+  @argument[axis]{a @symbol{graphene:vec3-t} instance for the axis of
     rotation, expressed as a vector}
   @return{The initialized @symbol{graphene:quaternion-t} instance.}
   @begin{short}
@@ -463,13 +475,13 @@
 (export 'quaternion-init-from-angle-vec3)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_init_from_euler ()
+;;; graphene_quaternion_init_from_euler
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_init_from_euler" quaternion-init-from-euler)
     (:pointer (:struct quaternion-t))
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance to initialize}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
   @return{The initialized @symbol{graphene:quaternion-t} instance.}
@@ -479,17 +491,17 @@
   @see-symbol{graphene:quaternion-t}
   @see-symbol{graphene:euler-t}"
   (quaternion (:pointer (:struct quaternion-t)))
-  (source :pointer)) ; euler-t not known at this point
+  (euler :pointer)) ; euler-t not known at this point
 
 (export 'quaternion-init-from-euler)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_to_vec4 ()
+;;; graphene_quaternion_to_vec4
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-to-vec4 (quaternion result)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @argument[result]{a @symbol{graphene:vec4-t} instance}
   @return{The @symbol{graphene:vec4-t} instance with the components.}
@@ -508,12 +520,12 @@
 (export 'quaternion-to-vec4)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_to_matrix ()
+;;; graphene_quaternion_to_matrix
 ;;; ----------------------------------------------------------------------------
 
 (defun quaternion-to-matrix (quaternion result)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @argument[result]{a @symbol{graphene:matrix-t} instance}
   @return{The @symbol{graphene:matrix-t} instance.}
@@ -532,7 +544,7 @@
 (export 'quaternion-to-matrix)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_to_angles ()
+;;; graphene_quaternion_to_angles
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_to_angles" %quaternion-to-angles) :void
@@ -543,10 +555,10 @@
 
 (defun quaternion-to-angles (quaternion)
  #+liber-documentation
- "@version{#2024-1-20}
+ "@version{#2025-4-7}
   @syntax{(graphene:quaternion-to-angles quaternion) => xdeg, ydeg, zdeg}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
-  @return{The value list of floats with the rotation angles, in degrees.}
+  @return{The value list of single floats with the rotation angles, in degrees.}
   @begin{short}
     Converts a quaternion to its corresponding rotations on the Euler angles on
     each axis.
@@ -561,7 +573,7 @@
 (export 'quaternion-to-angles)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_to_radians ()
+;;; graphene_quaternion_to_radians
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_to_radians" %quaternion-to-radians) :void
@@ -572,10 +584,10 @@
 
 (defun quaternion-to-radians (quaternion)
  #+liber-documentation
- "@version{#2024-1-20}
+ "@version{#2025-4-7}
   @syntax{(graphene:quaternion-to-angles quaternion) => xrad, yrad, zrad}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
-  @return{The value list of floats with the rotation angles, in radians.}
+  @return{The value list of single floats with the rotation angles, in radians.}
   @begin{short}
     Converts a quaternion to its corresponding rotations on the Euler angles on
     each axis.
@@ -590,7 +602,7 @@
 (export 'quaternion-to-radians)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_to_angle_vec3 ()
+;;; graphene_quaternion_to_angle_vec3
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_to_angle_vec3" %quaternion-to-angle-vec3)
@@ -601,12 +613,14 @@
 
 (defun quaternion-to-angle-vec3 (quaternion axis)
  #+liber-documentation
- "@version{#2024-1-20}
+ "@version{#2025-4-7}
   @syntax{(graphene:quaternion-to-angle-vec3 quaterion result) => angle, result}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the rotation axis}
-  @return{The value list with the angle in degrees and the
-    @symbol{graphene:vec3-t} instance with the rotation axis.}
+  @begin{return}
+    The value list with the angle in degrees and the @symbol{graphene:vec3-t}
+    instance with the rotation axis.
+  @end{return}
   @short{Converts a quaternion into an angle and an axis pair.}
   @see-symbol{graphene:quaternion-t}
   @see-symbol{graphene:vec3-t}"
@@ -617,12 +631,12 @@
 (export 'quaternion-to-angle-vec3)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_equal ()
+;;; graphene_quaternion_equal
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_equal" quaternion-equal) :bool
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{#2025-4-7}
   @argument[a]{a @symbol{graphene:quaternion-t} instance}
   @argument[b]{a @symbol{graphene:quaternion-t} instance}
   @return{@em{True} if the quaternions are equal.}
@@ -634,15 +648,15 @@
 (export 'quaternion-equal)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_dot ()
+;;; graphene_quaternion_dot
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_dot" quaternion-dot) :float
  #+liber-documentation
- "@version{#2023-12-10}
+ "@version{#2025-4-7}
   @argument[a]{a @symbol{graphene:quaternion-t} instance}
   @argument[b]{a @symbol{graphene:quaternion-t} instance}
-  @return{The float with the value of the dot product.}
+  @return{The single float with the value of the dot product.}
   @short{Computes the dot product of two quaternions.}
   @see-symbol{graphene:quaternion-t}"
   (a (:pointer (:struct quaternion-t)))
@@ -651,7 +665,7 @@
 (export 'quaternion-dot)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_invert ()
+;;; graphene_quaternion_invert
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_invert" %quaternion-invert) :void
@@ -660,11 +674,12 @@
 
 (defun quaternion-invert (quaternion result)
  #+liber-documentation
- "@version{#2023-12-10}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @argument[result]{a @symbol{graphene:quaternion-t} instance for the result}
-  @return{The @symbol{graphene:quaternion-t} instance with the inverted
-    quaternion.}
+  @begin{return}
+    The @symbol{graphene:quaternion-t} instance with the inverted quaternion.
+  @end{return}
   @begin{short}
     Inverts a quaternion and returns the conjugate quaternion.
   @end{short}
@@ -675,7 +690,7 @@
 (export 'quaternion-invert)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_normalize ()
+;;; graphene_quaternion_normalize
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_normalize" %quaternion-normalize) :void
@@ -684,7 +699,7 @@
 
 (defun quaternion-normalize (quaternion result)
  #+liber-documentation
- "@version{#2023-12-10}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
   @argument[result]{a @symbol{graphene:quaternion-t} instance for the
     normalized quaternion}
@@ -697,7 +712,7 @@
 (export 'quaternion-normalize)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_add ()
+;;; graphene_quaternion_add
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_add" %quaternion-add) :void
@@ -707,7 +722,7 @@
 
 (defun quaternion-add (a b result)
  #+liber-documentation
- "@version{#2023-12-10}
+ "@version{#2025-4-7}
   @argument[a]{a @symbol{graphene:quaternion-t} instance}
   @argument[b]{a @symbol{graphene:quaternion-t} instance}
   @argument[result]{a @symbol{graphene:quaternion-t} instance for the result}
@@ -720,7 +735,7 @@
 (export 'quaternion-add)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_multiply ()
+;;; graphene_quaternion_multiply
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_multiply" %quaternion-multiply) :void
@@ -730,7 +745,7 @@
 
 (defun quaternion-multiply (a b result)
  #+liber-documentation
- "@version{#2023-12-10}
+ "@version{#2025-4-7}
   @argument[a]{a @symbol{graphene:quaternion-t} instance}
   @argument[b]{a @symbol{graphene:quaternion-t} instance}
   @argument[result]{a @symbol{graphene:quaternion-t} instance for the result}
@@ -743,7 +758,7 @@
 (export 'quaternion-multiply)
 
 ;;; ----------------------------------------------------------------------------
-;;;graphene_quaternion_scale ()
+;;;graphene_quaternion_scale
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_scale" %quaternion-scale) :void
@@ -753,9 +768,9 @@
 
 (defun quaternion-scale (quaternion factor result)
  #+liber-documentation
- "@version{#2023-12-10}
+ "@version{#2025-4-7}
   @argument[quaternion]{a @symbol{graphene:quaternion-t} instance}
-  @argument[factor]{a number coerced to a float with the scaling factor}
+  @argument[factor]{a number coerced to a single float for the scaling factor}
   @argument[result]{a @symbol{graphene:quaternion-t} instance for the result}
   @return{The @symbol{graphene:quaternion-t} instance with the result.}
   @short{Scales all the elements of a quaternion using the given scalar factor.}
@@ -766,7 +781,7 @@
 (export 'quaternion-scale)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_quaternion_slerp ()
+;;; graphene_quaternion_slerp
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_quaternion_slerp" %quaternion-slerp) :void
@@ -777,10 +792,11 @@
 
 (defun quaternion-slerp (a b factor result)
  #+liber-documentation
- "@version{#2023-12-10}
+ "@version{#2025-4-7}
   @argument[a]{a @symbol{graphene:quaternion-t} instance}
   @argument[b]{a @symbol{graphene:quaternion-t} instance}
-  @argument[factor]{a number coerced to a float with the interpolation factor}
+  @argument[factor]{a number coerced to a single float for the interpolation
+    factor}
   @argument[result]{a @symbol{graphene:quaternion-t} instance for the result}
   @begin{short}
     The @symbol{graphene:quaternion-t} instance with the interpolated

@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -59,10 +59,11 @@
 
 (defmacro with-triangle ((var &rest args) &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-5}
   @syntax{(graphene:with-triangle (triangle) body) => result}
   @syntax{(graphene:with-triangle (triangle p1 p2 p3) body) => result}
-  @syntax{(graphene:with-triangle (triangle v1 v2 v3) body) => result}
+  @syntax{(graphene:with-triangle (triangle (v1 graphene:vec3-t) v2 v3) body)
+    => result}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance to create and
     initialize}
   @argument[p1]{a @symbol{graphene:point3d-t} instance to use for
@@ -83,10 +84,10 @@
 
   When no argument is given the components of the triangle are not definied.
   The initialization with three points uses the
-  @fun{graphene:triangle-init-from-point3d} function. If the first value has the
-  @code{graphene:vec3-t} type the @fun{graphene:triangle-init-from-vec3} is used
-  for initialization with threee vectors.
-  @begin[Note]{dictionary}
+  @fun{graphene:triangle-init-from-point3d} function. If the first value has
+  the @code{graphene:vec3-t} type the @fun{graphene:triangle-init-from-vec3} is
+  used for initialization with three vectors.
+  @begin[Notes]{dictionary}
     The memory is allocated with the @fun{graphene:triangle-alloc} function and
     released with the @fun{graphene:triangle-free} function.
   @end{dictionary}
@@ -103,40 +104,30 @@
               (progn ,@body)
               (triangle-free ,var))))
         ((null (fourth args))
-         ;; Three arguments, the first can be of type point3d-t or vec3-t.
-         (destructuring-bind ((arg1 &optional type1)
-                              (arg2 &optional type2)
-                              (arg3 &optional type3))
-             (list (mklist (first args))
-                   (mklist (second args))
-                   (mklist (third args)))
-           (cond ((and (or (not type1)
-                           (eq type1 'point3d-t))
-                       (or (not type2)
-                           (eq type2 'point3d-t))
-                       (or (not type3)
-                           (eq type3 'point3d-t)))
-                  ;; First argument with no type or of type point3d-t and
-                  ;; second and third argument with no type or type point3d-t
+         ;; Three arguments, the first can be of type point3d-t or vec3-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'point3d-t)
+                  ;; First argument of type point3d-t
                   `(let ((,var (triangle-alloc)))
-                     (triangle-init-from-point3d ,var ,arg1 ,arg2 ,arg3)
+                     (triangle-init-from-point3d ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (triangle-free ,var))))
-                 ((and (eq type1 'vec3-t)
-                       (or (not type2)
-                           (eq type2 'vec3-t))
-                       (or (not type3)
-                           (eq type3 'vec3-t)))
-                  ;; First argument of type vec3-t and second and third argument
-                  ;; with no type or type vec3-t
+                 ((eq type1 'vec3-t)
+                  ;; First argument of type vec3-t
                   `(let ((,var (triangle-alloc)))
-                     (triangle-init-from-vec3 ,var ,arg1 ,arg2 ,arg3)
+                     (triangle-init-from-vec3 ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (triangle-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-TRIANGLE")))))
+                  ;; No type, default is point3d-t
+                  `(let ((,var (triangle-alloc)))
+                     (triangle-init-from-point3d ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (triangle-free ,var)))))))
         (t
          (error "Syntax error in GRAPHENE:WITH-TRIANGLE"))))
 
@@ -144,10 +135,10 @@
 
 (defmacro with-triangles (vars &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-5}
   @syntax{(graphene:with-triangles (triangle1 ... trianglen) body) => result}
-  @argument[triangle1 ... trianglen]{the newly created
-    @symbol{graphene:triangle-t} instances}
+  @argument[triangle1 ... trianglen]{newly created @symbol{graphene:triangle-t}
+    instances}
   @argument[body]{a body that uses the bindings @arg{triangle1 ... trianglen}}
   @begin{short}
     The @fun{graphene:with-triangles} macro creates new variable bindings and
@@ -179,7 +170,10 @@
 (setf (liber:alias-for-symbol 'triangle-t)
       "CStruct"
       (liber:symbol-documentation 'triangle-t)
- "@version{#2023-12-7}
+ "@version{2025-4-5}
+  @begin{declaration}
+(cffi:defcstruct triangle-t)
+  @end{declaration}
   @begin{short}
     The @symbol{graphene:triangle-t} structure represents a triangle in 3D
     space.
@@ -188,13 +182,13 @@
 (export 'triangle-t)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_alloc ()
+;;; graphene_triangle_alloc
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_alloc" triangle-alloc)
     (:pointer (:struct triangle-t))
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @return{The newly allocated @symbol{graphene:triangle-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:triangle-t} instance.
@@ -208,12 +202,12 @@
 (export 'triangle-alloc)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_free ()
+;;; graphene_triangle_free
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_free" triangle-free) :void
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:triangle-alloc} function.
@@ -225,13 +219,13 @@
 (export 'triangle-free)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_init_from_point3d ()
+;;; graphene_triangle_init_from_point3d
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_init_from_point3d" triangle-init-from-point3d)
     (:pointer (:struct triangle-t))
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[a]{a @symbol{graphene:point3d-t} instance}
   @argument[b]{a @symbol{graphene:point3d-t} instance}
@@ -248,13 +242,13 @@
 (export 'triangle-init-from-point3d)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_init_from_vec3 ()
+;;; graphene_triangle_init_from_vec3
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_init_from_vec3" triangle-init-from-vec3)
     (:pointer (:struct triangle-t))
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[a]{a @symbol{graphene:vec3-t} instance}
   @argument[b]{a @symbol{graphene:vec3-t} instance}
@@ -271,7 +265,7 @@
 (export 'triangle-init-from-vec3)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_init_from_float ()
+;;; graphene_triangle_init_from_float
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_init_from_float" %triangle-init-from-float)
@@ -283,11 +277,11 @@
 
 (defun triangle-init-from-float (triangle a b c)
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
-  @argument[a]{a list of 3 floating point values}
-  @argument[b]{a list of 3 floating point values}
-  @argument[c]{a list of 3 floating point values}
+  @argument[a]{a list with 3 numbers coerced to single floats}
+  @argument[b]{a list with 3 numbers coerced to single floats}
+  @argument[c]{a list with 3 numbers coerced to single floats}
   @return{The initialized @symbol{graphene:triangle-t} instance.}
   @begin{short}
     Initializes a triangle using the three given list of floating point values,
@@ -307,7 +301,7 @@
 (export 'triangle-init-from-float)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_get_points ()
+;;; graphene_triangle_get_points
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_get_points" %triangle-points) :void
@@ -318,13 +312,15 @@
 
 (defun triangle-points (triangle a b c)
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[a]{a @symbol{graphene:point3d-t} instance for the first vertex}
   @argument[b]{a @symbol{graphene:point3d-t} instance for the second vertex}
   @argument[c]{a @symbol{graphene:point3d-t} instance for the third vertex}
-  @return{The value list of @symbol{graphene:point3d-t} instances with the
-    coordinates of the vertices.}
+  @begin{return}
+    The value list of @symbol{graphene:point3d-t} instances with the
+    coordinates of the vertices.
+  @end{return}
   @begin{short}
     Retrieves the three vertices of the given triangle and returns their
     coordinates as @symbol{graphene:point3d-t} instances.
@@ -337,7 +333,7 @@
 (export 'triangle-points)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_get_vertices ()
+;;; graphene_triangle_get_vertices
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_get_vertices" %triangle-vertices) :void
@@ -348,13 +344,14 @@
 
 (defun triangle-vertices (triangle a b c)
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[a]{a @symbol{graphene:vec3-t} instance for the first vertex}
   @argument[b]{a @symbol{graphene:vec3-t} instance for the second vertex}
   @argument[c]{a @symbol{graphene:vec3-t} instance for the third vertex}
-  @return{The value list of @symbol{graphene:vec3-t} instances with the
-    vertices.}
+  @begin{return}
+    The value list of @symbol{graphene:vec3-t} instances with the vertices.
+  @end{return}
   @short{Retrieves the three vertices of the given triangle.}
   @see-symbol{graphene:triangle-t}
   @see-symbol{graphene:vec3-t}"
@@ -364,14 +361,14 @@
 (export 'triangle-vertices)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_get_area ()
+;;; graphene_triangle_get_area
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_get_area" triangle-area) :float
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
-  @return{The float with the area of the triangle.}
+  @return{The single float with the area of the triangle.}
   @short{Computes the area of the given triangle.}
   @see-symbol{graphene:triangle-t}"
   (triangle (:pointer (:struct triangle-t))))
@@ -379,7 +376,7 @@
 (export 'triangle-area)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_get_midpoint ()
+;;; graphene_triangle_get_midpoint
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_get_midpoint" %triangle-midpoint) :void
@@ -388,16 +385,18 @@
 
 (defun triangle-midpoint (triangle result)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[result]{a @symbol{graphene:point3d-t} instance for the coordinates
     of the midpoint}
-  @return{The @symbol{graphene:point3d-t} instance with the coordinates of
-    the midpoint.}
+  @begin{return}
+    The @symbol{graphene:point3d-t} instance with the coordinates of the
+    midpoint.
+  @end{return}
   @begin{short}
     Computes the coordinates of the midpoint of the given triangle.
   @end{short}
-  The midpoint is the centroid of the triangle, i.e. the intersection of its
+  The midpoint is the centroid of the triangle, that is the intersection of its
   medians.
   @see-symbol{graphene:triangle-t}
   @see-symbol{graphene:point3d-t}"
@@ -407,7 +406,7 @@
 (export 'triangle-midpoint)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_get_normal ()
+;;; graphene_triangle_get_normal
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_get_normal" %triangle-normal) :void
@@ -416,7 +415,7 @@
 
 (defun triangle-normal (triangle result)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance for the normal vector}
   @return{The @symbol{graphene:vec3-t} instance with the normal vector.}
@@ -429,7 +428,7 @@
 (export 'triangle-normal)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_get_plane ()
+;;; graphene_triangle_get_plane
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_get_plane" %triangle-plane) :void
@@ -438,7 +437,7 @@
 
 (defun triangle-plane (triangle result)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[result]{a @symbol{graphene:plane-t} instance for the plane}
   @return{The @symbol{graphene:plane-t} instance with the plane.}
@@ -451,7 +450,7 @@
 (export 'triangle-plane)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_get_bounding_box ()
+;;; graphene_triangle_get_bounding_box
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_get_bounding_box" %triangle-bounding-box)
@@ -461,7 +460,7 @@
 
 (defun triangle-bounding-box (triangle result)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[result]{a @symbol{graphene:box-t} instance for the box}
   @return{The @symbol{graphene:box-t} instance with the box.}
@@ -474,7 +473,7 @@
 (export 'triangle-bounding-box)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_get_barycoords ()
+;;; graphene_triangle_get_barycoords
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_get_barycoords" %triangle-barycoords) :bool
@@ -484,13 +483,15 @@
 
 (defun triangle-barycoords (triangle point result)
  #+liber-documentation
- "@version{#2023-12-8}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
   @argument[result]{a @symbol{graphene:vec2-t} instance for the vector with the
     barycentric coordinates}
-  @return{The @symbol{graphene:vec2-t} instance with the barycentric
-    coordinates, or @code{nil}  if the result is not valid}
+  @begin{return}
+    The @symbol{graphene:vec2-t} instance with the barycentric coordinates,
+    or @code{nil}  if the result is not valid.
+  @end{return}
   @begin{short}
     Computes the barycentric coordinates of the given point.
   @end{short}
@@ -501,10 +502,12 @@
   barycentric coordinates are u, which is on the AC vector, and v which is on
   the AB vector.
 
+  @image[triangle-barycentric]{Figure: Barycentric coordinates}
+
   The returned vector contains the following values, in order:
   @begin{pre}
-result.x = u
-result.y = v
+(graphene:vec2-x result) => u
+(graphene:vec2-y result) => v
   @end{pre}
   @see-symbol{graphene:triangle-t}
   @see-symbol{graphene:point3d-t}
@@ -515,8 +518,10 @@ result.y = v
 (export 'triangle-barycoords)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_get_uv ()
+;;; graphene_triangle_get_uv
 ;;; ----------------------------------------------------------------------------
+
+;; TODO: Is the implementation correct?!
 
 (cffi:defcfun ("graphene_triangle_get_uv" %triangle-uv) :bool
   (triangle (:pointer (:struct triangle-t)))
@@ -528,19 +533,21 @@ result.y = v
 
 (defun triangle-uv (triangle point a b c result)
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{#2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
-  @argument[a]{a @symbol{graphene:vec2-t} instance with the UV coordinates
+  @argument[a]{a @symbol{graphene:vec2-t} instance for the UV coordinates
     of the first point}
-  @argument[b]{a @symbol{graphene:vec2-t} instance with the UV coordinates
+  @argument[b]{a @symbol{graphene:vec2-t} instance for the UV coordinates
     of the second point}
-  @argument[c]{a @symbol{graphene:vec2-t} instance with the UV coordinates
+  @argument[c]{a @symbol{graphene:vec2-t} instance for the UV coordinates
     of the third point}
   @argument[result]{a @symbol{graphene:vec2-t} instance containing the UV
     coordinates of the given point}
-  @return{The @symbol{graphene:vec2-t} instance with the UV coordinates of the
-    given point, of @code{nil} if the result is not valid.}
+  @begin{return}
+    The @symbol{graphene:vec2-t} instance with the UV coordinates of the
+    given point, of @code{nil} if the result is not valid.
+  @end{return}
   @begin{short}
     Computes the UV coordinates of the given point.
   @end{short}
@@ -550,8 +557,8 @@ result.y = v
 
   The UV coordinates will be placed in the result vector:
   @begin{pre}
-result.x = u
-result.y = v
+(graphene:vec2-x result) => u
+(graphene:vec2-y result) => v
   @end{pre}
   See also the @fun{graphene:triangle-barycoords} function.
   @see-symbol{graphene:triangle-t}
@@ -564,12 +571,12 @@ result.y = v
 (export 'triangle-uv)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_contains_point ()
+;;; graphene_triangle_contains_point
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_contains_point" triangle-contains-point) :bool
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @argument[triangle]{a @symbol{graphene:triangle-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
   @return{@em{True} if the point is inside the triangle.}
@@ -582,12 +589,12 @@ result.y = v
 (export 'triangle-contains-point)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_triangle_equal ()
+;;; graphene_triangle_equal
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_triangle_equal" triangle-equal) :bool
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{2025-4-5}
   @argument[a]{a @symbol{graphene:triangle-t} instance}
   @argument[b]{a @symbol{graphene:triangle-t} instance}
   @return{@em{True} if the triangles are equal.}

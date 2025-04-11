@@ -36,6 +36,141 @@
 
 ;;; --- Macros -----------------------------------------------------------------
 
+(test graphene-with-euler-macro.1
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT EULER 0 0 0)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand '(graphene:with-euler (euler) euler)))))
+
+(test graphene-with-euler-macro.2
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-EULER EULER EULER1)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler euler1) euler)))))
+
+(test graphene-with-euler-macro.3
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-EULER EULER EULER1)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (euler1 graphene:euler-t)) euler)))))
+
+(test graphene-with-euler-macro.4
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-MATRIX EULER MATRIX)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (matrix graphene:matrix-t)) euler)))))
+
+(test graphene-with-euler-macro.5
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-MATRIX EULER MATRIX :DEFAULT)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (matrix graphene:matrix-t) :default)
+                  euler)))))
+
+(test graphene-with-euler-macro.6
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-QUATERNION EULER QUAT)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (quat graphene:quaternion-t))
+                  euler)))))
+
+(test graphene-with-euler-macro.7
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-QUATERNION EULER QUAT :DEFAULT)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (quat graphene:quaternion-t) :default)
+                  euler)))))
+
+(test graphene-with-euler-macro.8
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-VEC3 EULER V)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (v graphene:vec3-t))
+                  euler)))))
+
+(test graphene-with-euler-macro.9
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-VEC3 EULER V :DEFAULT)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (v graphene:vec3-t) :default)
+                  euler)))))
+
+(test graphene-with-euler-macro.10
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT EULER A B C)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler a b c)
+                  euler)))))
+
+(test graphene-with-euler-macro.11
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT EULER A B C ORDER)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler a b c order)
+                  euler)))))
+
+(test graphene-with-euler-macro.12
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT EULER A B C ORDER)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (a :deg) b c order)
+                  euler)))))
+
+(test graphene-with-euler-macro.13
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-RADIANS EULER A B C)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (a :rad) b c)
+                  euler)))))
+
+(test graphene-with-euler-macro.14
+  (is (equal '(LET ((EULER (GRAPHENE:EULER-ALLOC)))
+                (GRAPHENE:EULER-INIT-FROM-RADIANS EULER A B C ORDER)
+                (UNWIND-PROTECT
+                  (PROGN EULER)
+                  (GRAPHENE:EULER-FREE EULER)))
+             (macroexpand
+               '(graphene:with-euler (euler (a :rad) b c order)
+                  euler)))))
+
 ;; no args
 (test graphene-with-euler.1
   (graphene:with-euler (euler)

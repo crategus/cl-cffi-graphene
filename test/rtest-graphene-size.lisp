@@ -41,6 +41,28 @@
       (is (= 5.0 (graphene:size-width s)))
       (is (= 6.0 (graphene:size-height s)))))
 
+(test graphene-with-size.5
+  (graphene:with-size (s (graphene:size-zero))
+    (is (= 0.0 (graphene:size-width s)))
+    (is (= 0.0 (graphene:size-height s)))))
+
+(test graphene-with-size.6
+  (graphene:with-size (s ((graphene:size-zero) graphene:size-t))
+    (is (= 0.0 (graphene:size-width s)))
+    (is (= 0.0 (graphene:size-height s)))))
+
+(test graphene-with-size.7
+  (graphene:with-size (s)
+    (graphene:with-size (s1 (graphene:size-init s 1 2))
+      (is (= 1.0 (graphene:size-width s)))
+      (is (= 2.0 (graphene:size-height s))))))
+
+(test graphene-with-size.8
+  (graphene:with-size (s)
+    (graphene:with-size (s1 ((graphene:size-init s 1 2) graphene:size-t))
+      (is (= 1.0 (graphene:size-width s)))
+      (is (= 2.0 (graphene:size-height s))))))
+
 ;;     with-sizes
 
 (test graphene-with-sizes
@@ -74,7 +96,7 @@
 ;;;     graphene_size_free
 
 (test graphene-size-alloc/free
-  (let ((size nil))
+  (let (size)
     (is (cffi:pointerp (setf size (graphene:size-alloc))))
     (is (= 0.0 (graphene:size-height size)))
     (is (= 0.0 (graphene:size-width size)))
@@ -156,4 +178,4 @@
     (is (= 1.0 (graphene:size-width size)))
     (is (= 2.0 (graphene:size-height size)))))
 
-;;; 2023-12-10
+;;; 2025-4-3

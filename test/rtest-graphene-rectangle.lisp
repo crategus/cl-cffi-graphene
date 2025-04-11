@@ -52,6 +52,28 @@
     (is (= 3.0 (graphene:rect-width r)))
     (is (= 4.0 (graphene:rect-height r)))))
 
+(test graphene-with-rect.5
+  (graphene:with-rect (r (graphene:rect-zero))
+    (is (= 0.0 (graphene:rect-x r)))
+    (is (= 0.0 (graphene:rect-y r)))
+    (is (= 0.0 (graphene:rect-width r)))
+    (is (= 0.0 (graphene:rect-height r)))))
+
+(test graphene-with-rect.6
+  (graphene:with-rect (r ((graphene:rect-zero) graphene:rect-t))
+    (is (= 0.0 (graphene:rect-x r)))
+    (is (= 0.0 (graphene:rect-y r)))
+    (is (= 0.0 (graphene:rect-width r)))
+    (is (= 0.0 (graphene:rect-height r)))))
+
+(test graphene-with-rect.7
+  (graphene:with-rect (r1)
+    (graphene:with-rect (r (graphene:rect-init r1 1 2 3 4))
+      (is (= 1.0 (graphene:rect-x r)))
+      (is (= 2.0 (graphene:rect-y r)))
+      (is (= 3.0 (graphene:rect-width r)))
+      (is (= 4.0 (graphene:rect-height r))))))
+
 ;;;     graphene:with-rects
 
 (test graphene-with-rects
@@ -104,7 +126,7 @@
 ;;;     graphene_rect_free
 
 (test graphene-rect-alloc/free
-  (let ((rect nil))
+  (let (rect)
     (is (cffi:pointerp (setf rect (graphene:rect-alloc))))
     (is (cffi:pointerp (setf rect (graphene:rect-init rect 0.0 1.0 3.0 4.0))))
 
@@ -394,4 +416,4 @@
       (is (=  6.0 (graphene:rect-width result)))
       (is (= 12.0 (graphene:rect-height result)))))
 
-;;; 2025-3-8
+;;; 2025-4-3

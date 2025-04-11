@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -65,15 +65,19 @@
 
 (defmacro with-euler ((var &rest args) &body body)
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @syntax{(graphene:with-euler (euler) body) => result}
   @syntax{(graphene:with-euler (euler euler1) body) => result}
   @syntax{(graphene:with-euler (euler (mat graphene:matrix-t)) body) => result}
-  @syntax{(graphene:with-euler (euler (mat graphene:matrix-t) order) body) => result}
-  @syntax{(graphene:with-euler (euler (quat graphene:quaternion-t)) body) => result}
-  @syntax{(graphene:with-euler (euler (quat graphene:quaternion-t) order) body) => result}
+  @syntax{(graphene:with-euler (euler (mat graphene:matrix-t) order) body)
+    => result}
+  @syntax{(graphene:with-euler (euler (quat graphene:quaternion-t)) body)
+    => result}
+  @syntax{(graphene:with-euler (euler (quat graphene:quaternion-t) order) body)
+    => result}
   @syntax{(graphene:with-euler (euler (vec graphene:vec3-t)) body) => result}
-  @syntax{(graphene:with-euler (euler (vec graphene:vec3-t) order) body) => result}
+  @syntax{(graphene:with-euler (euler (vec graphene:vec3-t) order) body)
+    => result}
   @syntax{(graphene:with-euler (euler x y z) body) => result}
   @syntax{(graphene:with-euler (euler x y z order) body) => result}
   @syntax{(graphene:with-euler (euler (x :rad) y z) body) => result}
@@ -107,7 +111,7 @@
   rotation angles in degrees and the @fun{graphene:euler-init-from-radians}
   function initializes an instance with the rotation angles in radians.
   In addition it is possible to initalize the order of the rotations.
-  @begin[Note]{dictionary}
+  @begin[Notes]{dictionary}
     The memory is allocated with the @fun{graphene:box-alloc} function and
     released with the @fun{graphene:box-free} function.
   @end{dictionary}
@@ -130,63 +134,69 @@
         ((null (third args))
          ;; One or two arguments, the first can be of type euler-t, matrix-t,
          ;; quaternion-t, or vec3-t, the second argument is the optional order
-         (destructuring-bind ((arg &optional type1) order)
-             (list (mklist (first args)) (second args))
-           (cond ((or (not type1)
-                      (eq type1 'euler-t))
-                  ;; First argument with type euler-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'euler-t)
+                  ;; First argument of type euler-t
                   `(let ((,var (euler-alloc)))
-                     (euler-init-from-euler ,var ,arg)
+                     (euler-init-from-euler ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (euler-free ,var))))
                  ((eq type1 'matrix-t)
-                  ;; First argument with type matrix-t
-                  (setf order (or order :default))
+                  ;; First argument of type matrix-t
                   `(let ((,var (euler-alloc)))
-                     (euler-init-from-matrix ,var ,arg ,order)
+                     (euler-init-from-matrix ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (euler-free ,var))))
                  ((eq type1 'quaternion-t)
                   ;; First argument of type quaternion-t
-                  (setf order (or order :default))
                   `(let ((,var (euler-alloc)))
-                     (euler-init-from-quaternion ,var ,arg ,order)
+                     (euler-init-from-quaternion ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (euler-free ,var))))
                  ((eq type1 'vec3-t)
                   ;; First argument of type vec3-t
-                  (setf order (or order :default))
                   `(let ((,var (euler-alloc)))
-                     (euler-init-from-vec3 ,var ,arg ,order)
+                     (euler-init-from-vec3 ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (euler-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-EULER")))))
-        ((null (fifth args))
-         ;; Three or four arguments, 3 floats in deegres or in radians and
-         ;; the optional order
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 :deg))
-                  ;; First argument with no type or of type :deg
+                  ;; First argument of no type, default is euler-t
                   `(let ((,var (euler-alloc)))
-                     (euler-init ,var ,arg ,@(rest args))
+                     (euler-init-from-euler ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (euler-free ,var)))))))
+        ((null (fifth args))
+         ;; Three or four arguments, 3 single floats in deegres or in radians
+         ;; and the optional order
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 :deg)
+                  ;; First argument of type :deg
+                  `(let ((,var (euler-alloc)))
+                     (euler-init ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (euler-free ,var))))
                  ((eq type1 :rad)
                   ;; First argument of type :rad
                   `(let ((,var (euler-alloc)))
-                     (euler-init-from-radians ,var ,arg ,@(rest args))
+                     (euler-init-from-radians ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (euler-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-EULER")))))
+                  ;; First argument of no type, default is :deg
+                  `(let ((,var (euler-alloc)))
+                     (euler-init ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (euler-free ,var)))))))
         (t
          (error "Syntax error in GRAPHENE:WITH-EULER"))))
 
@@ -194,7 +204,7 @@
 
 (defmacro with-eulers (vars &body body)
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @syntax{(graphene:with-euler (euler1 ... eulern) body) => result}
   @argument[euler1 ... eulern]{newly created @symbol{graphene:euler-t}
     instances}
@@ -237,7 +247,7 @@
 (setf (liber:alias-for-symbol 'euler-order-t)
       "CEnum"
       (liber:symbol-documentation 'euler-order-t)
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @begin{declaration}
 (cffi:defcenum euler-order-t
   :default
@@ -313,7 +323,10 @@
 (setf (liber:alias-for-symbol 'euler-t)
       "CStruct"
       (liber:symbol-documentation 'euler-t)
- "@version{2024-9-9}
+ "@version{2025-4-7}
+  @begin{declaration}
+(cffi:defcstruct euler-t)
+  @end{declaration}
   @begin{short}
     The @symbol{graphene:euler-t} structure defines a rotation along three axes
     using three angles.
@@ -385,7 +398,7 @@ G × B × A = R
 (cffi:defcfun ("graphene_euler_alloc" euler-alloc)
     (:pointer (:struct euler-t))
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @return{The newly allocated @symbol{graphene:euler-t} instance.}
   @short{Allocates a new @symbol{graphene:euler-t} instance.}
   The contents of the returned structure are undefined.
@@ -400,7 +413,7 @@ G × B × A = R
 
 (cffi:defcfun ("graphene_euler_free" euler-free) :void
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:euler-alloc} function.
@@ -413,17 +426,18 @@ G × B × A = R
 
 ;;; ----------------------------------------------------------------------------
 ;;; graphene_euler_init
+;;; graphene_euler_init_with_order
 ;;; ----------------------------------------------------------------------------
 
 (defun euler-init (euler x y z &optional (order :default))
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @argument[x]{a number coerced to a float with the rotation angle on the
+  @argument[x]{a number coerced to a single float for the rotation angle on the
     X axis, in degrees}
-  @argument[y]{a number coerced to a float with the rotation angle on the
+  @argument[y]{a number coerced to a single float for the rotation angle on the
     Y axis, in degrees}
-  @argument[z]{a number coerced to a float with the rotation angle on the
+  @argument[z]{a number coerced to a single float for the rotation angle on the
     Z axis, in degrees}
   @argument[order]{an optional @symbol{graphene:euler-order-t} value with the
     order used to apply the rotations, the default value is @code{:default}}
@@ -445,50 +459,16 @@ G × B × A = R
 (export 'euler-init)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_euler_init_with_order
-;;; ----------------------------------------------------------------------------
-
-;; not needed, functionality is included in graphene:euler-init
-
-#+nil
-(defun euler-init-with-order (euler x y z order)
- #+liber-documentation
- "@version{#2022-9-23}
-  @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @argument[x]{a float with the rotation angle on the x axis, in degrees}
-  @argument[y]{a float with the rotation angle on the y axis, in degrees}
-  @argument[z]{a float with the rotation angle on the z axis, in degrees}
-  @argument[order]{a @symbol{graphene:euler-order-t} value with the order used
-    to apply the rotations}
-  @return{The initialized @symbol{graphene:euler-t} instance.}
-  @begin{short}
-    Initializes a @symbol{graphene:euler-t} instance using the given angles and
-    order.
-  @end{short}
-  @see-symbol{graphene:euler-t}
-  @see-symbol{graphene:euler-order-t}"
-  (cffi:foreign-funcall "graphene_euler_init_with_order"
-                        (:pointer (:struct euler-t)) euler
-                        :float (coerce x 'single-float)
-                        :float (coerce y 'single-float)
-                        :float (coerce z 'single-float)
-                        euler-order-t order
-                        (:pointer (:struct euler-t))))
-
-#+nil
-(export 'euler-init-with-order)
-
-;;; ----------------------------------------------------------------------------
 ;;; graphene_euler_init_from_matrix
 ;;; ----------------------------------------------------------------------------
 
 (defun euler-init-from-matrix (euler matrix &optional (order :default))
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @argument[matrix]{a @symbol{graphene:matrix-t} instance with the rotation
+  @argument[matrix]{a @symbol{graphene:matrix-t} instance for the rotation
     matrix}
-  @argument[order]{an optional @symbol{graphene:euler-order-t} value with the
+  @argument[order]{an optional @symbol{graphene:euler-order-t} value for the
     order used to apply the rotations, the default value is @code{:default}}
   @return{The initialized @symbol{graphene:euler-t} instance.}
   @begin{short}
@@ -515,10 +495,10 @@ G × B × A = R
 
 (defun euler-init-from-quaternion (euler quaternion &optional (order :default))
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
   @argument[quaternion]{a normalized @symbol{graphene:quaternion-t} instance}
-  @argument[order]{an optional @symbol{graphene:euler-order-t} value with the
+  @argument[order]{an optional @symbol{graphene:euler-order-t} value for the
     order used to apply the rotations, the default value is @code{:default}}
   @return{The initialized @symbol{graphene:euler-t} instance.}
   @begin{short}
@@ -545,11 +525,11 @@ G × B × A = R
 
 (defun euler-init-from-vec3 (euler vector &optional (order :default))
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
   @argument[vector]{a @symbol{graphene:vec3-t} instance containing the rotation
     angles in degrees}
-  @argument[order]{an optional @symbol{graphene:euler-order-t} value with the
+  @argument[order]{an optional @symbol{graphene:euler-order-t} value for the
     order used to apply the rotations, the default value is @code{:default}}
   @return{The initialized @symbol{graphene:euler-t} instance.}
   @begin{short}
@@ -574,15 +554,9 @@ G × B × A = R
 ;;; graphene_euler_init_from_euler
 ;;; ----------------------------------------------------------------------------
 
-#+nil
-(cffi:defcfun ("graphene_euler_init_from_euler" euler-init-from-euler)
-    (:pointer (:struct euler-t))
-  (euler (:pointer (:struct euler-t)))
-  (source (:pointer (:struct euler-t))))
-
 (defun euler-init-from-euler (euler source)
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance to initialize}
   @argument[source]{a @symbol{graphene:euler-t} instance}
   @return{The initialized @symbol{graphene:euler-t} instance.}
@@ -607,15 +581,15 @@ G × B × A = R
 
 (defun euler-init-from-radians (euler x y z &optional (order :default))
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @argument[x]{a number coerced to a float with the rotation angle on the
+  @argument[x]{a number coerced to a single float for the rotation angle on the
     X axis, in radians}
-  @argument[y]{a number coerced to a float with the rotation angle on the
+  @argument[y]{a number coerced to a single float for the rotation angle on the
     Y axis, in radians}
-  @argument[z]{a number coerced to a float with the rotation angle on the
+  @argument[z]{a number coerced to a single float for the rotation angle on the
     Z axis, in radians}
-  @argument[order]{an optional @symbol{graphene:euler-order-t} value with the
+  @argument[order]{an optional @symbol{graphene:euler-order-t} value for the
     order used to apply the rotations, the default value is @code{:default}}
   @return{The initialized @symbol{graphene:euler-t} instance.}
   @begin{short}
@@ -640,7 +614,7 @@ G × B × A = R
 
 (cffi:defcfun ("graphene_euler_equal" euler-equal) :bool
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[a]{a @symbol{graphene:euler-t} instance}
   @argument[b]{another @symbol{graphene:euler-t} instance}
   @return{@em{True} if the two @symbol{graphene:euler-t} instances are equal.}
@@ -657,9 +631,9 @@ G × B × A = R
 
 (cffi:defcfun ("graphene_euler_get_x" euler-x) :float
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @return{The float with the rotation angle.}
+  @return{The single float with the rotation angle.}
   @short{Retrieves the rotation angle on the X axis, in degrees.}
   @see-symbol{graphene:euler-t}"
   (euler (:pointer (:struct euler-t))))
@@ -672,9 +646,9 @@ G × B × A = R
 
 (cffi:defcfun ("graphene_euler_get_y" euler-y) :float
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @return{The float with the rotation angle.}
+  @return{The single float with the rotation angle.}
   @short{Retrieves the rotation angle on the Y axis, in degrees.}
   @see-symbol{graphene:euler-t}"
   (euler (:pointer (:struct euler-t))))
@@ -687,9 +661,9 @@ G × B × A = R
 
 (cffi:defcfun ("graphene_euler_get_z" euler-z) :float
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @return{The float with the rotation angle.}
+  @return{The single float with the rotation angle.}
   @short{Retrieves the rotation angle on the Z axis, in degrees.}
   @see-symbol{graphene:euler-t}"
   (euler (:pointer (:struct euler-t))))
@@ -702,10 +676,11 @@ G × B × A = R
 
 (cffi:defcfun ("graphene_euler_get_order" euler-order) euler-order-t
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @return{The @symbol{graphene:euler-order-t} value with the order to apply
-    rotations.}
+  @begin{return}
+    The @symbol{graphene:euler-order-t} value with the order to apply rotations.
+  @end{return}
   @begin{short}
     Retrieves the order used to apply the rotations described in the
     @symbol{graphene:euler-t} instance, when converting to and from other
@@ -728,10 +703,12 @@ G × B × A = R
 
 (cffi:defcfun ("graphene_euler_get_alpha" euler-alpha) :float
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @return{The float with the first component of the Euler angle vector, in
-    radians.}
+  @begin{return}
+    The single float with the first component of the Euler angle vector, in
+    radians.
+  @end{return}
   @begin{short}
     Retrieves the first component of the Euler angle vector, depending on the
     order of rotation.
@@ -749,10 +726,12 @@ G × B × A = R
 
 (cffi:defcfun ("graphene_euler_get_beta" euler-beta) :float
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @return{The float with the second component of the Euler angle vector, in
-    radians.}
+  @begin{return}
+    The single float with the second component of the Euler angle vector, in
+    radians.
+  @end{return}
   @begin{short}
     Retrieves the second component of the Euler angle vector, depending on the
     order of rotation.
@@ -770,10 +749,12 @@ G × B × A = R
 
 (cffi:defcfun ("graphene_euler_get_gamma" euler-gamma) :float
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
-  @return{The float with the third component of the Euler angle vector, in
-    radians.}
+  @begin{return}
+    The single float with the third component of the Euler angle vector, in
+    radians.
+  @end{return}
   @begin{short}
     Retrieves the third component of the Euler angle vector, depending on the
     order of rotation.
@@ -791,7 +772,7 @@ G × B × A = R
 
 (defun euler-to-vec3 (euler result)
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
   @argument[result]{a @symbol{graphene:vec3-t} instance}
   @return{The @symbol{graphene:vec3-t} instance.}
@@ -815,7 +796,7 @@ G × B × A = R
 
 (defun euler-to-matrix (euler result)
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
   @argument[result]{a @symbol{graphene:matrix-t} instance}
   @return{The @symbol{graphene:matrix-t} instance.}
@@ -853,7 +834,7 @@ G × B × A = R
 
 (defun euler-to-quaternion (euler result)
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
   @argument[result]{a @symbol{graphene:quaternion-t} instance}
   @return{The @symbol{graphene:quaternion-t} instance.}
@@ -877,7 +858,7 @@ G × B × A = R
 
 (defun euler-reorder (euler order result)
  #+liber-documentation
- "@version{2024-9-9}
+ "@version{2025-4-7}
   @argument[euler]{a @symbol{graphene:euler-t} instance}
   @argument[order]{a @symbol{graphene:euler-order-t} value}
   @argument[result]{a @symbol{graphene:euler-t} instance}

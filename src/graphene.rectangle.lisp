@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -76,18 +76,16 @@
 
 (defmacro with-rect ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-3-8}
+ "@version{2025-4-3}
   @syntax{(graphene:with-rect (rect) body) => result}
   @syntax{(graphene:with-rect (rect src) body) => result}
   @syntax{(graphene:with-rect (rect x y width height) body) => result}
   @argument[rect]{a @symbol{graphene:rect-t} instance to create and initialize}
   @argument[src]{a @symbol{graphene:rect-t} instance to use for initialization}
-  @argument[x]{a number coerced to a float for the x coordinate of the
-    rectangle}
-  @argument[y]{a number coerced to a float for the y coordinate of the
-    rectangle}
-  @argument[width]{a number coerced to a float for the width of the rectangle}
-  @argument[height]{a number coerced to a float for the height of the rectangle}
+  @argument[x]{a number coerced to a single float for the x coordinate}
+  @argument[y]{a number coerced to a single float for the y coordinate}
+  @argument[width]{a number coerced to a single float for the width}
+  @argument[height]{a number coerced to a single float for the height}
   @begin{short}
     The @fun{graphene:with-rect} macro allocates a new @symbol{graphene:rect-t}
     instance, initializes the rectangle with the given values and executes the
@@ -109,27 +107,32 @@
   @see-function{graphene:rect-alloc}
   @see-function{graphene:rect-free}"
   (cond ((null args)
-         ;; We have no arguments, the default is initialization with zeros.
+         ;; No arguments, the default is initialization with zeros
          `(let ((,var (rect-alloc)))
             (rect-init ,var 0.0 0.0 0.0 0.0)
             (unwind-protect
               (progn ,@body)
               (rect-free ,var))))
         ((null (second args))
-         ;; We have one argument. The argument must be of type rect-t.
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 'rect-t))
-                  ;; One argument with no type or of type rect-t
+         ;; One argument of type rect-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'rect-t)
+                  ;; One argument of type rect-t
                   `(let ((,var (rect-alloc)))
-                     (rect-init-from-rect ,var ,arg)
+                     (rect-init-from-rect ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (rect-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-RECT")))))
+                  ;; One argument with no type, default is rect-t
+                  `(let ((,var (rect-alloc)))
+                     (rect-init-from-rect ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (rect-free ,var)))))))
         ((null (fifth args))
-         ;; We have a list of four arguments with (x,y,width,height) values
+         ;; Four arguments for the x, y, width, height values
          `(let ((,var (rect-alloc)))
             (rect-init ,var ,@args)
             (unwind-protect
@@ -186,7 +189,7 @@
   @end{declaration}
   @begin{values}
     @begin[code]{table}
-      @entry[origin]{The @symbol{graphene:point-t} instance with the coordinates
+      @entry[origin]{The @symbol{graphene:point-t} instance for the coordinates
         for the origin of the rectangle.}
       @entry[size]{The @symbol{graphene:size-t} instance for the size of the
         rectangle.}
@@ -218,6 +221,8 @@
 => (0.0 0.0 10.0 10.0)
     @end{pre}
   @end{dictionary}
+  @see-slot{graphene:rect-origin}
+  @see-slot{graphene:rect-size}
   @see-symbol{graphene:point-t}
   @see-symbol{graphene:size-t}
   @see-function{graphene:rect-normalize}")
@@ -311,15 +316,12 @@
 
 (defun rect-init (rect x y width height)
  #+liber-documentation
- "@version{2025-3-8}
+ "@version{2025-4-3}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
-  @argument[x]{a number coerced to a float for the x coordinate of the
-    rectangle}
-  @argument[y]{a number coerced to a float for the y coordinate of the
-    rectangle}
-  @argument[width]{a number coerced to a float for the width of the rectangle}
-  @argument[height]{a number coerced to a float for the height of the
-    rectangle}
+  @argument[x]{a number coerced to a single float for the x coordinate}
+  @argument[y]{a number coerced to a single float for the y coordinate}
+  @argument[width]{a number coerced to a single float for the width}
+  @argument[height]{a number coerced to a single float for the height}
   @return{The initialized @symbol{graphene:rect-t} instance.}
   @begin{short}
     Initializes the given rectangle with the given values.
@@ -762,8 +764,8 @@
  #+liber-documentation
  "@version{2025-3-8}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
-  @argument[dx]{a number coerced to a float for the horizontal offset}
-  @argument[dy]{a number coerced to a float for the vertical offset}
+  @argument[dx]{a number coerced to a single float for the horizontal offset}
+  @argument[dy]{a number coerced to a single float for the vertical offset}
   @argument[result]{a @symbol{graphene:rect-t} instance for the result}
   @return{The @symbol{graphene:rect-t} instance with the offset rectangle.}
   @begin{short}
@@ -794,8 +796,8 @@
  #+liber-documentation
  "@version{2025-3-8}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
-  @argument[dx]{a number coerced to a float for the horizontal inset}
-  @argument[dy]{a number coerced to a float for the vertical inset}
+  @argument[dx]{a number coerced to a single float for the horizontal inset}
+  @argument[dy]{a number coerced to a single float for the vertical inset}
   @argument[result]{a @symbol{graphene:rect-t} instance for the result}
   @return{The @symbol{graphene:rect-t} instance with the inset rectangle.}
   @begin{short}
@@ -932,7 +934,7 @@
   @return{The fixed @symbol{graphene:rect-t} instance.}
   @begin{short}
     Returns a degenerate rectangle with origin fixed at @code{(0,0)} and a
-    size of @code{0,0)}.
+    size of @code{(0,0)}.
   @end{short}
   @see-symbol{graphene:rect-t}")
 
@@ -946,8 +948,10 @@
  #+liber-documentation
  "@version{2025-3-8}
   @argument[rect]{a @symbol{graphene:rect-t} instance}
-  @argument[sh]{a number coerced to a float for the horizontal scale factor}
-  @argument[sv]{a number coerced to a float for the vertical scale factor}
+  @argument[sh]{a number coerced to a single float for the horizontal scale
+    factor}
+  @argument[sv]{a number coerced to a single float for the vertical scale
+    factor}
   @argument[result]{a @symbol{graphene:rect-t} instance}
   @return{The @symbol{graphene:rect-t} instance with the scaled rectangle.}
   @begin{short}

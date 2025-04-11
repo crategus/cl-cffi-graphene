@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -60,7 +60,7 @@
 
 (defmacro with-point3d ((var &rest args) &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-2}
   @syntax{(graphene:with-point3d (p) body) => result}
   @syntax{(graphene:with-point3d (p p1) body) => result}
   @syntax{(graphene:with-point3d (p (v graphene:vec3-t)) body) => result}
@@ -69,9 +69,9 @@
   @argument[p1]{a @symbol{graphene:point3d-t} instance to use for
     initialization}
   @argument[v]{a @symbol{graphene:vec3-t} instance to use for initialization}
-  @argument[x]{a number coerced to a float for the x component of the point}
-  @argument[y]{a number coerced to a float for the y component of the point}
-  @argument[z]{a number coerced to a float for the z component of the point}
+  @argument[x]{a number coerced to a single float for the x component}
+  @argument[y]{a number coerced to a single float for the y component}
+  @argument[z]{a number coerced to a single float for the z component}
   @begin{short}
     The @fun{graphene:with-point3d} macro allocates a new
     @symbol{graphene:point3d-t} instance, initializes the point with the given
@@ -86,7 +86,7 @@
   default when no type specifier for the value is given. If the value has the
   type specifier @code{graphene:vec3-t} the point is initialized with the
   @fun{graphene:point3d-init-from-vec3} function.
-  @begin[Note]{dictionary}
+  @begin[Notes]{dictionary}
     The memory is allocated with the @fun{graphene:point3d-alloc} function and
     released with the @fun{graphene:point3d-free} function.
   @end{dictionary}
@@ -125,34 +125,39 @@
   @see-function{graphene:point3d-alloc}
   @see-function{graphene:point3d-free}"
   (cond ((null args)
-         ;; We have no arguments, the default is initialization with zeros.
+         ;; No arguments, the default is initialization with zeros
          `(let ((,var (point3d-alloc)))
             (point3d-init ,var 0.0 0.0 0.0)
             (unwind-protect
               (progn ,@body)
               (point3d-free ,var))))
         ((null (second args))
-         ;; We have one argument. The argument is of type point3d-t or vec3-t
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 'point3d-t))
-                  ;; One argument with no type or of type point3d-t
+         ;; One argument of type point3d-t or vec3-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'point3d-t)
+                  ;; One argument of type point3d-t
                   `(let ((,var (point3d-alloc)))
-                     (point3d-init-from-point ,var ,arg)
+                     (point3d-init-from-point ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (point3d-free ,var))))
                  ((eq type1 'vec3-t)
-                  ;; One argument with type vec3-t
+                  ;; One argument of type vec3-t
                   `(let ((,var (point3d-alloc)))
-                     (point3d-init-from-vec3 ,var ,arg)
+                     (point3d-init-from-vec3 ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (point3d-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-POINT3D")))))
+                  ;; One argument with no type, default is point3d-t
+                  `(let ((,var (point3d-alloc)))
+                     (point3d-init-from-point ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (point3d-free ,var)))))))
         ((null (fourth args))
-         ;; We have a list of three arguments with (x,y,z) values
+        ;; Three arguments for the x,y,z components
          `(let ((,var (point3d-alloc)))
             (point3d-init ,var ,@args)
             (unwind-protect
@@ -165,9 +170,9 @@
 
 (defmacro with-point3ds (vars &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-2}
   @syntax{(graphene:with-point3ds (p1 p2 p3 ... pn) body) => result}
-  @argument[p1 ... pn]{the newly created @symbol{graphene:point3d-t} instances}
+  @argument[p1 ... pn]{newly created @symbol{graphene:point3d-t} instances}
   @argument[body]{a body that uses the bindings @arg{p1 ... pn}}
   @begin{short}
     The @fun{graphene:with-point3ds} macro creates new variable bindings and
@@ -217,23 +222,24 @@
 (setf (liber:alias-for-symbol 'point3d-t)
       "CStruct"
       (liber:symbol-documentation 'point3d-t)
- "@version{2023-12-3}
-  @begin{short}
-    The @symbol{graphene:point3d-t} structure is a data structure capable of
-    describing a point with three coordinates.
-  @end{short}
-  @begin{pre}
+ "@version{2025-4-2}
+  @begin{declaration}
 (cffi:defcstruct point3d-t
   (x :float)
   (y :float)
   (z :float))
-  @end{pre}
+  @end{declaration}
+  @begin{short}
+    The @symbol{graphene:point3d-t} structure is a data structure capable of
+    describing a point with three coordinates.
+  @end{short}
+
   Access the coordinates with the @fun{graphene:point3d-x},
   @fun{graphene:point3d-y} and @fun{graphene:point3d-z} functions. Use the
   @macro{graphene:with-point3d} and @macro{graphene:with-point3ds} macros to
   allocate a new @symbol{graphene:point3d-t} instance and initialize the point
   with values.
-  @begin[Example]{dictionary}
+  @begin[Examples]{dictionary}
     Allocate and initalize a point with values.
     @begin{pre}
 (graphene:with-point3d (p 1.0 1/2 5)
@@ -263,15 +269,15 @@
 (setf (liber:alias-for-function 'point3d-x)
       "Accessor"
       (documentation 'point3d-x 'function)
- "@version{2024-1-20}
+ "@version{2025-4-2}
   @syntax{(graphene:point3d-x p) => x}
   @syntax{(setf (graphene:point3d-x p) x)}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
-  @argument[x]{a float with the x coordinate}
+  @argument[x]{a number coerced to a single float for the x coordinate}
   @begin{short}
     Accessor of the @code{x} slot of the @symbol{graphene:point3d-t} structure.
   @end{short}
-  The @arg{x} value is coerced to a float before assignment.
+  The @arg{x} value is coerced to a single float before assignment.
   @begin[Examples]{dictionary}
     @begin{pre}
 (graphene:with-point3d (p 0.5 1.0 1.5)
@@ -302,15 +308,15 @@
 (setf (liber:alias-for-function 'point3d-y)
       "Accessor"
       (documentation 'point3d-y 'function)
- "@version{2024-1-20}
+ "@version{2025-4-2}
   @syntax{(graphene:point3d-y p) => y}
   @syntax{(setf (graphene:point3d-y p) y)}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
-  @argument[x]{a float with the y coordinate}
+  @argument[x]{a number coerced to a single float for the y coordinate}
   @begin{short}
     Accessor of the @code{y} slot of the @symbol{graphene:point3d-t} structure.
   @end{short}
-  The @arg{y} value is coerced to a float before assignment. See the
+  The @arg{y} value is coerced to a single float before assignment. See the
   @fun{graphene:point3d-x} documentation for an example.
   @see-symbol{graphene:point3d-t}
   @see-function{graphene:point3d-x}")
@@ -330,15 +336,15 @@
 (setf (liber:alias-for-function 'point3d-z)
       "Accessor"
       (documentation 'point3d-z 'function)
- "@version{2024-1-20}
+ "@version{2025-4-2}
   @syntax{(graphene:point3d-z p) => z}
   @syntax{(setf (graphene:point3d-z p) z)}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
-  @argument[x]{a float with the z coordinate}
+  @argument[x]{a number coerced to a single float for the z coordinate}
   @begin{short}
     Accessor of the @code{z} slot of the @symbol{graphene:point3d-t} structure.
   @end{short}
-  The @arg{z} value is coerced to a float before assignment. See the
+  The @arg{z} value is coerced to a single float before assignment. See the
   @fun{graphene:point3d-x} documentation for an example.
   @see-symbol{graphene:point3d-t}
   @see-function{graphene:point3d-x}")
@@ -346,13 +352,13 @@
 (export 'point3d-z)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_alloc ()
+;;; graphene_point3d_alloc
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_point3d_alloc" point3d-alloc)
     (:pointer (:struct point3d-t))
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2025-4-2}
   @return{The newly allocated @symbol{graphene:point3d-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:point3d-t} instance.
@@ -378,12 +384,12 @@
 (export 'point3d-alloc)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_free ()
+;;; graphene_point3d_free
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_point3d_free" point3d-free) :void
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2025-4-2}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:point3d-alloc} function.
@@ -395,13 +401,13 @@
 (export 'point3d-free)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_zero ()
+;;; graphene_point3d_zero
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_point3d_zero" point3d-zero)
     (:pointer (:struct point3d-t))
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2025-4-2}
   @return{The @symbol{graphene:point3d-t} instance with a zero point.}
   @begin{short}
     Returns a point with all three coordinates set to zero.
@@ -421,16 +427,16 @@
 (export 'point3d-zero)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_init ()
+;;; graphene_point3d_init
 ;;; ----------------------------------------------------------------------------
 
 (defun point3d-init (p x y z)
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2025-4-2}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
-  @argument[x]{a number coerced to a float with the x coordinate}
-  @argument[y]{a number coerced to a float with the y coordinate}
-  @argument[z]{a number coerced to a float with the z coordinate}
+  @argument[x]{a number coerced to a single float for the x coordinate}
+  @argument[y]{a number coerced to a single float for the y coordinate}
+  @argument[z]{a number coerced to a single float for the z coordinate}
   @return{The initialized @symbol{graphene:point3d-t} instance.}
   @begin{short}
     Initializes the point to the given @arg{x}, @arg{y}, and @arg{z}
@@ -448,13 +454,13 @@
 (export 'point3d-init)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_init_from_point ()
+;;; graphene_point3d_init_from_point
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_point3d_init_from_point" point3d-init-from-point)
     (:pointer (:struct point3d-t))
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2025-4-2}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
   @argument[src]{a @symbol{graphene:point3d-t} instance to use}
   @return{The initialized @symbol{graphene:point3d-t} instance.}
@@ -466,13 +472,13 @@
 (export 'point3d-init-from-point)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_init_from_vec3 ()
+;;; graphene_point3d_init_from_vec3
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_point3d_init_from_vec3" point3d-init-from-vec3)
    (:pointer (:struct point3d-t))
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2025-4-2}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
   @argument[v]{a @symbol{graphene:vec3-t} instance to use}
   @return{The initialized @symbol{graphene:point3d-t} instance.}
@@ -485,16 +491,17 @@
 (export 'point3d-init-from-vec3)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_to_vec3 ()
+;;; graphene_point3d_to_vec3
 ;;; ----------------------------------------------------------------------------
 
 (defun point3d-to-vec3 (p v)
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2025-4-2}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
   @argument[v]{a @symbol{graphene:vec3-t} instance}
-  @return{The @symbol{graphene:vec3-t} instance with the coordinates of the
-    point.}
+  @begin{return}
+    The @symbol{graphene:vec3-t} instance with the coordinates of the point.
+  @end{return}
   @short{Stores the coordinates of the given point into a vector.}
   @begin[Examples]{dictionary}
     @begin{pre}
@@ -515,16 +522,17 @@
 (export 'point3d-to-vec3)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_equal ()
+;;; graphene_point3d_equal
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_point3d_equal" point3d-equal) :bool
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2025-4-2}
   @argument[a]{a @symbol{graphene:point3d-t} instance}
   @argument[b]{a @symbol{graphene:point3d-t} instance}
-  @return{@em{True}, if the points have the same coordinates, otherwise
-    @em{false}.}
+  @begin{return}
+    @em{True}, if the points have the same coordinates, otherwise @em{false}.
+  @end{return}
   @begin{short}
     Checks whether two given points are equal.
   @end{short}
@@ -539,18 +547,20 @@
 (export 'point3d-equal)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_near ()
+;;; graphene_point3d_near
 ;;; ----------------------------------------------------------------------------
 
 (defun point3d-near (a b epsilon)
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2025-4-2}
   @argument[a]{a @symbol{graphene:point3d-t} instance}
   @argument[b]{a @symbol{graphene:point3d-t} instance}
-  @argument[epsilon]{a number coerced to a float with the threshold between the
-    two points}
-  @return{@em{True}, if the distance between the points is within
-    @arg{epsilon}, otherwise @em{false}.}
+  @argument[epsilon]{a number coerced to a single float with the threshold
+    between the two points}
+  @begin{return}
+    @em{True}, if the distance between the points is within @arg{epsilon},
+    otherwise @em{false}.
+  @end{return}
   @begin{short}
     Checks whether the two points @arg{a} and @arg{b} are within the threshold
     of @arg{epsilon} equal.
@@ -566,20 +576,20 @@
 (export 'point3d-near)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_distance ()
+;;; graphene_point3d_distance
 ;;; ----------------------------------------------------------------------------
 
 (defun point3d-distance (a b delta)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-2}
   @syntax{(graphene:point-distance a b) => dist, delta}
   @argument[a]{a @symbol{graphene:point3d-t} instance}
   @argument[b]{a @symbol{graphene:point3d-t} instance}
-  @argument[delta]{a @symbol{graphene:vec3-t} instance with the calculated
-    distance components on the x, y, and z axis}
-  @argument[dist]{a float with the distance between two points}
+  @argument[delta]{a @symbol{graphene:vec3-t} instance for the calculated
+    distance components on the X, Y, and Z axis}
+  @argument[dist]{a single float for the distance between two points}
   @short{Computes the distance between the two given points.}
-  @begin[Example]{dictionary}
+  @begin[Examples]{dictionary}
     @begin{pre}
 (graphene:with-vec3 (v)
   (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
@@ -603,15 +613,15 @@
 (export 'point3d-distance)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_interpolate ()
+;;; graphene_point3d_interpolate
 ;;; ----------------------------------------------------------------------------
 
 (defun point3d-interpolate (a b factor result)
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2025-4-2}
   @argument[a]{a @symbol{graphene:point3d-t} instance}
   @argument[b]{a @symbol{graphene:point3d-t} instance}
-  @argument[factor]{a number coerced to a double float with the linear
+  @argument[factor]{a number coerced to a double float for the linear
     interpolation factor}
   @argument[result]{a @symbol{graphene:point3d-t} instance for the interpolated
     point}
@@ -644,14 +654,14 @@
 (export 'point3d-interpolate)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_scale ()
+;;; graphene_point3d_scale
 ;;; ----------------------------------------------------------------------------
 
 (defun point3d-scale (p factor result)
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2025-4-2}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
-  @argument[factor]{a number coerced to a float with the scaling factor}
+  @argument[factor]{a number coerced to a single float for the scaling factor}
   @argument[result]{a @symbol{graphene:point3d-t} instance for the scaled point}
   @return{The @symbol{graphene:point3d-t} instance with the scaled point.}
   @short{Scales the coordinates of the given point by the given factor.}
@@ -666,12 +676,12 @@
 (export 'point3d-scale)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_cross ()
+;;; graphene_point3d_cross
 ;;; ----------------------------------------------------------------------------
 
 (defun point3d-cross (a b result)
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2025-4-2}
   @argument[a]{a @symbol{graphene:point3d-t} instance}
   @argument[b]{a @symbol{graphene:point3d-t} instance}
   @argument[result]{a @symbol{graphene:point3d-t} instance for the cross
@@ -689,15 +699,15 @@
 (export 'point3d-cross)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_dot ()
+;;; graphene_point3d_dot
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_point3d_dot" point3d-dot) :float
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2025-4-2}
   @argument[a]{a @symbol{graphene:point3d-t} instance}
   @argument[b]{a @symbol{graphene:point3d-t} instance}
-  @return{The float with the value of the dot product.}
+  @return{The single float with the value of the dot product.}
   @short{Computes the dot product of the two given points.}
   @see-symbol{graphene:point3d-t}"
   (a (:pointer (:struct point3d-t)))
@@ -706,15 +716,17 @@
 (export 'point3d-dot)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_length ()
+;;; graphene_point3d_length
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_point3d_length" point3d-length) :float
  #+liber-documentation
- "@version{2023-9-22}
+ "@version{2025-4-2}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
-  @return{The float with the value of the length of the vector represented by
-    the point.}
+  @begin{return}
+    The single float with the value of the length of the vector represented by
+    the point.
+  @end{return}
   @begin{short}
     Computes the length of the vector represented by the coordinates of the
     given point.
@@ -725,12 +737,12 @@
 (export 'point3d-length)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_normalize ()
+;;; graphene_point3d_normalize
 ;;; ----------------------------------------------------------------------------
 
 (defun point3d-normalize (p result)
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2025-4-2}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
   @argument[result]{a @symbol{graphene:point3d-t} instance}
   @return{The @symbol{graphene:point3d-t} instance with the normalized point.}
@@ -748,19 +760,19 @@
 (export 'point3d-normalize)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_point3d_normalize_viewport ()
+;;; graphene_point3d_normalize_viewport
 ;;; ----------------------------------------------------------------------------
 
 (defun point3d-normalize-viewport (p viewport znear zfar result)
  #+liber-documentation
- "@version{2023-12-3}
+ "@version{2025-4-2}
   @argument[p]{a @symbol{graphene:point3d-t} instance}
   @argument[viewport]{a @symbol{graphene:rect-t} instance representing a
     viewport}
-  @argument[znear]{a number coerced to a float with the coordinate of the near
-    clipping plane, of 0.0 for the default near clipping plane}
-  @argument[zfar]{a number coerced to a float with the coordinate of the far
-    clipping plane, of 1.0 for the default far clipping plane}
+  @argument[znear]{a number coerced to a single float for the coordinate of the
+    near clipping plane, or 0.0 for the default near clipping plane}
+  @argument[zfar]{a number coerced to a single float for the coordinate of the
+    far clipping plane, or 1.0 for the default far clipping plane}
   @argument[result]{a @symbol{graphene:point3d-t} instance for the nomalized
     point}
   @return{The @symbol{graphene:point3d-t} instance with the normalized point.}

@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -55,9 +55,8 @@
 (in-package :graphene)
 
 (defmacro with-sphere ((var &rest args) &body body)
-
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-5}
   @syntax{(graphene:with-sphere (sphere) body) => result}
   @syntax{(graphene:with-sphere (sphere sphere1) body) => result}
   @syntax{(graphene:with-sphere (sphere center radius) body) => result}
@@ -67,7 +66,7 @@
     initialization}
   @argument[center]{a @symbol{graphene:point3d-t} instance to use for
     initialization}
-  @argument[radius]{a float with the radius of the sphere}
+  @argument[radius]{a single float for the radius of the sphere}
   @begin{short}
     The @fun{graphene:with-sphere} macro allocates a new
     @symbol{graphene:sphere-t} instance, initializes the sphere with the given
@@ -79,7 +78,7 @@
   zero. The initialization from another sphere is done with the
   @fun{graphene:sphere-init-from-sphere} function. The initialization with
   a center and a radius uses the @fun{graphene:sphere-init} function.
-  @begin[Note]{dictionary}
+  @begin[Notes]{dictionary}
     The memory is allocated with the @fun{graphene:sphere-alloc} function and
     released with the @fun{graphene:sphere-free} function.
   @end{dictionary}
@@ -89,43 +88,49 @@
   @see-function{graphene:sphere-alloc}
   @see-function{graphene:sphere-free}"
   (cond ((null args)
-         ;; We have no arguments, the default is initialization with zeros.
+         ;; No arguments, the default is initialization with zeros
          `(let ((,var (sphere-alloc)))
             (sphere-init ,var (point3d-zero) 0.0)
             (unwind-protect
               (progn ,@body)
               (sphere-free ,var))))
         ((null (second args))
-         ;; One argument, the argument must be of type sphere-t.
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 'sphere-t))
-                  ;; One argument with no type or of type sphere-t
+         ;; One argument of type sphere-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'sphere-t)
+                  ;; One argument of type sphere-t
                   `(let ((,var (sphere-alloc)))
-                     (sphere-init-from-sphere ,var ,arg)
+                     (sphere-init-from-sphere ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (sphere-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-SPHERE")))))
+                  ;; One argument with no type, default is sphere-t
+                  `(let ((,var (sphere-alloc)))
+                     (sphere-init-from-sphere ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (sphere-free ,var)))))))
         ((null (third args))
-         ;; We have two arguments. The first must be of type point3d-t and
-         ;; the second a float.
-         (destructuring-bind ((arg1 &optional type1)
-                              (arg2 &optional type2))
-             (list (mklist (first args)) (mklist (second args)))
-           (cond ((and (or (not type1)
-                           (eq type1 'point3d-t))
-                       (not type2))
-                  ;; First argument with no type or of type point3d-t and
-                  ;; second argument with no type.
+         ;; Two arguments. The first must be of type point3d-t and
+         ;; the second a single float.
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'point3d-t)
+                  ;; First argument of type point3d-t
                   `(let ((,var (sphere-alloc)))
-                     (sphere-init ,var ,arg1 ,arg2)
+                     (sphere-init ,var ,arg1 ,@(rest args))
                      (unwind-protect
                        (progn ,@body)
                        (sphere-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-SPHERE")))))
+                  ;; No type for first argument, default is point3d-t
+                  `(let ((,var (sphere-alloc)))
+                     (sphere-init ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (sphere-free ,var)))))))
         (t
          (error "Syntax error in GRAPHENE:WITH-SPHERE"))))
 
@@ -133,9 +138,9 @@
 
 (defmacro with-spheres (vars &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-5}
   @syntax{(graphene:with-spheres (sphere1 sphere2 ... spheren) body) => result}
-  @argument[sphere1 ... spheren]{the newly created @symbol{graphene:sphere-t}
+  @argument[sphere1 ... spheren]{newly created @symbol{graphene:sphere-t}
     instances}
   @argument[body]{a body that uses the bindings @arg{sphere1 ... spheren}}
   @begin{short}
@@ -168,7 +173,10 @@
 (setf (liber:alias-for-symbol 'sphere-t)
       "CStruct"
       (liber:symbol-documentation 'sphere-t)
- "@version{2023-12-6}
+ "@version{2025-4-5}
+  @begin{declaration}
+(cffi:defcstruct sphere-t)
+  @end{declaration}
   @begin{short}
     The @symbol{graphene:sphere-t} structure provides a representation of a
     sphere using its center and radius.
@@ -177,18 +185,18 @@
 (export 'sphere-t)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_alloc ()
+;;; graphene_sphere_alloc
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_alloc" sphere-alloc)
     (:pointer (:struct sphere-t))
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2025-4-5}
   @return{The newly allocated @symbol{graphene:sphere-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:sphere-t} instance.
   @end{short}
-  The contents of the returned instance are undefined.  Use the
+  The contents of the returned instance are undefined. Use the
   @fun{graphene:sphere-free} function to free the resources allocated by this
   function.
   @see-symbol{graphene:sphere-t}
@@ -197,12 +205,12 @@
 (export 'sphere-alloc)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_free ()
+;;; graphene_sphere_free
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_free" sphere-free) :void
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:sphere-alloc} function.
@@ -214,16 +222,17 @@
 (export 'sphere-free)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_init ()
+;;; graphene_sphere_init
 ;;; ----------------------------------------------------------------------------
 
 (defun sphere-init (sphere center radius)
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance to initialize}
-  @argument[center]{a @symbol{graphene:point3d-t} instance with the coordinates
+  @argument[center]{a @symbol{graphene:point3d-t} instance for the coordinates
     of the center of the sphere}
-  @argument[radius]{a number coerced to a float with the radius of the sphere}
+  @argument[radius]{a number coerced to a single float for the radius of the
+    sphere}
   @return{The initialized @symbol{graphene:sphere-t} instance.}
   @begin{short}
     Initializes the given @symbol{graphene:sphere-t} instance with the given
@@ -252,10 +261,10 @@
 
 (defun sphere-init-from-points (sphere points center)
  #+liber-documentation
- "@version{2024-12-29}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance to initialize}
   @argument[points]{a list of @symbol{graphene:point3d-t} instances}
-  @argument[center]{a @symbol{graphne:point3d-t} instance with the center of
+  @argument[center]{a @symbol{graphne:point3d-t} instance for the center of
     the sphere, or @code{nil}}
   @return{The initialized @symbol{graphene:sphere-t} instance.}
   @begin{short}
@@ -290,10 +299,10 @@
 
 (defun sphere-init-from-vectors (sphere vectors center)
  #+liber-documentation
- "@version{2024-12-29}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance to initialize}
   @argument[vectors]{a list of @symbol{graphene:vec3-t} instances}
-  @argument[center]{a @symbol{graphne:point3d-t} instance with the center of
+  @argument[center]{a @symbol{graphne:point3d-t} instance for the center of
     the sphere, or @code{nil}}
   @return{The initialized @symbol{graphene:sphere-t} instance.}
   @begin{short}
@@ -322,12 +331,12 @@
 
 (defun sphere-init-from-sphere (sphere source)
  #+liber-documentation
- "@version{#2023-12-10}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance to initialize}
   @argument[source]{a @symbol{graphene:sphere-t} instance for initialization}
   @return{The initialized @symbol{graphene:sphere-t} instance.}
   @short{Initialize a sphere from another sphere.}
-  @begin[Note]{dictionary}
+  @begin[Notes]{dictionary}
     This implementation is added to the Lisp library and not present in the
     Graphene C library.
   @end{dictionary}
@@ -338,17 +347,19 @@
 (export 'sphere-init-from-sphere)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_get_center ()
+;;; graphene_sphere_get_center
 ;;; ----------------------------------------------------------------------------
 
 (defun sphere-center (sphere center)
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @argument[center]{a @symbol{graphene:point3d-t} instance for the coordinates
     of the center}
-  @return{The @symbol{graphene:point3d-t} instance with the coordinates of the
-    center.}
+  @begin{return}
+    The @symbol{graphene:point3d-t} instance with the coordinates of the
+    center.
+  @end{return}
   @short{Retrieves the coordinates of the center of a sphere.}
   @see-symbol{graphene:sphere-t}
   @see-symbol{graphene:point3d-t}"
@@ -361,14 +372,14 @@
 (export 'sphere-center)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_get_radius ()
+;;; graphene_sphere_get_radius
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_get_radius" sphere-radius) :float
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
-  @return{The float with the radius.}
+  @return{The single float with the radius.}
   @short{Retrieves the radius of a sphere.}
   @see-symbol{graphene:sphere-t}"
   (sphere (:pointer (:struct sphere-t))))
@@ -376,7 +387,7 @@
 (export 'sphere-radius)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_get_bounding_box ()
+;;; graphene_sphere_get_bounding_box
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_get_bounding_box" %sphere-bounding-box) :void
@@ -385,7 +396,7 @@
 
 (defun sphere-bounding-box (sphere box)
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @argument[box]{a @symbol{graphene:box-t} instance for the bounding box}
   @return{The @symbol{graphene:box-t} instance with the bounding box.}
@@ -398,12 +409,12 @@
 (export 'sphere-bounding-box)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_is_empty ()
+;;; graphene_sphere_is_empty
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_is_empty" sphere-is-empty) :bool
  #+liber-documentation
- "@version{2023-12-6}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @return{@em{True} if the sphere is empty.}
   @short{Checks whether the sphere has a zero radius.}
@@ -413,15 +424,15 @@
 (export 'sphere-is-empty)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_distance ()
+;;; graphene_sphere_distance
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_distance" sphere-distance) :float
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
-  @return{The float with the distance of the point.}
+  @return{The single float with the distance of the point.}
   @begin{short}
     Computes the distance of the given point from the surface of a sphere.
   @end{short}
@@ -433,12 +444,12 @@
 (export 'sphere-distance)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_contains_point ()
+;;; graphene_sphere_contains_point
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_contains_point" sphere-contains-point) :bool
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
   @return{@em{True} if the sphere contains the point.}
@@ -453,7 +464,7 @@
 (export 'sphere-contains-point)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_translate ()
+;;; graphene_sphere_translate
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_translate" %sphere-translate) :void
@@ -463,9 +474,9 @@
 
 (defun sphere-translate (sphere point result)
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-5}
   @argument[sphere]{a @symbol{graphene:sphere-t} instance}
-  @argument[point]{a @symbol{graphene:point3d-t} instance with the deltas of
+  @argument[point]{a @symbol{graphene:point3d-t} instance for the deltas of
     the translation}
   @argument[result]{a @symbol{graphene:sphere-t} instance for the translated
     sphere}
@@ -482,12 +493,12 @@
 (export 'sphere-translate)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_sphere_equal ()
+;;; graphene_sphere_equal
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_sphere_equal" sphere-equal) :bool
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-5}
   @argument[a]{a @symbol{graphene:sphere-t} instance}
   @argument[b]{a @symbol{graphene:sphere-t} instance}
   @return{@em{True} if the spheres are equal.}

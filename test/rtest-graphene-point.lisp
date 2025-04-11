@@ -53,6 +53,33 @@
       (is (= 3.5 (graphene:point-x p)))
       (is (= 4.5 (graphene:point-y p))))))
 
+(test graphene-with-point.7
+  (let ((a 3.5) (b 4.5))
+    (graphene:with-point (p (+ a b) (- b a))
+      (is (= 8.0 (graphene:point-x p)))
+      (is (= 1.0 (graphene:point-y p))))))
+
+(test graphene-with-point.8
+  (graphene:with-point (p (graphene:point-zero))
+    (is (= 0.0 (graphene:point-x p)))
+    (is (= 0.0 (graphene:point-y p)))))
+
+(test graphene-with-point.9
+  (graphene:with-point (p ((graphene:point-zero) graphene:point-t))
+    (is (= 0.0 (graphene:point-x p)))
+    (is (= 0.0 (graphene:point-y p)))))
+
+(test graphene-with-point.10
+  (graphene:with-point (p ((graphene:vec2-one) graphene:vec2-t))
+    (is (= 1.0 (graphene:point-x p)))
+    (is (= 1.0 (graphene:point-y p)))))
+
+(test graphene-with-point.11
+  (graphene:with-point (p)
+    (graphene:with-point (p1 (graphene:point-init p 1 2))
+      (is (= 1.0 (graphene:point-x p)))
+      (is (= 2.0 (graphene:point-y p))))))
+
 ;;;     with-points
 
 (test graphene-with-points.1
@@ -89,7 +116,7 @@
 ;;;     graphene_point_free
 
 (test graphene-point-alloc/free
-  (let ((point nil))
+  (let (point)
     (is (cffi:pointerp (setf point (graphene:point-alloc))))
     (is (= 0.0 (graphene:point-x point)))
     (is (= 0.0 (graphene:point-y point)))
@@ -202,4 +229,4 @@
     (is (= 0.0 (graphene:point-x result)))
     (is (= 0.1 (graphene:point-y result)))))
 
-;;; 2023-12-10
+;;; 2025-4-2

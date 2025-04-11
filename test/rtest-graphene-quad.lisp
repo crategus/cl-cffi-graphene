@@ -29,13 +29,21 @@
     (graphene:with-quad (q r)
       (is (cffi:pointerp q)))))
 
+(test graphene-with-quad.4
+  (graphene:with-quad (q (graphene:rect-zero))
+    (is (cffi:pointerp q))))
+
+(test graphene-with-quad.5
+  (graphene:with-quad (q ((graphene:rect-zero) graphene:rect-t))
+    (is (cffi:pointerp q))))
+
 ;;; --- Functions --------------------------------------------------------------
 
 ;;;     graphene_quad_alloc
 ;;;     graphene_quad_free
 
-(test graphene-quad-alloc
-  (let ((quad nil))
+(test graphene-quad-alloc/free
+  (let (quad)
     (is (cffi:pointerp (setf quad (graphene:quad-alloc))))
     (is-false (graphene:quad-free quad))))
 
@@ -92,4 +100,4 @@
         (is (= 1.0 (graphene:point-x result)))
         (is (= 6.0 (graphene:point-y result)))))))
 
-;;; 2023-12-10
+;;; 2025-4-3

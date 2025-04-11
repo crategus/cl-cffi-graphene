@@ -61,6 +61,24 @@
       (is (= 4.5 (graphene:point3d-y p)))
       (is (= 5.5 (graphene:point3d-z p))))))
 
+(test graphene-with-point3d.7
+  (graphene:with-point3d (p (graphene:point3d-zero))
+    (is (= 0.0 (graphene:point3d-x p)))
+    (is (= 0.0 (graphene:point3d-y p)))
+    (is (= 0.0 (graphene:point3d-z p)))))
+
+(test graphene-with-point3d.8
+  (graphene:with-point3d (p ((graphene:point3d-zero) graphene:point3d-t))
+    (is (= 0.0 (graphene:point3d-x p)))
+    (is (= 0.0 (graphene:point3d-y p)))
+    (is (= 0.0 (graphene:point3d-z p)))))
+
+(test graphene-with-point3d.9
+  (graphene:with-point3d (p ((graphene:vec3-one) graphene:vec3-t))
+    (is (= 1.0 (graphene:point3d-x p)))
+    (is (= 1.0 (graphene:point3d-y p)))
+    (is (= 1.0 (graphene:point3d-z p)))))
+
 ;;;     with-point3ds
 
 (test graphene-with-point3ds.1
@@ -115,7 +133,7 @@
 ;;;     graphene_point3d_free
 
 (test graphene-point3d-alloc/free
-  (let ((point nil))
+  (let (point)
     (is (cffi:pointerp (setf point (graphene:point3d-alloc))))
     (is (= 0.0 (graphene:point3d-x point)))
     (is (= 0.0 (graphene:point3d-y point)))
@@ -307,4 +325,4 @@
         (is (= -0.5 (graphene:point3d-y result)))
         (is (= -1.0 (graphene:point3d-z result))))))
 
-;;; 2023-12-10
+;;; 2025-4-2

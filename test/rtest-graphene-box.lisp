@@ -25,7 +25,7 @@
 
 (test graphene-with-box.4
   (graphene:with-point3ds ((p1 0 0 0) (p2 1 1 1))
-    (graphene:with-box (box (p1 graphene:point3d-t) (p2 graphene:point3d-t))
+    (graphene:with-box (box (p1 graphene:point3d-t) p2)
       (is (cffi:pointerp box)))))
 
 (test graphene-with-box.5
@@ -35,7 +35,7 @@
 
 (test graphene-with-box.6
   (graphene:with-vec3s ((v1 0 0 0) (v2 1 1 1))
-    (graphene:with-box (box (v1 graphene:vec3-t) (v2 graphene:vec3-t))
+    (graphene:with-box (box (v1 graphene:vec3-t) v2)
       (is (cffi:pointerp box)))))
 
 (test graphene-with-boxes.1
@@ -470,4 +470,4 @@
     (is (= sb-ext:single-float-positive-infinity
            (graphene:point3d-z (graphene:box-max (graphene:box-infinite) max))))))
 
-;;; 2024-11-12
+;;; 2025-4-5

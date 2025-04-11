@@ -6,13 +6,9 @@ Graphene
   graphene.rectangle.lisp      Rectangular shape type            Graphene 1.10
   graphene.quad.lisp           Four-vertex quadrilateral         Graphene 1.10
   graphene.triangle.lisp       Triangle described by 3D points   Graphene 1.10
-  graphene.box.lisp            Axis-aligned bounding box         Graphene 1.10 .
+  graphene.box.lisp            Axis-aligned bounding box         Graphene 1.10
   graphene.sphere.lisp         Sphere                            Graphene 1.10
-  graphene.frustum.lisp        3D field of view                  Graphene 1.10 .
-
-SIMD vector — Low level floating point 4-sized vector
-SIMD matrix — Low level floating point 4 by 4 matrix
-
+  graphene.frustum.lisp        3D field of view                  Graphene 1.10
   graphene.vector.lisp         Vectors                           Graphene 1.10
   graphene.matrix.lisp         4x4 matrices                      Graphene 1.10
   graphene.euler.lisp          Euler angles                      Graphene 1.10
@@ -20,7 +16,9 @@ SIMD matrix — Low level floating point 4 by 4 matrix
   graphene.plane.lisp          Plane in 3D space                 Graphene 1.10
   graphene.ray.lisp            Ray emitted from an origin        Graphene 1.10
 
+SIMD vector — Low level floating point 4-sized vector
+SIMD matrix — Low level floating point 4 by 4 matrix
 Versioning information — Detemining the version of Graphene in use
 GObject integration — Types for GObject properties and signals
 
-2024-12-26
+2025-4-8

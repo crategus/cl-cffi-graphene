@@ -3,7 +3,7 @@
 ;;;
 ;;; The documentation in this file is taken from the GRAPHENE Reference Manual
 ;;; and modified to document the Lisp binding to the Graphene library, see
-;;; <https://ebassi.github.io/graphene/docs/>. The API documentation of the
+;;; <https://ebassi.github.io/graphene/docs/>. The API documentation for the
 ;;; Lisp binding is available at <http://www.crategus.com/books/cl-cffi-gtk4/>.
 ;;;
 ;;; Copyright (C) 2022 - 2025 Dieter Kaiser
@@ -57,7 +57,7 @@
 
 (defmacro with-plane ((var &rest args) &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-7}
   @syntax{(graphene:with-plane (plane) body) => result}
   @syntax{(graphene:with-plane (plane plane1) body) => result}
   @syntax{(graphene:with-plane (plane (v graphene:vec4-t) body) => result}
@@ -82,7 +82,7 @@
     values and executes the body that uses the box.
   @end{short}
   After execution of the body the allocated memory for the plane is released.
-  @begin[Note]{dictionary}
+  @begin[Notes]{dictionary}
     The memory is allocated with the @fun{graphene:plane-alloc} function and
     released with the @fun{graphene:plane-free} function.
   @end{dictionary}
@@ -101,53 +101,50 @@
               (progn ,@body)
               (plane-free ,var))))
         ((null (second args))
-         ;; One argument
-         (destructuring-bind (arg &optional type1) (mklist (first args))
-           (cond ((or (not type1)
-                      (eq type1 'plane-t))
-                  ;; One argument with no type or of type plane-t
+         ;; One argument of type plane-t or vec4-t
+         (dbind (arg1 &optional type1 &rest rest1) (mklist (first args))
+           (declare (ignore rest1))
+           (cond ((eq type1 'plane-t)
+                  ;; One argument of type plane-t
                   `(let ((,var (plane-alloc)))
-                     (plane-init-from-plane ,var ,arg)
+                     (plane-init-from-plane ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (plane-free ,var))))
                  ((eq type1 'vec4-t)
-                  ;; One argument with type vec4-t
+                  ;; One argument of type vec4-t
                   `(let ((,var (plane-alloc)))
-                     (plane-init-from-vec4 ,var ,arg)
+                     (plane-init-from-vec4 ,var ,arg1)
                      (unwind-protect
                        (progn ,@body)
                        (plane-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-PLANE")))))
+                  ;; One argument of no type, default is plane-t
+                  `(let ((,var (plane-alloc)))
+                     (plane-init-from-plane ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (plane-free ,var)))))))
         ((null (third args))
          ;; Two arguments
-         (destructuring-bind ((arg1 &optional type1)
-                              (arg2 &optional type2))
+         (dbind ((arg1 &optional type1 &rest rest1)
+                 (arg2 &optional type2 &rest rest2))
              (list (mklist (first args)) (mklist (second args)))
-           (cond ((and (or (not type1)
-                           (eq type1 'vec3-t))
-                       (or (not type2)
-                           (eq type2 :float)))
-                  ;; First argument with no type or of type vec3-t and
-                  ;; second argument with no type or type point3d-t
+           (declare (ignore arg1 type1 rest1 arg2 rest2))
+           (cond ((eq type2 'point3d-t)
+                  ;; Second argument of type point3d-t
                   `(let ((,var (plane-alloc)))
-                     (plane-init ,var ,arg1 ,arg2)
-                     (unwind-protect
-                       (progn ,@body)
-                       (plane-free ,var))))
-                 ((and (or (not type1)
-                           (eq type1 'vec3-t))
-                       (eq type2 'point3d-t))
-                  ;; First argument with no type or of type vec3-t and
-                  ;; second argument with type point3d-t
-                  `(let ((,var (plane-alloc)))
-                     (plane-init-from-point ,var ,arg1 ,arg2)
+                     (plane-init-from-point ,var ,@args)
                      (unwind-protect
                        (progn ,@body)
                        (plane-free ,var))))
                  (t
-                  (error "Syntax error in GRAPHENE:WITH-PLANE")))))
+                  ;; All other cases
+                  `(let ((,var (plane-alloc)))
+                     (plane-init ,var ,@args)
+                     (unwind-protect
+                       (progn ,@body)
+                       (plane-free ,var)))))))
         ((null (fourth args))
          ;; Three arguments
          `(let ((,var (plane-alloc)))
@@ -162,9 +159,9 @@
 
 (defmacro with-planes (vars &body body)
  #+liber-documentation
- "@version{2024-1-20}
+ "@version{2025-4-7}
   @syntax{(graphene:with-planes (plane1 ... planen) body) => result}
-  @argument[plane1 ... planen]{the newly created @symbol{graphene:plane-t}
+  @argument[plane1 ... planen]{newly created @symbol{graphene:plane-t}
     instances}
   @argument[body]{a body that uses the bindings @arg{plane1 ... planen}}
   @begin{short}
@@ -202,7 +199,12 @@
 (setf (liber:alias-for-symbol 'plane-t)
       "CStruct"
       (liber:symbol-documentation 'plane-t)
- "@version{2023-12-7}
+ "@version{2025-4-7}
+  @begin{declaration}
+(cffi:defcstruct plane-t
+  (normal :float :count 4)
+  (constant :float :count 4))
+  @end{declaration}
   @begin{short}
     The @symbol{graphene:plane-t} structure is a structure representing a plane
     that extends infinitely in 3D space.
@@ -214,12 +216,12 @@
 (export 'plane-t)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_alloc ()
+;;; graphene_plane_alloc
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_plane_alloc" plane-alloc) (:pointer (:struct plane-t))
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-7}
   @return{The newly allocated @symbol{graphene:plane-t} instance.}
   @begin{short}
     Allocates a new @symbol{graphene:plane-t} instance.
@@ -233,12 +235,12 @@
 (export 'plane-alloc)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_free ()
+;;; graphene_plane_free
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_plane_free" plane-free) :void
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance}
   @begin{short}
     Frees the resources allocated by the @fun{graphene:plane-alloc} function.
@@ -250,18 +252,18 @@
 (export 'plane-free)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_init ()
+;;; graphene_plane_init
 ;;; ----------------------------------------------------------------------------
 
 (defun plane-init (plane normal constant)
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance to initialize}
-  @argument[normal]{a @symbol{graphene:vec3-t} instance with a unit length
-    normal vector defining the plane pointing towards the origin, if unset, the
-    x axis is used by default}
-  @argument[constant]{a number coerced to a float with the distance from the
-    origin to the plane along the normal vector, the sign determines the
+  @argument[normal]{a @symbol{graphene:vec3-t} instance for a unit length
+    normal vector defining the plane pointing towards the origin, if unset,
+    the X axis is used by default}
+  @argument[constant]{a number coerced to a single float for the distance from
+    the origin to the plane along the normal vector, the sign determines the
     half-space occupied by the plane}
   @return{The initialized @symbol{graphene:plane-t} instance.}
   @begin{short}
@@ -280,15 +282,15 @@
 (export 'plane-init)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_init_from_vec4 ()
+;;; graphene_plane_init_from_vec4
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_plane_init_from_vec4" plane-init-from-vec4)
     (:pointer (:struct plane-t))
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance to initialize}
-  @argument[vector]{a @symbol{graphene:vec4-t} instance with the vector
+  @argument[vector]{a @symbol{graphene:vec4-t} instance for the vector
     containing the normal vector in its first three components, and the
     distance in its fourth component}
   @return{The initialized @symbol{graphene:plane-t} instance.}
@@ -303,13 +305,13 @@
 (export 'plane-init-from-vec4)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_init_from_plane ()
+;;; graphene_plane_init_from_plane
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_plane_init_from_plane" plane-init-from-plane)
     (:pointer (:struct plane-t))
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{#2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance to initialize}
   @argument[source]{a @symbol{graphene:plane-t} instance}
   @return{The initialized @symbol{graphene:plane-t} instance.}
@@ -324,15 +326,15 @@
 (export 'plane-init-from-plane)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_init_from_point ()
+;;; graphene_plane_init_from_point
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_plane_init_from_point" plane-init-from-point)
     (:pointer (:struct plane-t))
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{#2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance to initialize}
-  @argument[normal]{a @symbol{graphene:vec3-t} instance with the normal vector
+  @argument[normal]{a @symbol{graphene:vec3-t} instance for the normal vector
     defining the plane pointing towards the origin}
   @argument[point]{a @symbol{point3d-t} instance}
   @return{The initialized @symbol{graphene:plane-t} instance.}
@@ -350,13 +352,13 @@
 (export 'plane-init-from-point)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_init_from_points ()
+;;; graphene_plane_init_from_points
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_plane_init_from_points" plane-init-from-points)
     (:pointer (:struct plane-t))
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{#2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance to initialize}
   @argument[a]{a @symbol{graphene:point3d-t} instance}
   @argument[b]{a @symbol{graphene:point3d-t} instance}
@@ -377,12 +379,12 @@
 (export 'plane-init-from-points)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_normalize ()
+;;; graphene_plane_normalize
 ;;; ----------------------------------------------------------------------------
 
 (defun plane-normalize (plane result)
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{#2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance to initialize}
   @argument[result]{a @symbol{graphene:plane-t} instance for the result}
   @return{The normalized @symbol{graphene:plane-t} instance.}
@@ -400,12 +402,12 @@
 (export 'plane-normalize)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_negate ()
+;;; graphene_plane_negate
 ;;; ----------------------------------------------------------------------------
 
 (defun plane-negate (plane result)
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{#2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance to initialize}
   @argument[result]{a @symbol{graphene:plane-t} instance for the result}
   @return{The normalized @symbol{graphene:plane-t} instance.}
@@ -423,12 +425,12 @@
 (export 'plane-negate)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_equal ()
+;;; graphene_plane_equal
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_plane_equal" plane-equal) :bool
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{#2025-4-7}
   @argument[a]{a @symbol{graphene:plane-t} instance}
   @argument[b]{a @symbol{graphene:plane-t} instance}
   @return{@em{True} if the given planes are equal.}
@@ -440,15 +442,15 @@
 (export 'plane-equal)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_distance ()
+;;; graphene_plane_distance
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_plane_distance" plane-distance) :float
  #+liber-documentation
- "@version{#2023-12-7}
+ "@version{#2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance}
   @argument[point]{a @symbol{graphene:point3d-t} instance}
-  @return{The float with the distance of the given point from the plane.}
+  @return{The single float with the distance of the given point from the plane.}
   @short{Computes the distance of the point from the plane.}
   @see-symbol{graphene:plane-t}
   @see-symbol{graphene:point3d-t}"
@@ -463,7 +465,7 @@
 
 (defun plane-transform (plane matrix normal result)
  #+liber-documentation
- "@version{#2024-12-29}
+ "@version{#2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance}
   @argument[matrix]{a @symbol{graphene:matrix-t} instance}
   @argument[normal]{a @symbol{graphene:matrix-t} instance}
@@ -490,12 +492,12 @@
 (export 'plane-transform)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_get_normal ()
+;;; graphene_plane_get_normal
 ;;; ----------------------------------------------------------------------------
 
 (defun plane-normal (plane normal)
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance}
   @argument[normal]{a @symbol{graphene:vec3-t} instance for the normal vector}
   @return{The @symbol{graphene:vec3-t} instance with the normal vector.}
@@ -513,14 +515,14 @@
 (export 'plane-normal)
 
 ;;; ----------------------------------------------------------------------------
-;;; graphene_plane_get_constant ()
+;;; graphene_plane_get_constant
 ;;; ----------------------------------------------------------------------------
 
 (cffi:defcfun ("graphene_plane_get_constant" plane-constant) :float
  #+liber-documentation
- "@version{2023-12-7}
+ "@version{2025-4-7}
   @argument[plane]{a @symbol{graphene:plane-t} instance}
-  @return{The float with the constant value of the plane.}
+  @return{The single float with the constant value of the plane.}
   @begin{short}
     Retrieves the distance along the normal vector of the given plane from the
     origin.
