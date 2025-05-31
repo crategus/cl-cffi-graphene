@@ -60,7 +60,7 @@
 
 (defmacro with-point3d ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-2}
+ "@version{2025-05-09}
   @syntax{(graphene:with-point3d (p) body) => result}
   @syntax{(graphene:with-point3d (p p1) body) => result}
   @syntax{(graphene:with-point3d (p (v graphene:vec3-t)) body) => result}
@@ -79,7 +79,7 @@
   @end{short}
   After execution of the body the allocated memory for the point is released.
 
-  When no argument is given the components of the point are initialized to zero.
+  If no argument is given, the components of the point are initialized to zero.
   The initialization with three single floats uses the
   @fun{graphene:point3d-init} function. The initialization from another point
   is done with the @fun{graphene:point3d-init-from-point} function. That is the

@@ -51,7 +51,7 @@
 
 (defmacro with-size ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-3}
+ "@version{2025-05-09}
   @syntax{(graphene:with-size (s) body) => result}
   @syntax{(graphene:with-size (s s1) body) => result}
   @syntax{(graphene:with-size (s width height) body) => result}
@@ -66,7 +66,7 @@
   @end{short}
   After execution of the body the allocated memory for the size is released.
 
-  When no argument is given the components of the @symbol{graphene:size-t}
+  If no argument is given, the components of the @symbol{graphene:size-t}
   instance are initialized to zero. The initialization with two single floats
   uses the @fun{graphene:size-init} function. The initialization from another
   size is done with the @fun{graphene:size-init-from-size} function.

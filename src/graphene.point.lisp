@@ -54,7 +54,7 @@
 
 (defmacro with-point ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-2}
+ "@version{2025-05-09}
   @syntax{(graphene:with-point (p) body) => result}
   @syntax{(graphene:with-point (p p1) body) => result}
   @syntax{(graphene:with-point (p (v graphene:vec2-t)) body) => result}
@@ -71,7 +71,7 @@
   @end{short}
   After execution of the body the allocated memory for the point is released.
 
-  When no argument is given the components of the point are initialized to zero.
+  If no argument is given, the components of the point are initialized to zero.
   The initialization with two single floats uses the @fun{graphene:point-init}
   function. The initialization from another point is done with the
   @fun{graphene:point-init-from-point} function. That is the default when no

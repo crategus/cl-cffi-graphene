@@ -53,7 +53,7 @@
 
 (defmacro with-quad ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-3}
+ "@version{2025-05-09}
   @syntax{(graphene:with-quad (q) body) => result}
   @syntax{(graphene:with-quad (q r) body) => result}
   @syntax{(graphene:with-quad (q p0 p1 p2 p3) body) => result}
@@ -71,7 +71,7 @@
   After execution of the body the allocated memory for the quadrilateral is
   released.
 
-  When no argument is given the components of the quadrilateral are initialized
+  If no argument is given, the components of the quadrilateral are initialized
   to zeros. The initialization with four points uses the
   @fun{graphene:quad-init} function. The initialization from a rectangle is done
   with the @fun{graphene:quad-init-from-rect} function.

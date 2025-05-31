@@ -77,7 +77,7 @@
 
 (defmacro with-box ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-5}
+ "@version{2025-05-09}
   @syntax{(graphene:with-box (box) body) => result}
   @syntax{(graphene:with-box (box box1) body) => result}
   @syntax{(graphene:with-box (box pmin pmax) body) => result}
@@ -97,7 +97,7 @@
   @end{short}
   After execution of the body the allocated memory for the box is released.
 
-  When no argument is given the components of the box are initialized to zero.
+  If no argument is given, the components of the box are initialized to zero.
   The initialization with two points uses the @fun{graphene:box-init} function.
   If the first value has the @code{graphene:vec3-t} type the
   @fun{graphene:box-init-from-vec3} function is used for initialization with

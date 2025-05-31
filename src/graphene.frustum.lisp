@@ -53,7 +53,7 @@
 
 (defmacro with-frustum ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-5}
+ "@version{2025-05-09}
   @syntax{(graphene:with-frustum (frustum) body) => result}
   @syntax{(graphene:with-frustum (frustum frustum1) body) => result}
   @syntax{(graphene:with-frustum (frustum (matrix graphene:matrix-t)) body)
@@ -74,7 +74,7 @@
   @end{short}
   After execution of the body the allocated memory for the frustum is released.
 
-  When no argument is given the components of the frustum are undefined. The
+  If no argument is given, the components of the frustum are undefined. The
   initialization with another frustum uses the
   @fun{graphene:frustum-init-from-frustum} function. If the first value has the
   @code{graphene:matrix-t} type the @fun{graphene:frustum-init-from-matrix}

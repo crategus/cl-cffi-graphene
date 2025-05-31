@@ -65,7 +65,7 @@
 
 (defmacro with-euler ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-7}
+ "@version{2025-05-09}
   @syntax{(graphene:with-euler (euler) body) => result}
   @syntax{(graphene:with-euler (euler euler1) body) => result}
   @syntax{(graphene:with-euler (euler (mat graphene:matrix-t)) body) => result}
@@ -100,7 +100,7 @@
   @end{short}
   After execution of the body the allocated memory for the instance is released.
 
-  When no argument is given the components of the instance are initialized with
+  If no argument is given, the components of the instance are initialized with
   zeros. The initialization from another instance is done with the
   @fun{graphene:euler-init-from-euler} function. The initialization from other
   Graphene types is done with the @fun{graphene:euler-init-from-matrix},

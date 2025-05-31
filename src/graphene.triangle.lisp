@@ -59,7 +59,7 @@
 
 (defmacro with-triangle ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-5}
+ "@version{2025-05-09}
   @syntax{(graphene:with-triangle (triangle) body) => result}
   @syntax{(graphene:with-triangle (triangle p1 p2 p3) body) => result}
   @syntax{(graphene:with-triangle (triangle (v1 graphene:vec3-t) v2 v3) body)
@@ -82,7 +82,7 @@
   @end{short}
   After execution of the body the allocated memory for the triangle is released.
 
-  When no argument is given the components of the triangle are not definied.
+  If no argument is given, the components of the triangle are not definied.
   The initialization with three points uses the
   @fun{graphene:triangle-init-from-point3d} function. If the first value has
   the @code{graphene:vec3-t} type the @fun{graphene:triangle-init-from-vec3} is

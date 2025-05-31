@@ -56,7 +56,7 @@
 
 (defmacro with-sphere ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-5}
+ "@version{2025-05-09}
   @syntax{(graphene:with-sphere (sphere) body) => result}
   @syntax{(graphene:with-sphere (sphere sphere1) body) => result}
   @syntax{(graphene:with-sphere (sphere center radius) body) => result}
@@ -74,7 +74,7 @@
   @end{short}
   After execution of the body the allocated memory for the sphere is released.
 
-  When no argument is given the components of the sphere are initialized to
+  If no argument is given, the components of the sphere are initialized to
   zero. The initialization from another sphere is done with the
   @fun{graphene:sphere-init-from-sphere} function. The initialization with
   a center and a radius uses the @fun{graphene:sphere-init} function.

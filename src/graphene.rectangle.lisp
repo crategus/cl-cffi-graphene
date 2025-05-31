@@ -76,7 +76,7 @@
 
 (defmacro with-rect ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-3}
+ "@version{2025-05-09}
   @syntax{(graphene:with-rect (rect) body) => result}
   @syntax{(graphene:with-rect (rect src) body) => result}
   @syntax{(graphene:with-rect (rect x y width height) body) => result}
@@ -94,7 +94,7 @@
   After execution of the body the allocated memory for the rectangle is
   released.
 
-  When no argument is given the components of the rectangle are initialized to
+  If no argument is given, the components of the rectangle are initialized to
   zero. The initialization with four single floats uses the
   @fun{graphene:rect-init} function. The initialization from another rectangle
   is done with the @fun{graphene:rect-init-from-rect} function.

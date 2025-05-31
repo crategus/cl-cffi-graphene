@@ -146,7 +146,7 @@
 
 (defmacro with-vec2 ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-5}
+ "@version{2025-05-09}
   @syntax{(graphene:with-vec2 (v) body) => result}
   @syntax{(graphene:with-vec2 (v v1) body) => result}
   @syntax{(graphene:with-vec2 (v x y) body) => result}
@@ -161,7 +161,7 @@
   @end{short}
   After execution of the body the allocated memory for the vector is released.
 
-  When no argument is given the components of the vector are initialized to
+  If no argument is given, the components of the vector are initialized to
   zero. The initialization from another vector is done with the
   @fun{graphene:vec2-init-from-vec2} function. The initialization with two
   values @arg{x} and @arg{y} uses the @fun{graphene:vec2-init} function.
@@ -240,7 +240,7 @@
 
 (defmacro with-vec3 ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-5}
+ "@version{2025-05-09}
   @syntax{(graphene:with-vec3 (v) body) => result}
   @syntax{(graphene:with-vec3 (v v1) body) => result}
   @syntax{(graphene:with-vec3 (v x y z) body) => result}
@@ -256,7 +256,7 @@
   @end{short}
   After execution of the body the allocated memory for the vector is released.
 
-  When no argument is given the components of the vector are initialized to
+  If no argument is given, the components of the vector are initialized to
   zero. The initialization from another vector is done with the
   @fun{graphene:vec3-init-from-vec3} function. The initialization with three
   values @arg{x}, @arg{y} and @arg{z} uses the @fun{graphene:vec3-init}
@@ -336,7 +336,7 @@
 
 (defmacro with-vec4 ((var &rest args) &body body)
  #+liber-documentation
- "@version{2025-4-5}
+ "@version{2025-05-09}
   @syntax{(graphene:with-vec4 (v) body) => result}
   @syntax{(graphene:with-vec4 (v v1) body) => result}
   @syntax{(graphene:with-vec4 (v v2 w) body) => result}
@@ -357,7 +357,7 @@
   @end{short}
   After execution of the body the allocated memory for the vector is released.
 
-  When no argument is given the components of the vector are initialized to
+  If no argument is given, the components of the vector are initialized to
   zero. The initialization from another vector is done with the
   @fun{graphene:vec4-init-from-vec4} function. The initialization with two
   values uses the @fun{graphene:vec4-init-from-vec3} function and the
